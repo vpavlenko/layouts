@@ -249,7 +249,7 @@ const createChordTaskConfig = (
   };
 };
 
-export const TASKS_ON_MAJOR_CHORDS = {
+export const TASKS_ON_MAJOR_CHORDS: Record<string, TaskConfig> = {
   "play-c-major-chord": createChordTaskConfig(0, "C-major"),
   "play-c-sharp-major-chord": createChordTaskConfig(1, "C#-major", ["C-major"]),
   "play-d-major-chord": createChordTaskConfig(2, "D-major", [
