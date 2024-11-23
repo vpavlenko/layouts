@@ -1,9 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import Keyboard from "react-simple-keyboard";
 import "react-simple-keyboard/build/css/index.css";
 import { KEY_DISPLAY_LABELS, KeyboardMapping } from "../constants/keyboard";
 import { getColors, getLabelColorForNote } from "../utils/colors";
-import { TASK_CONFIGS } from "../tasks/tasks";
 
 interface KeyboardState {
   activeKeyCodes: Set<string>;
@@ -12,7 +11,6 @@ interface KeyboardState {
 
 interface PianoKeyboardProps {
   keyboardState: KeyboardState;
-  activeTaskId: string | null;
 }
 
 const KEYBOARD_LAYOUT = {
@@ -26,133 +24,95 @@ const KEYBOARD_LAYOUT = {
 
 export const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
   keyboardState,
-  activeTaskId,
 }) => {
-  // Function to manage keyboard styles
-  const updateKeyStyles = (
-    keyCode: string,
-    backgroundColor: string,
-    textColor: string,
-    isActive: boolean = false
-  ) => {
-    const styleId = `keyboard-style-${keyCode}`;
-    let styleEl = document.getElementById(styleId) as HTMLStyleElement;
+  const keyboardRef = useRef<HTMLDivElement>(null);
+  const styleSheetRef = useRef<HTMLStyleElement | null>(null);
 
-    if (!styleEl) {
-      styleEl = document.createElement("style");
-      styleEl.id = styleId;
-      document.head.appendChild(styleEl);
+  // Create a single stylesheet for all keyboard styles
+  const createStyleSheet = useCallback((mapping: KeyboardMapping) => {
+    if (!styleSheetRef.current) {
+      styleSheetRef.current = document.createElement("style");
+      styleSheetRef.current.id = "piano-keyboard-styles";
+      document.head.appendChild(styleSheetRef.current);
     }
 
-    const activeStyles = isActive
-      ? `
-        .simple-keyboard-base .${keyCode}-mapped.key-active {
+    const colors = getColors(0, "chromatic");
+    let css = "";
+
+    Object.entries(mapping).forEach(([keyCode, { note }]) => {
+      const backgroundColor = colors[note];
+      const textColor = getLabelColorForNote(note);
+      css += `
+        .simple-keyboard-base .hg-button.${keyCode}-mapped {
           background: ${backgroundColor} !important;
           color: ${textColor} !important;
-          transform: scale(0.8);
-        }`
-      : "";
+        }
+      `;
+    });
 
-    styleEl.textContent = `
-      .simple-keyboard-base .${keyCode}-mapped {
-        background: ${backgroundColor} !important;
-        color: ${textColor} !important;
+    // Add styles for unmapped keys
+    Object.keys(KEY_DISPLAY_LABELS).forEach((keyCode) => {
+      if (!mapping[keyCode]) {
+        css += `
+          .simple-keyboard-base .hg-button.${keyCode}-mapped {
+            background: #444 !important;
+            color: rgba(255, 255, 255, 0.3) !important;
+          }
+        `;
       }
-      ${activeStyles}
-    `;
-  };
+    });
+
+    styleSheetRef.current.textContent = css;
+
+    console.log("Applied keyboard styles:", {
+      mappingSize: Object.keys(mapping).length,
+      cssLength: css.length,
+      sampleStyle: css.split("}")[0] + "}",
+    });
+  }, []);
+
+  // Apply styles when mapping changes
+  useEffect(() => {
+    if (keyboardState.taskKeyboardMapping) {
+      createStyleSheet(keyboardState.taskKeyboardMapping);
+    }
+
+    // Cleanup
+    return () => {
+      if (styleSheetRef.current) {
+        styleSheetRef.current.remove();
+        styleSheetRef.current = null;
+      }
+    };
+  }, [keyboardState.taskKeyboardMapping, createStyleSheet]);
 
   // Function to get button themes
-  const getButtonTheme = (keyboardState: KeyboardState) => {
-    if (!activeTaskId || !keyboardState.taskKeyboardMapping) return [];
+  const getButtonTheme = useCallback(() => {
+    const mapping = keyboardState.taskKeyboardMapping;
+    if (!mapping) return [];
 
-    const taskConfig = TASK_CONFIGS[activeTaskId];
-    if (!taskConfig?.keyboardMapping) return [];
-
-    const colors = getColors(0, taskConfig.colorMode || "chromatic");
-    const buttonTheme: Array<{ class: string; buttons: string }> = [];
-
-    // Create mapping of key labels to notes
-    const keyLabelToNote: Record<string, number> = {};
-    Object.entries(taskConfig.keyboardMapping).forEach(([keyCode, mapping]) => {
-      const keyLabel = KEY_DISPLAY_LABELS[keyCode]?.toLowerCase();
-      if (keyLabel) {
-        keyLabelToNote[keyLabel] = mapping.note;
-      }
-    });
-
-    // Apply styles for all keyboard keys
-    Object.entries(KEY_DISPLAY_LABELS).forEach(([keyCode, label]) => {
-      const keyLabel = label.toLowerCase();
-      const note = keyLabelToNote[keyLabel];
-      const isActive = keyboardState.activeKeyCodes.has(keyCode);
-
-      if (note !== undefined) {
-        const backgroundColor = colors[note];
-        const textColor = getLabelColorForNote(note);
-
-        updateKeyStyles(keyCode, backgroundColor, textColor, isActive);
-
-        buttonTheme.push({
-          class: `${keyCode}-mapped${isActive ? " key-active" : ""}`,
-          buttons: keyLabel,
-        });
-      } else {
-        updateKeyStyles(keyCode, "#444", "rgba(255, 255, 255, 0.3)");
-        buttonTheme.push({
-          class: `${keyCode}-unmapped`,
-          buttons: keyLabel,
-        });
-      }
-    });
-
-    return buttonTheme;
-  };
+    return Object.entries(KEY_DISPLAY_LABELS).map(([keyCode, label]) => ({
+      class: `${keyCode}-mapped`,
+      buttons: label.toLowerCase(),
+    }));
+  }, [keyboardState.taskKeyboardMapping]);
 
   // Function to get display mapping
-  const getDisplay = () => {
-    if (!activeTaskId) return {};
-
-    const taskConfig = TASK_CONFIGS[activeTaskId];
-    if (!taskConfig?.keyboardMapping) return {};
-
-    const display: Record<string, string> = {};
+  const getDisplay = useCallback(() => {
     const keys = "1234567890-=qwertyuiop[]asdfghjkl;'zxcvbnm,./";
-
-    // Initialize all keys as empty
+    const display: Record<string, string> = {};
     keys.split("").forEach((key) => {
-      display[key] = " ";
+      display[key] = key;
     });
-
-    // Set mapped keys to be visible
-    Object.entries(taskConfig.keyboardMapping).forEach(([key]) => {
-      const keyLabel = KEY_DISPLAY_LABELS[key]?.toLowerCase();
-      if (keyLabel) {
-        display[keyLabel] = keyLabel;
-      }
-    });
-
     return display;
-  };
-
-  // Cleanup styles on unmount
-  useEffect(() => {
-    return () => {
-      Object.keys(KEY_DISPLAY_LABELS).forEach((keyCode) => {
-        const styleEl = document.getElementById(`keyboard-style-${keyCode}`);
-        if (styleEl) {
-          styleEl.remove();
-        }
-      });
-    };
   }, []);
 
   return (
-    <div className="w-[290px]">
+    <div className="w-[290px]" ref={keyboardRef}>
       <Keyboard
         layout={KEYBOARD_LAYOUT}
         display={getDisplay()}
-        buttonTheme={getButtonTheme(keyboardState)}
+        buttonTheme={getButtonTheme()}
         mergeDisplay={true}
         physicalKeyboardHighlight={false}
         physicalKeyboardHighlightPress={false}

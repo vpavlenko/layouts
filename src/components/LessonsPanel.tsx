@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Lesson, LESSONS } from "../data/lessons";
-import { Bars3Icon } from "@heroicons/react/24/outline";
+import { Bars3Icon, ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { URL_PREFIX } from "../constants/routes";
 import { Task } from "./Task";
@@ -134,22 +134,27 @@ export const LessonsPanel: React.FC<LessonsPanelProps> = React.memo(
         {/* Keyboard section - moved to top */}
         <div className="bg-gray-900 p-4 border-b border-gray-800">
           <div className="w-full flex justify-end">
-            <PianoKeyboard
-              keyboardState={keyboardState}
-              activeTaskId={activeTaskId}
-            />
+            <PianoKeyboard keyboardState={keyboardState} />
           </div>
         </div>
 
         {/* Menu Header */}
         <div className="bg-gray-900 z-20 p-8 pb-4 border-b border-gray-800">
           <div className="flex items-center gap-2 mb-4">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 bg-gray-800 rounded border border-gray-700 hover:bg-gray-700 relative z-20 pointer-events-auto"
-            >
-              <Bars3Icon className="w-6 h-6" />
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="p-2 bg-gray-800 rounded border border-gray-700 hover:bg-gray-700 relative z-20 pointer-events-auto"
+              >
+                <Bars3Icon className="w-6 h-6" />
+              </button>
+              <Link
+                to={`${URL_PREFIX}/mappings`}
+                className="p-2 bg-gray-800 rounded border border-gray-700 hover:bg-gray-700 relative z-20 pointer-events-auto"
+              >
+                <ShoppingBagIcon className="w-6 h-6" />
+              </Link>
+            </div>
 
             <div className="flex-1 flex gap-2">
               <div className={`flex-1 ${nextLesson ? "w-1/2" : "w-full"}`}>
