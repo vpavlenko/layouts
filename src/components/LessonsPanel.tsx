@@ -3,8 +3,6 @@ import { Lesson, LESSONS } from "../data/lessons";
 import { Bars3Icon, ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { URL_PREFIX } from "../constants/routes";
-import { Task } from "./Task";
-import { TASK_CONFIGS } from "../tasks/tasks";
 import type { TaskProgress } from "../tasks/tasks";
 import { KeyboardMapping } from "../constants/keyboard";
 import { Layout } from "./Layout";
@@ -23,16 +21,12 @@ interface LessonsPanelProps {
   keyboardState: KeyboardState;
 }
 
-// Memoize the Task components
-const MemoizedTask = React.memo(Task);
-
 export const LessonsPanel: React.FC<LessonsPanelProps> = React.memo(
   ({
     currentLessonId,
     onLessonChange,
     taskProgress,
     activeTaskId,
-    onSkipTask,
     keyboardState,
   }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -131,7 +125,7 @@ export const LessonsPanel: React.FC<LessonsPanelProps> = React.memo(
 
     return (
       <div className="fixed top-0 left-0 w-[600px] h-screen bg-gray-900 text-white flex flex-col">
-        {/* Keyboard section - moved to top */}
+        {/* Keyboard section */}
         <div className="bg-gray-900 p-4 border-b border-gray-800">
           <div className="w-full flex justify-end">
             <Layout keyboardState={keyboardState} />
@@ -239,42 +233,6 @@ export const LessonsPanel: React.FC<LessonsPanelProps> = React.memo(
                     taskProgress,
                     currentLesson
                   )}
-                  {currentLesson.taskIds.map((taskId, index) => (
-                    <MemoizedTask
-                      key={taskId}
-                      taskConfig={TASK_CONFIGS[taskId]}
-                      data-task-id={taskId}
-                      progress={
-                        taskProgress.find((t) => t.taskId === taskId)
-                          ?.progress ?? 0
-                      }
-                      status={
-                        taskProgress.find((t) => t.taskId === taskId)?.status ??
-                        "active"
-                      }
-                      previousTaskCompleted={
-                        index === 0
-                          ? true
-                          : taskProgress.some(
-                              (t) =>
-                                t.taskId === currentLesson.taskIds[index - 1] &&
-                                t.status === "completed"
-                            )
-                      }
-                      isActive={taskId === activeTaskId}
-                      onSkip={onSkipTask}
-                    />
-                  ))}
-                  {currentLesson.finalText &&
-                    currentLesson.taskIds.every((taskId) =>
-                      taskProgress.some(
-                        (t) => t.taskId === taskId && t.status === "completed"
-                      )
-                    ) && (
-                      <p className="mt-6 text-gray-400 italic">
-                        {currentLesson.finalText}
-                      </p>
-                    )}
                 </div>
               )}
             </div>

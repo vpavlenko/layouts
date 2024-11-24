@@ -10,11 +10,7 @@ import { immediate } from "tone";
 import { useParams, useNavigate } from "react-router-dom";
 import { LESSONS } from "../data/lessons";
 import { URL_PREFIX } from "../constants/routes";
-import {
-  TASK_CONFIGS,
-  canTaskBeActivated,
-  getNextTaskId,
-} from "../tasks/tasks";
+import { TASK_CONFIGS, getNextTaskId } from "../tasks/tasks";
 import { ensureSamplerLoaded } from "../audio/sampler";
 
 const NOTE_NAMES = [
@@ -46,95 +42,18 @@ export interface PianoControllerState {
   taskPlayedNotes: Record<string, Set<string>>;
 }
 
-const getLastTaskInLesson = (lessonId: number): string | null => {
-  const lesson = LESSONS.find((l) => l.id === lessonId);
-  if (!lesson || !lesson.taskIds.length) return null;
-  return lesson.taskIds[lesson.taskIds.length - 1];
-};
-
 const getActiveTaskId = (
   state: PianoControllerState,
   currentLessonId: number
 ): string | null => {
-  console.log("[getActiveTaskId] Called with:", {
-    taskProgress: state.taskProgress,
-    currentLessonId,
-    pendingNextTask: state.pendingNextTask,
-  });
-
   const currentLesson = LESSONS.find((l) => l.id === currentLessonId);
   if (!currentLesson) {
     console.log("No lesson found for id:", currentLessonId);
     return null;
   }
 
-  // Check if this is the free play lesson
-  if (currentLesson.taskIds.length === 0) {
-    return null;
-  }
-
-  // First check for any completing tasks - they take priority
-  const completingTask = state.taskProgress.find(
-    (t) => t.status === "completing"
-  );
-  if (completingTask) {
-    console.log("Found completing task:", completingTask.taskId);
-    return completingTask.taskId;
-  }
-
-  // Check if current lesson is completed
-  const allTasksCompleted = currentLesson.taskIds.every((taskId) =>
-    state.taskProgress.some(
-      (t) => t.taskId === taskId && t.status === "completed"
-    )
-  );
-
-  if (allTasksCompleted) {
-    console.log("All tasks completed in lesson:", currentLessonId);
-    return getLastTaskInLesson(currentLessonId);
-  }
-
-  // Then handle pending task transitions
-  if (state.pendingNextTask) {
-    if (state.activeKeysSize > 0) {
-      const currentTaskId =
-        state.taskProgress.find((t) => t.status === "active")?.taskId ?? null;
-      console.log(
-        "Waiting for key releases before activating:",
-        state.pendingNextTask
-      );
-      console.log("Staying with current task:", currentTaskId);
-      return currentTaskId;
-    }
-
-    console.log("Activating pending task:", state.pendingNextTask);
-    return state.pendingNextTask;
-  }
-
-  // First check if there's already an active task
-  const activeTask = state.taskProgress.find((t) => t.status === "active");
-  if (activeTask && currentLesson.taskIds.includes(activeTask.taskId)) {
-    console.log("Found existing active task:", activeTask.taskId);
-    return activeTask.taskId;
-  }
-
-  // Find first incomplete task in current lesson
-  for (const taskId of currentLesson.taskIds) {
-    console.log("Checking task:", taskId);
-    const taskState = state.taskProgress.find((t) => t.taskId === taskId);
-    console.log("Task state:", taskState);
-
-    // If task doesn't exist or is not completed
-    if (!taskState || taskState.status !== "completed") {
-      if (canTaskBeActivated(taskId, state.taskProgress, currentLessonId)) {
-        console.log(`Activating task: ${taskId}`);
-        return taskId;
-      }
-    }
-  }
-
-  console.log("No active task found - all completed");
-  return null;
+  // Always return the last task of the lesson for free play
+  return currentLesson.taskIds[currentLesson.taskIds.length - 1] || null;
 };
 
 export const PianoController: React.FC = () => {
@@ -458,61 +377,35 @@ export const PianoController: React.FC = () => {
 
   const handleLessonChange = useCallback(
     (lessonId: number) => {
-      console.log("[lessonChange] Changing to lesson:", lessonId, {
-        currentLessonId,
-        lessonId,
-      });
-
+      console.log("[lessonChange] Changing to lesson:", lessonId);
       const currentLesson = LESSONS.find((l) => l.id === lessonId);
       if (!currentLesson) return;
 
-      const firstTaskId = currentLesson.taskIds[0];
-      console.log("[lessonChange] Lesson info:", {
-        currentLesson,
-        firstTaskId,
-        hasTaskIds: currentLesson.taskIds.length,
-      });
+      // Get the last task ID for this lesson
+      const lastTaskId =
+        currentLesson.taskIds[currentLesson.taskIds.length - 1];
 
-      // Reset all task states for the new lesson
-      const newTaskProgress = currentLesson.taskIds.map((taskId) => ({
-        taskId,
-        progress: 0,
-        status: "active" as const,
-      }));
-
-      // Reset sequence indices and played notes for all tasks in the lesson
-      const newSequenceIndices: Record<string, number> = {};
-      const newTaskPlayedNotes: Record<string, Set<string>> = {};
-
-      currentLesson.taskIds.forEach((taskId) => {
-        const taskConfig = TASK_CONFIGS[taskId];
-        if (taskConfig) {
-          if (taskConfig.checker.type === "sequence") {
-            newSequenceIndices[taskId] = 0;
-          }
-          newTaskPlayedNotes[taskId] = new Set();
-        }
-      });
-
-      // Update all states at once
+      // Reset states but mark the last task as completed if it exists
       setState((prev) => ({
         ...prev,
-        taskProgress: newTaskProgress,
-        sequenceIndices: newSequenceIndices,
+        taskProgress: lastTaskId
+          ? [
+              {
+                taskId: lastTaskId,
+                progress: TASK_CONFIGS[lastTaskId]?.total || 0,
+                status: "completed",
+              },
+            ]
+          : [],
+        sequenceIndices: {},
         pendingNextTask: null,
       }));
 
-      setTaskPlayedNotes(newTaskPlayedNotes);
+      setTaskPlayedNotes({});
       setCurrentLessonId(lessonId);
       navigate(`${URL_PREFIX}/${lessonId}`);
-
-      console.log("[lessonChange] Reset states:", {
-        newTaskProgress,
-        newSequenceIndices,
-        newTaskPlayedNotes,
-      });
     },
-    [currentLessonId, navigate]
+    [navigate]
   );
 
   useEffect(() => {
