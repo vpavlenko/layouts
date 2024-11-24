@@ -11,7 +11,7 @@ import {
 import { PianoControls } from "./PianoControls";
 import { Voicing } from "../constants/voicings";
 import { StopIcon } from "@heroicons/react/24/solid";
-import { TASK_CONFIGS, TaskConfig } from "../tasks/tasks";
+import { TASK_CONFIGS } from "../tasks/tasks";
 import type { TaskProgress } from "../tasks/tasks";
 import { PianoControllerState } from "./PianoController";
 
@@ -303,168 +303,6 @@ const countWhiteKeysInRange = (start: number, length: number): number => {
   return count;
 };
 
-// Update TaskIndicator component to add debug output
-const TaskIndicator: React.FC<{
-  noteKey?: string;
-  note: number;
-  octave: number;
-  keyWidth: number;
-  isPlayed?: boolean;
-  isCurrent?: boolean;
-  isSetMode?: boolean;
-  colorMode: ColorMode;
-}> = ({
-  note,
-  octave,
-  keyWidth,
-  isPlayed,
-  isCurrent,
-  isSetMode,
-  colorMode,
-}) => {
-  const left = calculateKeyLeftPosition(note, octave, keyWidth, colorMode);
-
-  console.log("[TaskIndicator] Rendering:", {
-    note,
-    octave,
-    isPlayed,
-    isCurrent,
-    isSetMode,
-    left,
-  });
-
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left: left,
-        bottom: 0,
-        color: isPlayed ? "#4ade80" : "white",
-        fontSize: "20px",
-        transform: isCurrent ? "translateY(-5px)" : "none",
-        transition: "transform 0.2s ease-in-out",
-        width: colorMode === "flat-chromatic" ? keyWidth * (7 / 12) : keyWidth,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      {isPlayed ? "✓" : isCurrent ? "↓" : ""}
-    </div>
-  );
-};
-
-// Update TaskIndicators to properly handle both checker types
-interface TaskIndicatorsProps {
-  taskConfig: TaskConfig;
-  totalWidth: number;
-  keyWidth: number;
-  activeKeysCount: number;
-  isCompleting: boolean;
-  colorMode: ColorMode;
-  currentIndex: number;
-  playedNotes: Set<string>;
-}
-
-const TaskIndicators: React.FC<TaskIndicatorsProps> = ({
-  taskConfig,
-  totalWidth,
-  keyWidth,
-  activeKeysCount,
-  isCompleting,
-  colorMode,
-  currentIndex,
-  playedNotes,
-}) => {
-  // Get the current state from the checker
-  const checkerState =
-    taskConfig.checker.type === "sequence"
-      ? taskConfig.checker.getState(currentIndex)
-      : taskConfig.checker.getState(playedNotes);
-
-  console.log("[TaskIndicators] Checker state:", {
-    type: taskConfig.checker.type,
-    state: checkerState,
-    currentIndex,
-    playedNotes,
-  });
-
-  return (
-    <div
-      style={{
-        position: "absolute",
-        top: -30,
-        left: 0,
-        width: totalWidth,
-        height: "30px",
-        display: "flex",
-        alignItems: "flex-end",
-      }}
-    >
-      {/* Release keys message */}
-      {isCompleting && activeKeysCount > 0 && (
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: "50%",
-            transform: "translateX(-50%)",
-            color: "rgba(255, 255, 255, 0.5)",
-            fontSize: "14px",
-            whiteSpace: "nowrap",
-            padding: "4px 12px",
-            borderRadius: "4px",
-            background: "rgba(0, 0, 0, 0.6)",
-          }}
-        >
-          Release all keys to continue
-        </div>
-      )}
-
-      {/* Only show indicators if not completing */}
-      {!isCompleting && (
-        <>
-          {/* Show completed notes */}
-          {checkerState.completedNotes.map(({ note, octave }) => {
-            console.log("[TaskIndicator] Rendering completed note:", {
-              note,
-              octave,
-            });
-            return (
-              <TaskIndicator
-                key={`completed-${note}-${octave}`}
-                note={note}
-                octave={octave}
-                keyWidth={keyWidth}
-                isPlayed={true}
-                colorMode={colorMode}
-              />
-            );
-          })}
-
-          {/* Show active targets */}
-          {checkerState.activeTargets.map(({ note, octave }) => {
-            console.log("[TaskIndicator] Rendering active target:", {
-              note,
-              octave,
-            });
-            return (
-              <TaskIndicator
-                key={`active-${note}-${octave}`}
-                note={note}
-                octave={octave}
-                keyWidth={keyWidth}
-                isCurrent={true}
-                colorMode={colorMode}
-              />
-            );
-          })}
-        </>
-      )}
-    </div>
-  );
-};
-
 // Update the helper function to include white key counting logic
 const calculateKeyLeftPosition = (
   noteNum: number,
@@ -549,9 +387,6 @@ export const PianoUI: React.FC<PianoUIProps> = ({
   onStopPlaying,
   taskKeyboardMapping,
   activeTaskId,
-  taskProgress,
-  taskPlayedNotes,
-  state,
   setActiveKeyCodes,
 }) => {
   const [isShiftPressed, setIsShiftPressed] = useState(false);
@@ -847,30 +682,6 @@ export const PianoUI: React.FC<PianoUIProps> = ({
             c2: { note: 24, left: c2Left },
           }}
         />
-        {activeTaskId &&
-          TASK_CONFIGS[activeTaskId] &&
-          (() => {
-            const taskConfig = {
-              ...TASK_CONFIGS[activeTaskId],
-              playedNotes: taskPlayedNotes[activeTaskId] || new Set(),
-            };
-            const isCompleting = taskProgress.some(
-              (t) => t.taskId === activeTaskId && t.status === "completing"
-            );
-
-            return (
-              <TaskIndicators
-                taskConfig={taskConfig}
-                totalWidth={totalWidth}
-                keyWidth={keyWidth}
-                activeKeysCount={activeKeys.size}
-                isCompleting={isCompleting}
-                colorMode={colorMode}
-                currentIndex={state.sequenceIndices[activeTaskId] || 0}
-                playedNotes={taskPlayedNotes[activeTaskId] || new Set()}
-              />
-            );
-          })()}
       </div>
     </div>
   );
