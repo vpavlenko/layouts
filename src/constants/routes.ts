@@ -1,1 +1,1 @@
-export const URL_PREFIX = "/p2";
+export const URL_PREFIX = "/layouts";
