@@ -233,19 +233,11 @@ const createChordTaskConfig = (
 
   return {
     id: `play-${chordName.toLowerCase()}-chord`,
-    description: `Play ${chordName.replace("-", " ")} chord`,
     total: 3,
-    requiredProgress: 3,
     keyboardMapping: mapping,
     colorMode: useFlat ? "flat-chromatic" : "chromatic",
     chromaticNotes: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
     checker: createSetChecker(targetNotes),
-    previousTaskId:
-      index > 0
-        ? `play-${previousChords[
-            previousChords.length - 1
-          ].toLowerCase()}-chord`
-        : null,
   };
 };
 

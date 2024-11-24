@@ -43,9 +43,6 @@ export const MappingsPanel: React.FC = () => {
               <h2 className="text-lg font-semibold mb-2">
                 {mapping.lessonTitle}
               </h2>
-              <p className="text-gray-400 mb-4">
-                {mapping.taskConfig.description}
-              </p>
               <div className="bg-gray-800 p-4 rounded">
                 <Layout
                   keyboardState={{

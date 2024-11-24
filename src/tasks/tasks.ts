@@ -14,14 +14,11 @@ export type ChromaticNote = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 
 export interface TaskConfig {
   id: string;
-  description: string;
   total: number;
   keyboardMapping?: KeyboardMapping;
   colorMode?: ColorMode;
   chromaticNotes?: number[];
   checker: TaskChecker;
-  requiredProgress: number;
-  previousTaskId?: string | null;
   playedNotes?: Set<string>;
 }
 
@@ -160,7 +157,6 @@ const ASCENDING_KEY_SEQUENCE = [
 const createTaskConfig = (
   index: number,
   targetNote: NoteMapping,
-  description: string,
   chromaticNotes: number[],
   lessonNumber: number
 ): TaskConfig => {
@@ -231,10 +227,7 @@ const createTaskConfig = (
 
   return {
     id: TASK_SEQUENCE[index],
-    description: `Play ${description}`,
     total: 4,
-    requiredProgress: 4,
-    previousTaskId: index > 0 ? TASK_SEQUENCE[index - 1] : null,
     chromaticNotes,
     keyboardMapping: fullMapping,
     checker,
@@ -516,23 +509,18 @@ export const TASK_CONFIGS: Record<string, TaskConfig> = {
   "play-b-across-octaves": createTaskConfig(
     6,
     NOTE_MAPPINGS.B,
-    "B notes across different octaves",
     [0, 2, 4, 5, 7, 9, 11],
     1
   ),
   "play-f-sharp": createTaskConfig(
     16,
     NOTE_MAPPINGS["F#"],
-    "F# notes across different octaves",
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
     2
   ),
   "play-chromatic-ascending-flat": {
     id: "play-chromatic-ascending-flat",
-    description:
-      "Play notes in ascending chromatic order using flat keyboard layout",
     total: ASCENDING_KEY_SEQUENCE.length,
-    requiredProgress: ASCENDING_KEY_SEQUENCE.length,
     keyboardMapping: createSequenceKeyboardMapping(
       ascendingSequence,
       ASCENDING_KEY_SEQUENCE
@@ -540,28 +528,22 @@ export const TASK_CONFIGS: Record<string, TaskConfig> = {
     colorMode: "flat-chromatic",
     chromaticNotes: Array.from(new Set(ascendingSequence.map((n) => n.note))),
     checker: createSequenceChecker(ascendingSequence),
-    previousTaskId: "play-chromatic-descending",
   },
 
   "play-major-seconds-from-asharp0": {
     id: "play-major-seconds-from-asharp0",
-    description: "Play notes separated by major seconds, starting from A#0",
     total: majorSecondFromASharp0Sequence.length,
-    requiredProgress: majorSecondFromASharp0Sequence.length,
     keyboardMapping: createFlatChromaticMapping(majorSecondFromASharp0Sequence),
     colorMode: "flat-chromatic",
     chromaticNotes: Array.from(
       new Set(majorSecondFromASharp0Sequence.map((n) => n.note))
     ),
     checker: createSequenceChecker(majorSecondFromASharp0Sequence),
-    previousTaskId: "play-major-seconds-from-a0",
   },
 
   "play-dorian-scale": {
     id: "play-dorian-scale",
-    description: SCALE_SEQUENCES.dorian.description,
     total: SCALE_SEQUENCES.dorian.notes.length,
-    requiredProgress: SCALE_SEQUENCES.dorian.notes.length,
     keyboardMapping: createScaleKeyboardMapping(SCALE_SEQUENCES.dorian, [
       "lydian",
       "major",
@@ -577,14 +559,11 @@ export const TASK_CONFIGS: Record<string, TaskConfig> = {
       ])
     ),
     checker: createSequenceChecker([...SCALE_SEQUENCES.dorian.notes]),
-    previousTaskId: "play-mixolydian-scale",
   },
 
   "play-locrian-scale": {
     id: "play-locrian-scale",
-    description: SCALE_SEQUENCES.locrian.description,
     total: SCALE_SEQUENCES.locrian.notes.length,
-    requiredProgress: SCALE_SEQUENCES.locrian.notes.length,
     keyboardMapping: createScaleKeyboardMapping(SCALE_SEQUENCES.locrian, [
       "dorianLow",
       "minor",
@@ -600,7 +579,6 @@ export const TASK_CONFIGS: Record<string, TaskConfig> = {
       ])
     ),
     checker: createSequenceChecker([...SCALE_SEQUENCES.locrian.notes]),
-    previousTaskId: "play-phrygian-scale",
   },
 
   ...TASKS_ON_MAJOR_CHORDS,
@@ -609,7 +587,7 @@ export const TASK_CONFIGS: Record<string, TaskConfig> = {
 
 export const isTaskCompleted = (taskId: string, progress: number): boolean => {
   const config = TASK_CONFIGS[taskId];
-  return config && progress >= config.requiredProgress;
+  return config && progress >= config.total;
 };
 
 export const canTaskBeActivated = (
@@ -623,17 +601,17 @@ export const canTaskBeActivated = (
   // Find which lesson this task belongs to
   const taskLesson = LESSONS.find((lesson) => lesson.taskIds.includes(taskId));
   if (!taskLesson || taskLesson.id !== currentLessonId) {
-    return false; // Don't activate if task is not in current lesson
+    return false;
   }
 
-  if (!config.previousTaskId) return true;
+  const taskIndex = taskLesson.taskIds.indexOf(taskId);
+  if (taskIndex === 0) return true;
 
-  const previousTask = taskProgress.find(
-    (t) => t.taskId === config.previousTaskId
-  );
+  const previousTaskId = taskLesson.taskIds[taskIndex - 1];
+  const previousTask = taskProgress.find((t) => t.taskId === previousTaskId);
   const previousTaskProgress = previousTask?.progress || 0;
 
-  return isTaskCompleted(config.previousTaskId, previousTaskProgress);
+  return isTaskCompleted(previousTaskId, previousTaskProgress);
 };
 
 export const getNextTaskId = (currentTaskId: string): string | null => {
@@ -650,8 +628,4 @@ export const getNextTaskId = (currentTaskId: string): string | null => {
 
   // Return the next task in the lesson
   return lesson.taskIds[currentIndex + 1];
-};
-
-export const getPreviousTaskId = (currentTaskId: string): string | null => {
-  return TASK_CONFIGS[currentTaskId]?.previousTaskId || null;
 };
