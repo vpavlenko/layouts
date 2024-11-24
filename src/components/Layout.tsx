@@ -9,7 +9,7 @@ interface KeyboardState {
   taskKeyboardMapping?: KeyboardMapping;
 }
 
-interface PianoKeyboardProps {
+interface LayoutProps {
   keyboardState: KeyboardState;
 }
 
@@ -22,9 +22,7 @@ const KEYBOARD_LAYOUT = {
   ],
 };
 
-export const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
-  keyboardState,
-}) => {
+export const Layout: React.FC<LayoutProps> = ({ keyboardState }) => {
   const keyboardRef = useRef<HTMLDivElement>(null);
   const styleSheetRef = useRef<HTMLStyleElement | null>(null);
 

@@ -7,7 +7,7 @@ import { Task } from "./Task";
 import { TASK_CONFIGS } from "../tasks/tasks";
 import type { TaskProgress } from "../tasks/tasks";
 import { KeyboardMapping } from "../constants/keyboard";
-import { PianoKeyboard } from "./PianoKeyboard";
+import { Layout } from "./Layout";
 
 interface KeyboardState {
   activeKeyCodes: Set<string>;
@@ -134,7 +134,7 @@ export const LessonsPanel: React.FC<LessonsPanelProps> = React.memo(
         {/* Keyboard section - moved to top */}
         <div className="bg-gray-900 p-4 border-b border-gray-800">
           <div className="w-full flex justify-end">
-            <PianoKeyboard keyboardState={keyboardState} />
+            <Layout keyboardState={keyboardState} />
           </div>
         </div>
 
