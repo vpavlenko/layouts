@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import { PianoKeyboard } from "./PianoKeyboard";
@@ -22,7 +22,8 @@ export const MappingsPanel: React.FC = () => {
     })
     .filter((m): m is NonNullable<typeof m> => m !== null);
 
-  const firstMapping = mappings[2];
+  const [selectedMappingIndex, setSelectedMappingIndex] = useState(0);
+  const selectedMapping = mappings[selectedMappingIndex];
 
   return (
     <div className="fixed top-0 left-0 w-[600px] h-screen bg-gray-900 text-white flex flex-col">
@@ -36,24 +37,40 @@ export const MappingsPanel: React.FC = () => {
           </Link>
           <h1 className="text-2xl font-bold">Final Keyboard Mappings</h1>
         </div>
+
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {mappings.map((mapping, index) => (
+            <button
+              key={mapping.taskId}
+              onClick={() => setSelectedMappingIndex(index)}
+              className={`px-3 py-1 rounded whitespace-nowrap ${
+                selectedMappingIndex === index
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+              }`}
+            >
+              {mapping.lessonTitle}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto">
         <div className="p-8">
-          {firstMapping && (
-            <div key={firstMapping.taskId} className="mb-8">
+          {selectedMapping && (
+            <div key={selectedMapping.taskId} className="mb-8">
               <h2 className="text-lg font-semibold mb-2">
-                {firstMapping.lessonTitle}
+                {selectedMapping.lessonTitle}
               </h2>
               <p className="text-gray-400 mb-4">
-                {firstMapping.taskConfig.description}
+                {selectedMapping.taskConfig.description}
               </p>
               <div className="bg-gray-800 p-4 rounded">
                 <PianoKeyboard
                   keyboardState={{
                     activeKeyCodes: new Set(),
                     taskKeyboardMapping:
-                      firstMapping.taskConfig.keyboardMapping,
+                      selectedMapping.taskConfig.keyboardMapping,
                   }}
                 />
               </div>
