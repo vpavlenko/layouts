@@ -33,54 +33,6 @@ export const LessonsPanel: React.FC<LessonsPanelProps> = React.memo(
         ? LESSONS[currentLessonIndex + 1]
         : null;
 
-    // Simplify task display logic since we only have one task per lesson
-    const renderContent = useCallback(
-      (content: React.ReactNode): React.ReactNode => {
-        if (!React.isValidElement(content)) {
-          return content;
-        }
-
-        if (content.props.children) {
-          const children = React.Children.map(content.props.children, (child) =>
-            renderContent(child)
-          );
-          return React.cloneElement(content, {}, children);
-        }
-
-        return content;
-      },
-      []
-    );
-
-    // Add ref for content container
-    const contentRef = useRef<HTMLDivElement>(null);
-
-    // Add effect to scroll to active task when it changes
-    useEffect(() => {
-      if (activeTaskId && contentRef.current) {
-        const activeTaskElement = contentRef.current.querySelector(
-          `[data-task-id="${activeTaskId}"]`
-        );
-
-        if (activeTaskElement) {
-          const containerRect = contentRef.current.getBoundingClientRect();
-          const taskRect = activeTaskElement.getBoundingClientRect();
-          const keyboardHeight = 200; // Height of keyboard section
-
-          // Check if task is below the visible area or partially hidden by keyboard
-          if (
-            taskRect.bottom > containerRect.bottom - keyboardHeight ||
-            taskRect.top > containerRect.bottom - keyboardHeight
-          ) {
-            activeTaskElement.scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-            });
-          }
-        }
-      }
-    }, [activeTaskId]);
-
     return (
       <div className="fixed top-0 left-0 w-[600px] h-screen bg-gray-900 text-white flex flex-col">
         {/* Keyboard section */}
@@ -140,7 +92,7 @@ export const LessonsPanel: React.FC<LessonsPanelProps> = React.memo(
           </div>
         </div>
 
-        {/* Menu Overlay - Move outside of scrollable content */}
+        {/* Menu Overlay */}
         {isMenuOpen && (
           <div className="absolute inset-0 bg-gray-900 z-30 overflow-y-auto">
             <div className="p-8">
@@ -175,22 +127,6 @@ export const LessonsPanel: React.FC<LessonsPanelProps> = React.memo(
             </div>
           </div>
         )}
-
-        {/* Main scrollable content area */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="relative min-h-[calc(100vh-400px)]">
-            <div ref={contentRef} className="p-8 pt-4">
-              {currentLesson && (
-                <div className="prose prose-invert">
-                  {renderContent(currentLesson.content)}
-                </div>
-              )}
-            </div>
-
-            {/* Gradient overlay */}
-            <div className="pointer-events-none sticky bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-gray-900 to-transparent" />
-          </div>
-        </div>
       </div>
     );
   }
