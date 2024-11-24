@@ -30,7 +30,6 @@ const NOTE_NAMES = [
 
 export interface PianoControllerState {
   activeKeysSize: number;
-  sequenceIndices: Record<string, number>;
 }
 
 const getActiveTaskId = (currentLessonId: number): string | null => {
@@ -53,7 +52,6 @@ export const PianoController: React.FC = () => {
   const { lessonId } = useParams();
   const [state, setState] = useState<PianoControllerState>({
     activeKeysSize: 0,
-    sequenceIndices: {},
   });
   const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
   const [samplerReady, setSamplerReady] = useState(false);
@@ -210,7 +208,6 @@ export const PianoController: React.FC = () => {
               },
             ]
           : [],
-        sequenceIndices: {},
       }));
 
       setCurrentLessonId(lessonId);
@@ -238,38 +235,6 @@ export const PianoController: React.FC = () => {
 
   // Get the current active task ID
   const currentActiveTaskId = getActiveTaskId(currentLessonId);
-
-  // Add this effect to initialize sequenceCheckers when tasks change
-  useEffect(() => {
-    console.log(
-      "[sequenceCheckers] Initializing for active task:",
-      currentActiveTaskId
-    );
-    if (currentActiveTaskId) {
-      const taskConfig = TASK_CONFIGS[currentActiveTaskId];
-      if (taskConfig?.checker.type === "sequence") {
-        setState((prev) => {
-          // Only initialize if not already present
-          if (
-            typeof prev.sequenceIndices[currentActiveTaskId] === "undefined"
-          ) {
-            console.log(
-              "[sequenceCheckers] Initializing new sequence checker for:",
-              currentActiveTaskId
-            );
-            return {
-              ...prev,
-              sequenceIndices: {
-                ...prev.sequenceIndices,
-                [currentActiveTaskId]: 0,
-              },
-            };
-          }
-          return prev;
-        });
-      }
-    }
-  }, [currentActiveTaskId]);
 
   return (
     <>
