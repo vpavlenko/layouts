@@ -22,7 +22,10 @@ const KEYBOARD_LAYOUT = {
   ],
 };
 
+const generateId = () => Math.random().toString(36).substring(2, 10);
+
 export const Layout: React.FC<LayoutProps> = ({ keyboardState }) => {
+  const uid = useRef(generateId());
   const keyboardRef = useRef<HTMLDivElement>(null);
   const styleSheetRef = useRef<HTMLStyleElement | null>(null);
 
@@ -41,7 +44,7 @@ export const Layout: React.FC<LayoutProps> = ({ keyboardState }) => {
       const backgroundColor = colors[note];
       const textColor = getLabelColorForNote(note);
       css += `
-        .simple-keyboard-base .hg-button.${keyCode}-mapped {
+        .keyboard-${uid.current} .simple-keyboard-base .hg-button.${keyCode}-mapped {
           background: ${backgroundColor} !important;
           color: ${textColor} !important;
         }
@@ -52,7 +55,7 @@ export const Layout: React.FC<LayoutProps> = ({ keyboardState }) => {
     Object.keys(KEY_DISPLAY_LABELS).forEach((keyCode) => {
       if (!mapping[keyCode]) {
         css += `
-          .simple-keyboard-base .hg-button.${keyCode}-mapped {
+          .keyboard-${uid.current}  .simple-keyboard-base .hg-button.${keyCode}-mapped {
             background: #444 !important;
             color: rgba(255, 255, 255, 0.3) !important;
           }
@@ -106,7 +109,7 @@ export const Layout: React.FC<LayoutProps> = ({ keyboardState }) => {
   }, []);
 
   return (
-    <div className="w-[290px]" ref={keyboardRef}>
+    <div className={`w-[290px] keyboard-${uid.current}`} ref={keyboardRef}>
       <Keyboard
         layout={KEYBOARD_LAYOUT}
         display={getDisplay()}
