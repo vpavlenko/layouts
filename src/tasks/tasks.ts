@@ -590,30 +590,6 @@ export const isTaskCompleted = (taskId: string, progress: number): boolean => {
   return config && progress >= config.total;
 };
 
-export const canTaskBeActivated = (
-  taskId: string,
-  taskProgress: TaskProgress[],
-  currentLessonId: number
-): boolean => {
-  const config = TASK_CONFIGS[taskId];
-  if (!config) return false;
-
-  // Find which lesson this task belongs to
-  const taskLesson = LESSONS.find((lesson) => lesson.taskIds.includes(taskId));
-  if (!taskLesson || taskLesson.id !== currentLessonId) {
-    return false;
-  }
-
-  const taskIndex = taskLesson.taskIds.indexOf(taskId);
-  if (taskIndex === 0) return true;
-
-  const previousTaskId = taskLesson.taskIds[taskIndex - 1];
-  const previousTask = taskProgress.find((t) => t.taskId === previousTaskId);
-  const previousTaskProgress = previousTask?.progress || 0;
-
-  return isTaskCompleted(previousTaskId, previousTaskProgress);
-};
-
 export const getNextTaskId = (currentTaskId: string): string | null => {
   // Find which lesson contains this task
   const lesson = LESSONS.find((lesson) =>

@@ -475,25 +475,6 @@ export const PianoController: React.FC = () => {
     }
   }, [activeKeys.size]); // Only depend on activeKeys.size
 
-  const handleSkipTask = useCallback((taskId: string) => {
-    setState((prev) => {
-      const nextTaskId = getNextTaskId(taskId);
-      return {
-        ...prev,
-        taskProgress: prev.taskProgress.map((t) =>
-          t.taskId === taskId
-            ? {
-                ...t,
-                status: "completed",
-                progress: TASK_CONFIGS[taskId].total,
-              }
-            : t
-        ),
-        pendingNextTask: nextTaskId,
-      };
-    });
-  }, []);
-
   // Add this effect to initialize sequenceCheckers when tasks change
   useEffect(() => {
     console.log(
@@ -533,7 +514,6 @@ export const PianoController: React.FC = () => {
         onLessonChange={handleLessonChange}
         taskProgress={state.taskProgress}
         activeTaskId={currentActiveTaskId}
-        onSkipTask={handleSkipTask}
         keyboardState={{
           activeKeyCodes,
           taskKeyboardMapping: currentActiveTaskId

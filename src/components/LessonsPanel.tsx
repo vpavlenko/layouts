@@ -17,7 +17,6 @@ interface LessonsPanelProps {
   onLessonChange: (lessonId: number) => void;
   taskProgress: TaskProgress[];
   activeTaskId: string | null;
-  onSkipTask?: (taskId: string) => void;
   keyboardState: KeyboardState;
 }
 
