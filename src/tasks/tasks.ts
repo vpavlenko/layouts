@@ -8,7 +8,6 @@ import {
 } from "./checkers";
 import { createSequenceKeyboardMapping } from "./mappings";
 import { TASKS_ON_MAJOR_CHORDS, TASKS_ON_MINOR_CHORDS } from "./tasksOnChords";
-import { TASKS_ON_CHORDS_IN_SCALE } from "./tasksOnChordsInScale";
 
 export type RelativeNote = 0 | 2 | 4 | 5 | 7 | 9 | 11; // C D E F G A B
 export type ChromaticNote = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
@@ -992,7 +991,22 @@ export const TASK_CONFIGS: Record<string, TaskConfig> = {
 
   ...TASKS_ON_MAJOR_CHORDS,
   ...TASKS_ON_MINOR_CHORDS,
-  ...TASKS_ON_CHORDS_IN_SCALE,
+
+  "play-c-minor-primary-v": {
+    id: "play-c-minor-primary-v",
+    description: "Play G minor chord (v)",
+    total: 3,
+    requiredProgress: 3,
+    keyboardMapping: {
+      KeyM: { note: 7, octave: 3 }, // G3
+      Comma: { note: 10, octave: 3 }, // Bb3
+      Period: { note: 2, octave: 4 }, // D4
+    },
+    colorMode: "chromatic",
+    chromaticNotes: [2, 7, 10],
+    checker: createSetChecker(new Set(["7-3", "10-3", "2-4"])),
+    previousTaskId: null,
+  },
 };
 
 export const isTaskCompleted = (taskId: string, progress: number): boolean => {

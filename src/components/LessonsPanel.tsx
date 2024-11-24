@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { Lesson, LESSONS } from "../data/lessons";
+import { LESSONS } from "../data/lessons";
 import { Bars3Icon, ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { URL_PREFIX } from "../constants/routes";
@@ -22,13 +22,7 @@ interface LessonsPanelProps {
 }
 
 export const LessonsPanel: React.FC<LessonsPanelProps> = React.memo(
-  ({
-    currentLessonId,
-    onLessonChange,
-    taskProgress,
-    activeTaskId,
-    keyboardState,
-  }) => {
+  ({ currentLessonId, onLessonChange, activeTaskId, keyboardState }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const currentLessonIndex = LESSONS.findIndex(
@@ -42,49 +36,16 @@ export const LessonsPanel: React.FC<LessonsPanelProps> = React.memo(
         ? LESSONS[currentLessonIndex + 1]
         : null;
 
-    // Check if all tasks in current lesson are completed
-    const allTasksCompleted = currentLesson?.taskIds.every((taskId) =>
-      taskProgress.some((t) => t.taskId === taskId && t.status === "completed")
-    );
-
-    useEffect(() => {
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === "ArrowLeft" && previousLesson) {
-          onLessonChange(previousLesson.id);
-        } else if (e.key === "ArrowRight" && nextLesson) {
-          onLessonChange(nextLesson.id);
-        }
-      };
-
-      window.addEventListener("keydown", handleKeyDown);
-      return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [previousLesson, nextLesson, onLessonChange]);
-
-    useEffect(() => {
-      const handleEscape = (e: KeyboardEvent) => {
-        if (e.key === "Escape" && isMenuOpen) {
-          setIsMenuOpen(false);
-        }
-      };
-
-      window.addEventListener("keydown", handleEscape);
-      return () => window.removeEventListener("keydown", handleEscape);
-    }, [isMenuOpen]);
-
-    // Move renderContent inside the component
+    // Simplify task display logic since we only have one task per lesson
     const renderContent = useCallback(
-      (
-        content: React.ReactNode,
-        taskProgress: TaskProgress[],
-        currentLesson: Lesson
-      ): React.ReactNode => {
+      (content: React.ReactNode): React.ReactNode => {
         if (!React.isValidElement(content)) {
           return content;
         }
 
         if (content.props.children) {
           const children = React.Children.map(content.props.children, (child) =>
-            renderContent(child, taskProgress, currentLesson)
+            renderContent(child)
           );
           return React.cloneElement(content, {}, children);
         }
@@ -168,11 +129,7 @@ export const LessonsPanel: React.FC<LessonsPanelProps> = React.memo(
                   <Link
                     to={`${URL_PREFIX}/${nextLesson.id}`}
                     onClick={() => onLessonChange(nextLesson.id)}
-                    className={`block w-full p-2 rounded border text-right select-none transition-all duration-300 ${
-                      allTasksCompleted
-                        ? "bg-blue-600 hover:bg-blue-500 border-blue-500 text-white shadow-lg shadow-blue-500/20"
-                        : "bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700"
-                    }`}
+                    className="block w-full p-2 rounded border text-right select-none transition-all duration-300 bg-blue-600 hover:bg-blue-500 border-blue-500 text-white shadow-lg shadow-blue-500/20"
                   >
                     {currentLessonIndex + 2}. {nextLesson.title} →
                   </Link>
@@ -228,11 +185,7 @@ export const LessonsPanel: React.FC<LessonsPanelProps> = React.memo(
             <div ref={contentRef} className="p-8 pt-4">
               {currentLesson && (
                 <div className="prose prose-invert">
-                  {renderContent(
-                    currentLesson.content,
-                    taskProgress,
-                    currentLesson
-                  )}
+                  {renderContent(currentLesson.content)}
                 </div>
               )}
             </div>

@@ -51,15 +51,7 @@ const LESSONS_WITHOUT_IDS: {
     ),
     finalText:
       "Play around with all seven keys. Then, as you're ready, go to the next lesson",
-    taskIds: [
-      "play-c-across-octaves",
-      "play-d-across-octaves",
-      "play-e-across-octaves",
-      "play-f-across-octaves",
-      "play-g-across-octaves",
-      "play-a-across-octaves",
-      "play-b-across-octaves",
-    ],
+    taskIds: ["play-b-across-octaves"],
   },
   {
     title: "Black Keys",
@@ -68,18 +60,8 @@ const LESSONS_WITHOUT_IDS: {
         <P>Now let's learn about the black keys!</P>
       </>
     ),
-    taskIds: [
-      "play-d-again",
-      "play-c-sharp",
-      "play-e-again",
-      "play-d-sharp",
-      "play-a-again",
-      "play-g-sharp",
-      "play-b-again",
-      "play-a-sharp",
-      "play-f-again",
-      "play-f-sharp",
-    ],
+    finalText: "Play the last black key",
+    taskIds: ["play-f-sharp"],
   },
   {
     title: "Chromatic Sequences",
@@ -100,11 +82,8 @@ const LESSONS_WITHOUT_IDS: {
         </P>
       </>
     ),
-    taskIds: [
-      "play-chromatic-ascending",
-      "play-chromatic-descending",
-      "play-chromatic-ascending-flat",
-    ],
+    finalText: "Play the last note in the chromatic sequence",
+    taskIds: ["play-chromatic-ascending-flat"],
   },
   {
     title: "Major Second Intervals",
@@ -120,7 +99,8 @@ const LESSONS_WITHOUT_IDS: {
         </P>
       </>
     ),
-    taskIds: ["play-major-seconds-from-a0", "play-major-seconds-from-asharp0"],
+    finalText: "Play the last note in the major second sequence",
+    taskIds: ["play-major-seconds-from-asharp0"],
   },
   {
     title: "Scale Modes",
@@ -141,13 +121,8 @@ const LESSONS_WITHOUT_IDS: {
         <P>Number row (1-8): Dorian mode - minor scale with a raised 6th</P>
       </>
     ),
-    taskIds: [
-      "play-major-scale",
-      "play-lydian-scale",
-      "play-major-scale-with-lydian",
-      "play-mixolydian-scale",
-      "play-dorian-scale",
-    ],
+    finalText: "Play the last note in the scale mode sequence",
+    taskIds: ["play-dorian-scale"],
   },
   {
     title: "More Scale Modes",
@@ -171,12 +146,8 @@ const LESSONS_WITHOUT_IDS: {
         </P>
       </>
     ),
-    taskIds: [
-      "play-dorian-low-scale",
-      "play-minor-scale",
-      "play-phrygian-scale",
-      "play-locrian-scale",
-    ],
+    finalText: "Play the last note in the more scale modes sequence",
+    taskIds: ["play-locrian-scale"],
   },
   {
     title: "Major Chords",
@@ -198,20 +169,8 @@ const LESSONS_WITHOUT_IDS: {
         </P>
       </>
     ),
-    taskIds: [
-      "play-c-major-chord",
-      "play-c-sharp-major-chord",
-      "play-d-major-chord",
-      "play-eb-major-chord",
-      "play-e-major-chord",
-      "play-f-major-chord",
-      "play-f-sharp-major-chord",
-      "play-g-major-chord",
-      "play-g-sharp-major-chord",
-      "play-a-major-chord",
-      "play-bb-major-chord",
-      "play-b-major-chord",
-    ],
+    finalText: "Play the last major chord",
+    taskIds: ["play-b-major-chord"],
   },
   {
     title: "Minor Chords",
@@ -236,20 +195,8 @@ const LESSONS_WITHOUT_IDS: {
         </P>
       </>
     ),
-    taskIds: [
-      "play-c-minor-chord",
-      "play-c-sharp-minor-chord",
-      "play-d-minor-chord",
-      "play-eb-minor-chord",
-      "play-e-minor-chord",
-      "play-f-minor-chord",
-      "play-f-sharp-minor-chord",
-      "play-g-minor-chord",
-      "play-g-sharp-minor-chord",
-      "play-a-minor-chord",
-      "play-bb-minor-chord",
-      "play-b-minor-chord",
-    ],
+    finalText: "Play the last minor chord",
+    taskIds: ["play-b-minor-chord"],
   },
   {
     title: "C Major and C Minor Relations",
@@ -278,16 +225,8 @@ const LESSONS_WITHOUT_IDS: {
         </P>
       </>
     ),
-    taskIds: [
-      "play-c-major-scale-sequence",
-      "play-c-major-primary-i",
-      "play-c-major-primary-iv",
-      "play-c-major-primary-v",
-      "play-c-minor-scale-sequence",
-      "play-c-minor-primary-i",
-      "play-c-minor-primary-iv",
-      "play-c-minor-primary-v",
-    ],
+    finalText: "Play the last primary chord in C minor",
+    taskIds: ["play-c-minor-primary-v"],
   },
   {
     title: "Free Play",
