@@ -12,7 +12,6 @@ import { PianoControls } from "./PianoControls";
 import { Voicing } from "../constants/voicings";
 import { StopIcon } from "@heroicons/react/24/solid";
 import { TASK_CONFIGS } from "../tasks/tasks";
-import type { TaskProgress } from "../tasks/tasks";
 import { PianoControllerState } from "./PianoController";
 
 const BLACK_KEYS = [1, 3, -1, 6, 8, 10, -1];
@@ -367,8 +366,6 @@ interface PianoUIProps {
   onStopPlaying: () => void;
   taskKeyboardMapping?: KeyboardMapping;
   activeTaskId: string | null;
-  taskProgress: TaskProgress[];
-  taskPlayedNotes: Record<string, Set<string>>;
   state: PianoControllerState;
   setActiveKeyCodes: React.Dispatch<React.SetStateAction<Set<string>>>;
 }

@@ -3,7 +3,6 @@ import { LESSONS } from "../data/lessons";
 import { Bars3Icon, ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { URL_PREFIX } from "../constants/routes";
-import type { TaskProgress } from "../tasks/tasks";
 import { KeyboardMapping } from "../constants/keyboard";
 import { Layout } from "./Layout";
 
@@ -15,7 +14,6 @@ interface KeyboardState {
 interface LessonsPanelProps {
   currentLessonId: number;
   onLessonChange: (lessonId: number) => void;
-  taskProgress: TaskProgress[];
   activeTaskId: string | null;
   keyboardState: KeyboardState;
 }

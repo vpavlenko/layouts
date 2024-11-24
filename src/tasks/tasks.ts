@@ -22,12 +22,6 @@ export interface TaskConfig {
   playedNotes?: Set<string>;
 }
 
-export interface TaskProgress {
-  taskId: string;
-  progress: number;
-  status: "active" | "completing" | "completed";
-}
-
 const taskSequenceArray = LESSONS.reduce<string[]>(
   (sequence, lesson) => [...sequence, ...lesson.taskIds],
   []
@@ -583,25 +577,4 @@ export const TASK_CONFIGS: Record<string, TaskConfig> = {
 
   ...TASKS_ON_MAJOR_CHORDS,
   ...TASKS_ON_MINOR_CHORDS,
-};
-
-export const isTaskCompleted = (taskId: string, progress: number): boolean => {
-  const config = TASK_CONFIGS[taskId];
-  return config && progress >= config.total;
-};
-
-export const getNextTaskId = (currentTaskId: string): string | null => {
-  // Find which lesson contains this task
-  const lesson = LESSONS.find((lesson) =>
-    lesson.taskIds.includes(currentTaskId)
-  );
-  if (!lesson) return null;
-
-  // Find the index of current task in the lesson
-  const currentIndex = lesson.taskIds.indexOf(currentTaskId);
-  if (currentIndex === -1 || currentIndex === lesson.taskIds.length - 1)
-    return null;
-
-  // Return the next task in the lesson
-  return lesson.taskIds[currentIndex + 1];
 };

@@ -10,7 +10,7 @@ import { immediate } from "tone";
 import { useParams, useNavigate } from "react-router-dom";
 import { LESSONS } from "../data/lessons";
 import { URL_PREFIX } from "../constants/routes";
-import { TASK_CONFIGS, getNextTaskId } from "../tasks/tasks";
+import { TASK_CONFIGS } from "../tasks/tasks";
 import { ensureSamplerLoaded } from "../audio/sampler";
 
 const NOTE_NAMES = [
@@ -28,24 +28,12 @@ const NOTE_NAMES = [
   "B",
 ] as const;
 
-interface TaskState {
-  taskId: string;
-  progress: number;
-  status: "active" | "completing" | "completed";
-}
-
 export interface PianoControllerState {
-  taskProgress: TaskState[];
-  pendingNextTask: string | null;
   activeKeysSize: number;
   sequenceIndices: Record<string, number>;
-  taskPlayedNotes: Record<string, Set<string>>;
 }
 
-const getActiveTaskId = (
-  state: PianoControllerState,
-  currentLessonId: number
-): string | null => {
+const getActiveTaskId = (currentLessonId: number): string | null => {
   const currentLesson = LESSONS.find((l) => l.id === currentLessonId);
   if (!currentLesson || !currentLesson.taskIds.length) return null;
   return currentLesson.taskIds[0];
@@ -64,47 +52,12 @@ export const PianoController: React.FC = () => {
   const navigate = useNavigate();
   const { lessonId } = useParams();
   const [state, setState] = useState<PianoControllerState>({
-    taskProgress: [],
-    pendingNextTask: null,
     activeKeysSize: 0,
     sequenceIndices: {},
-    taskPlayedNotes: {},
-  });
-  const [taskPlayedNotes, setTaskPlayedNotes] = useState<
-    Record<string, Set<string>>
-  >(() => {
-    // Initialize for all tasks across all lessons
-    const allTasks = LESSONS.reduce((acc, lesson) => {
-      return [...acc, ...lesson.taskIds];
-    }, [] as string[]);
-
-    return allTasks.reduce(
-      (acc, taskId) => ({
-        ...acc,
-        [taskId]: new Set<string>(),
-      }),
-      {}
-    );
   });
   const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
   const [samplerReady, setSamplerReady] = useState(false);
   const [activeKeyCodes, setActiveKeyCodes] = useState<Set<string>>(new Set());
-
-  // Move resetTaskState inside the component
-  const resetTaskState = useCallback((taskId: string) => {
-    console.log("[resetTaskState] Resetting state for task:", taskId);
-    setState((prev) => ({
-      ...prev,
-      sequenceIndices: {
-        ...prev.sequenceIndices,
-        [taskId]: 0,
-      },
-    }));
-    setTaskPlayedNotes((prev) => ({
-      ...prev,
-      [taskId]: new Set<string>(),
-    }));
-  }, []);
 
   // Initialize currentLessonId from URL parameter
   useEffect(() => {
@@ -116,22 +69,6 @@ export const PianoController: React.FC = () => {
 
     if (!isNaN(parsedId) && LESSONS.some((lesson) => lesson.id === parsedId)) {
       setCurrentLessonId(parsedId);
-      const currentLesson = LESSONS.find((l) => l.id === parsedId);
-      const taskId = currentLesson?.taskIds[0];
-
-      if (taskId) {
-        setState((prev) => ({
-          ...prev,
-          taskProgress: [
-            {
-              taskId,
-              progress: 0,
-              status: "active" as const,
-            },
-          ],
-          pendingNextTask: null,
-        }));
-      }
     }
   }, [lessonId]);
 
@@ -142,60 +79,6 @@ export const PianoController: React.FC = () => {
       activeKeysSize: activeKeys.size,
     }));
   }, [activeKeys.size]);
-
-  const incrementTaskProgress = useCallback(
-    (taskId: string, note: number, octave: number) => {
-      const taskConfig = TASK_CONFIGS[taskId];
-      if (!taskConfig) return;
-
-      const checker = taskConfig.checker;
-      const currentIndex = state.sequenceIndices[taskId] || 0;
-      const playedNotes = state.taskPlayedNotes[taskId] || new Set();
-
-      // Check if the note matches using the checker's checkNote method
-      const matches =
-        checker.type === "sequence"
-          ? checker.checkNote(note, octave, currentIndex)
-          : checker.checkNote(note, octave, playedNotes);
-
-      if (!matches) return;
-
-      // Get current state to determine progress
-      const checkerState =
-        checker.type === "sequence"
-          ? checker.getState(currentIndex)
-          : checker.getState(playedNotes);
-
-      const newProgress = checkerState.progress + 1;
-
-      // Update state
-      setState((prev) => ({
-        ...prev,
-        sequenceIndices:
-          checker.type === "sequence"
-            ? { ...prev.sequenceIndices, [taskId]: currentIndex + 1 }
-            : prev.sequenceIndices,
-        taskPlayedNotes:
-          checker.type === "set"
-            ? {
-                ...prev.taskPlayedNotes,
-                [taskId]: new Set([...playedNotes, `${note}-${octave}`]),
-              }
-            : prev.taskPlayedNotes,
-        taskProgress: prev.taskProgress.map((t) =>
-          t.taskId === taskId
-            ? {
-                ...t,
-                progress: newProgress,
-                status:
-                  newProgress >= taskConfig.total ? "completing" : "active",
-              }
-            : t
-        ),
-      }));
-    },
-    [state]
-  );
 
   // Move sampler loading to an earlier useEffect
   useEffect(() => {
@@ -211,20 +94,6 @@ export const PianoController: React.FC = () => {
   const playNotes = useCallback(
     async (note: number, octave: number) => {
       if (!samplerReady) return [];
-
-      const activeTaskId = getActiveTaskId(state, currentLessonId);
-      if (activeTaskId) {
-        incrementTaskProgress(activeTaskId, note, octave);
-      }
-
-      console.log("[playNotes] Called with:", { note, octave, tonic });
-      console.log("[playNotes] Current state:", {
-        taskProgress: state.taskProgress,
-        activeKeys: Array.from(activeKeys),
-        currentLessonId,
-        sequenceIndices: state.sequenceIndices,
-        taskPlayedNotes,
-      });
 
       const relativeNote = (note - tonic + 12) % 12;
       console.log("Calculated relative note:", relativeNote);
@@ -257,17 +126,7 @@ export const PianoController: React.FC = () => {
 
       return playedNotes;
     },
-    [
-      samplerReady,
-      tonic,
-      voicing,
-      state.sequenceIndices,
-      state.taskProgress,
-      currentLessonId,
-      activeKeys,
-      taskPlayedNotes,
-      incrementTaskProgress,
-    ]
+    [samplerReady, tonic, voicing]
   );
 
   const releaseNotes = useCallback(
@@ -352,10 +211,8 @@ export const PianoController: React.FC = () => {
             ]
           : [],
         sequenceIndices: {},
-        pendingNextTask: null,
       }));
 
-      setTaskPlayedNotes({});
       setCurrentLessonId(lessonId);
       navigate(`${URL_PREFIX}/${lessonId}`);
     },
@@ -379,101 +236,8 @@ export const PianoController: React.FC = () => {
     return () => window.removeEventListener("keydown", handleSpaceKey);
   }, [currentlyPlayingId, stopProgression]);
 
-  // Keep the effect for transitioning to next task when keys are released
-  useEffect(() => {
-    if (state.pendingNextTask && activeKeys.size === 0) {
-      console.log(
-        "All keys released, finalizing task transition to:",
-        state.pendingNextTask
-      );
-      setState((prev) => ({
-        ...prev,
-        pendingNextTask: null, // Clear the pending state
-      }));
-    }
-  }, [state.pendingNextTask, activeKeys.size]);
-
-  // Add this effect to initialize new tasks
-  useEffect(() => {
-    if (state.pendingNextTask) {
-      setState((prev) => {
-        // Check if task already exists
-        const exists = prev.taskProgress.some(
-          (t) => t.taskId === state.pendingNextTask
-        );
-        if (!exists && state.pendingNextTask) {
-          // Reset the state of the new task
-          resetTaskState(state.pendingNextTask);
-          // Initialize the new task
-          return {
-            ...prev,
-            taskProgress: [
-              ...prev.taskProgress,
-              {
-                taskId: state.pendingNextTask,
-                progress: 0,
-                status: "active",
-              } as TaskState,
-            ],
-          };
-        }
-        return prev;
-      });
-    }
-  }, [state.pendingNextTask]);
-
   // Get the current active task ID
-  const currentActiveTaskId = getActiveTaskId(state, currentLessonId);
-
-  // Add this effect to reset taskPlayedNotes when lesson changes
-  useEffect(() => {
-    console.log("[taskPlayedNotes] Resetting for lesson:", currentLessonId);
-    const currentLesson = LESSONS.find((l) => l.id === currentLessonId);
-    if (currentLesson) {
-      setTaskPlayedNotes((prev) => {
-        const newState = { ...prev };
-        currentLesson.taskIds.forEach((taskId) => {
-          newState[taskId] = new Set<string>();
-        });
-        return newState;
-      });
-    }
-  }, [currentLessonId]);
-
-  // Add this effect near other effects in PianoController
-  useEffect(() => {
-    console.log("[activeKeys effect] Size changed:", {
-      size: activeKeys.size,
-      completingTask: state.taskProgress.find((t) => t.status === "completing")
-        ?.taskId,
-    });
-
-    // If we have no active keys and a completing task, it's time to complete
-    if (activeKeys.size === 0) {
-      const completingTask = state.taskProgress.find(
-        (t) => t.status === "completing"
-      );
-      if (completingTask) {
-        console.log(
-          "[activeKeys effect] Completing task:",
-          completingTask.taskId
-        );
-
-        setState((prev) => {
-          const nextTaskId = getNextTaskId(completingTask.taskId);
-          return {
-            ...prev,
-            taskProgress: prev.taskProgress.map((t) =>
-              t.taskId === completingTask.taskId
-                ? { ...t, status: "completed" }
-                : t
-            ),
-            pendingNextTask: nextTaskId,
-          };
-        });
-      }
-    }
-  }, [activeKeys.size]); // Only depend on activeKeys.size
+  const currentActiveTaskId = getActiveTaskId(currentLessonId);
 
   // Add this effect to initialize sequenceCheckers when tasks change
   useEffect(() => {
@@ -512,7 +276,6 @@ export const PianoController: React.FC = () => {
       <LessonsPanel
         currentLessonId={currentLessonId}
         onLessonChange={handleLessonChange}
-        taskProgress={state.taskProgress}
         activeTaskId={currentActiveTaskId}
         keyboardState={{
           activeKeyCodes,
@@ -548,8 +311,6 @@ export const PianoController: React.FC = () => {
               : undefined
           }
           activeTaskId={currentActiveTaskId}
-          taskProgress={state.taskProgress}
-          taskPlayedNotes={state.taskPlayedNotes}
           state={state}
           setActiveKeyCodes={setActiveKeyCodes}
         />
