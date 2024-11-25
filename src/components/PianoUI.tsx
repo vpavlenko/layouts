@@ -50,7 +50,7 @@ const isNoteInScaleMapping = (
   taskId: TaskId | null,
   keyboardMapping?: KeyboardMapping
 ): boolean => {
-  if (!taskId || !keyboardMapping || !taskId.includes("scale")) return true;
+  if (!taskId || !keyboardMapping) return true;
 
   // Check if this note/octave combination exists in the mapping
   return Object.values(keyboardMapping).some(
@@ -96,15 +96,9 @@ const PianoKey: React.FC<PianoKeyProps> = ({
 
     if (colorMode === "flat-chromatic") return "flat-chromatic";
 
-    // For scale tasks, only color mapped notes
-    if (activeTaskId?.includes("scale")) {
-      return shouldColorNote && chromaticNotes?.includes(note)
-        ? "chromatic"
-        : "traditional";
-    }
-
-    // For other tasks, use previous logic
-    return chromaticNotes?.includes(note) ? "chromatic" : "traditional";
+    return shouldColorNote && chromaticNotes?.includes(note)
+      ? "chromatic"
+      : "traditional";
   })();
 
   const colors = getColors(tonic, effectiveColorMode);
@@ -362,7 +356,7 @@ interface PianoUIProps {
   ) => Array<{ note: number; octave: number }>;
   fallingNotes: FallingNote[];
   taskKeyboardMapping?: KeyboardMapping;
-  activeTaskId: TaskId | null;
+  taskId: TaskId;
   state: PianoControllerState;
   setActiveKeyCodes: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
@@ -378,7 +372,7 @@ export const PianoUI: React.FC<PianoUIProps> = ({
   releaseNotes,
   fallingNotes,
   taskKeyboardMapping,
-  activeTaskId,
+  taskId,
   setActiveKeyCodes,
 }) => {
   const [isShiftPressed, setIsShiftPressed] = useState(false);
@@ -546,7 +540,7 @@ export const PianoUI: React.FC<PianoUIProps> = ({
     colorMode,
     playNotes,
     releaseNotes,
-    activeTaskId,
+    activeTaskId: taskId,
   };
 
   const c1Left = calculateKeyLeftPosition(0, 1, keyWidth, "traditional");
@@ -648,7 +642,7 @@ export const PianoUI: React.FC<PianoUIProps> = ({
                     zIndex:
                       colorMode === "flat-chromatic" ? 1 : isWhiteKey ? 1 : 2,
                   }}
-                  activeTaskId={activeTaskId}
+                  activeTaskId={taskId}
                   keyboardMapping={taskKeyboardMapping}
                 />
               );

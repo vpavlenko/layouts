@@ -8,7 +8,7 @@ import { FallingNote } from "./FallingNotes";
 import { TaskPanel } from "./TaskPanel";
 import { immediate } from "tone";
 import { useParams, useNavigate } from "react-router-dom";
-import { TASK_SEQUENCE, TASK_CONFIGS, TaskId } from "../tasks/tasks";
+import { TASK_CONFIGS, TaskId } from "../tasks/tasks";
 import { URL_PREFIX } from "../constants/routes";
 import { ensureSamplerLoaded } from "../audio/sampler";
 
@@ -36,9 +36,9 @@ export const PianoController: React.FC = () => {
   const [voicing, setVoicing] = useState<Voicing>("single");
   const [colorMode, setColorMode] = useState<ColorMode>("chromatic");
   const [fallingNotes, setFallingNotes] = useState<FallingNote[]>([]);
-  const [currentTaskId, setCurrentTaskId] = useState<TaskId>(TASK_SEQUENCE[0]);
+  const [taskId, setTaskId] = useState<TaskId>(0);
   const navigate = useNavigate();
-  const { taskId } = useParams();
+  const { taskId: urlTaskId } = useParams();
   const [state, setState] = useState<PianoControllerState>({
     activeKeysSize: 0,
   });
@@ -46,13 +46,17 @@ export const PianoController: React.FC = () => {
   const [samplerReady, setSamplerReady] = useState(false);
   const [activeKeyCodes, setActiveKeyCodes] = useState<Set<string>>(new Set());
 
-  // Initialize currentTaskId from URL parameter
+  // Initialize taskId from URL parameter
   useEffect(() => {
-    const validTaskId = TASK_SEQUENCE.includes(taskId as TaskId)
-      ? (taskId as TaskId)
-      : TASK_SEQUENCE[0];
-    setCurrentTaskId(validTaskId);
-  }, [taskId]);
+    const parsedTaskId = parseInt(urlTaskId || "0");
+    const validTaskId =
+      isNaN(parsedTaskId) ||
+      parsedTaskId < 0 ||
+      parsedTaskId >= TASK_CONFIGS.length
+        ? 0
+        : parsedTaskId;
+    setTaskId(validTaskId);
+  }, [urlTaskId]);
 
   // Add effect to sync activeKeysSize
   useEffect(() => {
@@ -150,13 +154,10 @@ export const PianoController: React.FC = () => {
   );
 
   const handleTaskChange = useCallback(
-    (taskId: TaskId) => {
-      console.log("[taskChange] Changing to task:", taskId);
-      const taskConfig = TASK_CONFIGS[taskId];
-      if (!taskConfig) return;
-
-      setCurrentTaskId(taskId);
-      navigate(`${URL_PREFIX}/${taskId}`);
+    (newTaskId: TaskId) => {
+      console.log("[taskChange] Changing to task:", newTaskId);
+      setTaskId(newTaskId);
+      navigate(`${URL_PREFIX}/${newTaskId}`);
     },
     [navigate]
   );
@@ -164,11 +165,11 @@ export const PianoController: React.FC = () => {
   return (
     <>
       <TaskPanel
-        currentTaskId={currentTaskId}
+        taskId={taskId}
         onTaskChange={handleTaskChange}
         keyboardState={{
           activeKeyCodes,
-          taskKeyboardMapping: TASK_CONFIGS[currentTaskId]?.keyboardMapping,
+          taskKeyboardMapping: TASK_CONFIGS[taskId]?.keyboardMapping,
         }}
       />
       {!samplerReady ? (
@@ -179,15 +180,15 @@ export const PianoController: React.FC = () => {
         <PianoUI
           tonic={tonic}
           setTonic={setTonic}
-          colorMode={TASK_CONFIGS[currentTaskId]?.colorMode || colorMode}
+          colorMode={TASK_CONFIGS[taskId]?.colorMode || colorMode}
           onColorModeChange={setColorMode}
           currentVoicing={voicing}
           onVoicingChange={setVoicing}
           playNotes={playNotes}
           releaseNotes={releaseNotes}
           fallingNotes={fallingNotes}
-          taskKeyboardMapping={TASK_CONFIGS[currentTaskId]?.keyboardMapping}
-          activeTaskId={currentTaskId}
+          taskKeyboardMapping={TASK_CONFIGS[taskId]?.keyboardMapping}
+          taskId={taskId}
           state={state}
           setActiveKeyCodes={setActiveKeyCodes}
         />

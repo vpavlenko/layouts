@@ -4,18 +4,7 @@ import { createSequenceKeyboardMapping } from "./mappings";
 
 export type ChromaticNote = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 
-export const TASK_SEQUENCE = [
-  "play-b-across-octaves",
-  "play-chromatic-ascending-flat",
-  "play-major-seconds-from-asharp0",
-  "play-dorian-scale",
-  "play-locrian-scale",
-  "play-b-major-chord",
-  "play-b-minor-chord",
-  "free-play",
-] as const;
-
-export type TaskId = (typeof TASK_SEQUENCE)[number];
+export type TaskId = number;
 
 export interface TaskConfig {
   title: string;
@@ -430,15 +419,13 @@ const createScaleKeyboardMapping = (
   return mapping;
 };
 
-// Add these new task definitions after the SCALE_SEQUENCES constant and before TASK_CONFIGS
-
-// Update TASK_CONFIGS with the modified scale tasks
-export const TASK_CONFIGS: Record<TaskId, TaskConfig> = {
-  "play-b-across-octaves": {
+// Convert TASK_CONFIGS from Record to Array
+export const TASK_CONFIGS: TaskConfig[] = [
+  {
     title: "White Keys",
     ...createTaskConfig(NOTE_MAPPINGS.B, [0, 2, 4, 5, 7, 9, 11]),
   },
-  "play-chromatic-ascending-flat": {
+  {
     title: "Chromatic Sequences",
     keyboardMapping: createSequenceKeyboardMapping(
       ascendingSequence,
@@ -447,7 +434,7 @@ export const TASK_CONFIGS: Record<TaskId, TaskConfig> = {
     colorMode: "flat-chromatic",
     chromaticNotes: Array.from(new Set(ascendingSequence.map((n) => n.note))),
   },
-  "play-major-seconds-from-asharp0": {
+  {
     title: "Major Seconds from A#0",
     keyboardMapping: createFlatChromaticMapping(majorSecondFromASharp0Sequence),
     colorMode: "flat-chromatic",
@@ -455,7 +442,7 @@ export const TASK_CONFIGS: Record<TaskId, TaskConfig> = {
       new Set(majorSecondFromASharp0Sequence.map((n) => n.note))
     ),
   },
-  "play-dorian-scale": {
+  {
     title: "Dorian Scale",
     keyboardMapping: createScaleKeyboardMapping(SCALE_SEQUENCES.dorian, [
       "lydian",
@@ -472,7 +459,7 @@ export const TASK_CONFIGS: Record<TaskId, TaskConfig> = {
       ])
     ),
   },
-  "play-locrian-scale": {
+  {
     title: "Locrian Scale",
     keyboardMapping: createScaleKeyboardMapping(SCALE_SEQUENCES.locrian, [
       "dorianLow",
@@ -489,16 +476,8 @@ export const TASK_CONFIGS: Record<TaskId, TaskConfig> = {
       ])
     ),
   },
-  "play-b-major-chord": {
-    title: "B Major Chord",
-    colorMode: "chromatic",
-  },
-  "play-b-minor-chord": {
-    title: "B Minor Chord",
-    colorMode: "chromatic",
-  },
-  "free-play": {
+  {
     title: "Free Play",
     colorMode: "chromatic",
   },
-};
+];

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { URL_PREFIX } from "../constants/routes";
 import { KeyboardMapping } from "../constants/keyboard";
 import { Layout } from "./Layout";
-import { TASK_SEQUENCE, TASK_CONFIGS, TaskId } from "../tasks/tasks";
+import { TASK_CONFIGS, TaskId } from "../tasks/tasks";
 
 interface KeyboardState {
   activeKeyCodes: Set<string>;
@@ -11,13 +11,13 @@ interface KeyboardState {
 }
 
 interface TaskPanelProps {
-  currentTaskId: TaskId;
+  taskId: TaskId;
   onTaskChange: (taskId: TaskId) => void;
   keyboardState: KeyboardState;
 }
 
 export const TaskPanel: React.FC<TaskPanelProps> = React.memo(
-  ({ currentTaskId, onTaskChange, keyboardState }) => {
+  ({ taskId, onTaskChange, keyboardState }) => {
     return (
       <div className="fixed top-0 left-0 w-[600px] h-screen bg-gray-900 text-white flex flex-col">
         {/* Keyboard section */}
@@ -31,15 +31,14 @@ export const TaskPanel: React.FC<TaskPanelProps> = React.memo(
         <div className="flex-1 overflow-y-auto">
           <div className="p-4">
             <div className="grid gap-4">
-              {TASK_SEQUENCE.map((taskId, index) => {
-                const taskConfig = TASK_CONFIGS[taskId];
-                const isCurrentTask = taskId === currentTaskId;
+              {TASK_CONFIGS.map((taskConfig, index) => {
+                const isCurrentTask = index === taskId;
 
                 return (
                   <Link
-                    key={taskId}
-                    to={`${URL_PREFIX}/${taskId}`}
-                    onClick={() => onTaskChange(taskId)}
+                    key={index}
+                    to={`${URL_PREFIX}/${index}`}
+                    onClick={() => onTaskChange(index)}
                     className={`p-4 rounded-lg border transition-all ${
                       isCurrentTask
                         ? "bg-blue-600 border-blue-500 shadow-lg shadow-blue-500/20"
