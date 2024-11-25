@@ -15,8 +15,6 @@ interface ColorModeToggleProps {
 interface ControlsProps extends TonicPickerProps, ColorModeToggleProps {}
 
 const TonicPicker: React.FC<TonicPickerProps> = ({ tonic, onTonicChange }) => {
-  const [showPicker, setShowPicker] = useState(false);
-  const pickerRef = React.useRef<HTMLDivElement>(null);
   const [hoveredNote, setHoveredNote] = useState<number | null>(null);
   const notes = [
     "C",
@@ -33,102 +31,76 @@ const TonicPicker: React.FC<TonicPickerProps> = ({ tonic, onTonicChange }) => {
     "B",
   ];
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        pickerRef.current &&
-        !pickerRef.current.contains(event.target as Node)
-      ) {
-        setShowPicker(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  // Calculate positions for black keys
+  const blackKeyIndices = [1, 3, 6, 8, 10]; // C#, D#, F#, G#, A#
 
   return (
     <div
-      ref={pickerRef}
       style={{
         position: "relative",
-        cursor: "pointer",
+        height: "30px",
+        width: "180px",
+        display: "flex",
       }}
-      onClick={() => setShowPicker(!showPicker)}
     >
-      <div style={{ fontSize: "16px", fontWeight: "bold" }}>{notes[tonic]}</div>
-      {showPicker && (
+      {/* White keys first */}
+      {notes.map((note, index) => {
+        const isSharp = note.includes("#");
+        if (isSharp) return null;
+
+        return (
+          <div
+            key={note}
+            onClick={() => onTonicChange(index)}
+            onMouseEnter={() => setHoveredNote(index)}
+            onMouseLeave={() => setHoveredNote(null)}
+            style={{
+              flex: 1,
+              height: "100%",
+              backgroundColor:
+                tonic === index
+                  ? "#4CAF50"
+                  : hoveredNote === index
+                  ? "#ddd"
+                  : "#fff",
+              border: "1px solid #000",
+              borderRadius: "0 0 3px 3px",
+              cursor: "pointer",
+              transition: "all 0.1s ease-in-out",
+              position: "relative",
+              marginRight: "-1px",
+              color: tonic === index ? "#fff" : "#000",
+            }}
+          />
+        );
+      })}
+
+      {/* Black keys overlay */}
+      {blackKeyIndices.map((index) => (
         <div
+          key={notes[index]}
+          onClick={() => onTonicChange(index)}
+          onMouseEnter={() => setHoveredNote(index)}
+          onMouseLeave={() => setHoveredNote(null)}
           style={{
             position: "absolute",
-            top: "100%",
-            left: "0",
-            transform: "none",
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-            padding: "8px",
-            background: "rgba(0, 0, 0, 0.8)",
-            borderRadius: "4px",
-            marginTop: "4px",
-            zIndex: 10,
-            minWidth: "200px",
+            width: "16px",
+            height: "20px",
+            backgroundColor:
+              tonic === index
+                ? "#4CAF50"
+                : hoveredNote === index
+                ? "#666"
+                : "#000",
+            border: "1px solid #000",
+            borderRadius: "0 0 3px 3px",
+            cursor: "pointer",
+            zIndex: 1,
+            left: `${(index * 180) / 12}px`,
+            transition: "all 0.1s ease-in-out",
           }}
-        >
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(6, 1fr)",
-              gap: "4px",
-            }}
-          >
-            {notes.map((note, index) => (
-              <div
-                key={note}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onTonicChange(index);
-                  setShowPicker(false);
-                }}
-                onMouseEnter={() => setHoveredNote(index)}
-                onMouseLeave={() => setHoveredNote(null)}
-                style={{
-                  padding: "4px 8px",
-                  cursor: "pointer",
-                  background:
-                    tonic === index || hoveredNote === index
-                      ? "rgba(255, 255, 255, 0.15)"
-                      : "none",
-                  border:
-                    tonic === index
-                      ? "1px solid rgba(255, 255, 255, 0.8)"
-                      : "1px solid transparent",
-                  borderRadius: "4px",
-                  fontSize: "14px",
-                  textAlign: "center",
-                  fontWeight: tonic === index ? "bold" : "normal",
-                  transition: "all 0.1s ease-in-out",
-                }}
-              >
-                {note}
-              </div>
-            ))}
-          </div>
-          <div
-            style={{
-              fontSize: "12px",
-              color: "rgba(255, 255, 255, 0.7)",
-              textAlign: "center",
-              borderTop: "1px solid rgba(255, 255, 255, 0.2)",
-              paddingTop: "8px",
-            }}
-          >
-            Press Ctrl + key to change tonic
-          </div>
-        </div>
-      )}
+        />
+      ))}
     </div>
   );
 };
