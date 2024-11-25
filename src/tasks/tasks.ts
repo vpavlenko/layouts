@@ -725,6 +725,38 @@ const createPentatonicMapping = (): KeyboardMapping => {
   return mapping;
 };
 
+// Add this function before TASK_CONFIGS
+const createHirajoshiMapping = (): KeyboardMapping => {
+  const mapping: KeyboardMapping = {};
+
+  // Define the Hirajoshi scale notes (C, C#, F, F#, Bb)
+  const hirajoshiNotes: ChromaticNote[] = [0, 1, 5, 6, 10];
+
+  // Define rows of keys for each octave
+  const keyRows = [
+    ["KeyZ", "KeyX", "KeyC", "KeyV", "KeyB"], // Octave 1
+    ["KeyA", "KeyS", "KeyD", "KeyF", "KeyG"], // Octave 2
+    ["KeyQ", "KeyW", "KeyE", "KeyR", "KeyT"], // Octave 3
+    ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5"], // Octave 4
+    ["KeyN", "KeyM", "Comma", "Period", "Slash"], // Octave 5
+    ["KeyH", "KeyJ", "KeyK", "KeyL", "Semicolon"], // Octave 6
+    ["KeyY", "KeyU", "KeyI", "KeyO", "KeyP"], // Octave 7
+  ];
+
+  // Map each row to its corresponding octave
+  keyRows.forEach((row, rowIndex) => {
+    const octave = rowIndex + 1;
+    row.forEach((key, noteIndex) => {
+      mapping[key] = {
+        note: hirajoshiNotes[noteIndex],
+        octave,
+      };
+    });
+  });
+
+  return mapping;
+};
+
 // Remove the createTaskConfig function and directly define TASK_CONFIGS
 export const TASK_CONFIGS: TaskConfig[] = [
   {
@@ -818,6 +850,11 @@ export const TASK_CONFIGS: TaskConfig[] = [
   {
     title: "Minor Pentatonic",
     keyboardMapping: createPentatonicMapping(),
+    colorMode: "chromatic",
+  },
+  {
+    title: "Hirajoshi Scale",
+    keyboardMapping: createHirajoshiMapping(),
     colorMode: "chromatic",
   },
 ];
