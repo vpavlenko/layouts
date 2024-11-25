@@ -181,348 +181,7 @@ const majorSecondFromASharp0Sequence = createIntervalSequence(
   2
 ); // Start from A#0
 
-// Create keyboard mappings for the sequences
-const createFlatChromaticMapping = (
-  sequence: Array<{ note: number; octave: number }>
-): KeyboardMapping => {
-  const mapping: KeyboardMapping = {};
-  const keySequence = [
-    // Bottom row
-    "KeyZ",
-    "KeyX",
-    "KeyC",
-    "KeyV",
-    "KeyB",
-    "KeyN",
-    "KeyM",
-    "Comma",
-    "Period",
-    "Slash",
-    // Middle row
-    "KeyA",
-    "KeyS",
-    "KeyD",
-    "KeyF",
-    "KeyG",
-    "KeyH",
-    "KeyJ",
-    "KeyK",
-    "KeyL",
-    "Semicolon",
-    "Quote",
-    // Top row
-    "KeyQ",
-    "KeyW",
-    "KeyE",
-    "KeyR",
-    "KeyT",
-    "KeyY",
-    "KeyU",
-    "KeyI",
-    "KeyO",
-    "KeyP",
-    "BracketLeft",
-    "BracketRight",
-    // Number row
-    "Digit1",
-    "Digit2",
-    "Digit3",
-    "Digit4",
-    "Digit5",
-    "Digit6",
-    "Digit7",
-    "Digit8",
-    "Digit9",
-    "Digit0",
-    "Minus",
-    "Equal",
-  ];
-
-  sequence.forEach(({ note, octave }, index) => {
-    if (index < keySequence.length) {
-      mapping[keySequence[index]] = { note, octave };
-    }
-  });
-
-  return mapping;
-};
-
-// Replace createTonicChordMapping with this version
-const createTonicChordMapping = (): KeyboardMapping => {
-  const mappingString = `E1 E2 E3 E4 E5 E6 E7 . . . . .
-G1 G2 G3 G4 G5 G6 G7 . . . . .
-C1 C2 C3 C4 C5 C6 C7 C8 . . .
-Eb1 Eb2 Eb3 Eb4 Eb5 Eb6 Eb7 . . .`;
-
-  return processKeyboardString(mappingString);
-};
-
-const createFifthsOnlyMapping = (): KeyboardMapping => {
-  const mapping: KeyboardMapping = {};
-
-  // Define rows of keys for fifths
-  const keyRows = [
-    [
-      "Digit1",
-      "Digit2",
-      "Digit3",
-      "Digit4",
-      "Digit5",
-      "Digit6",
-      "Digit7",
-      "Digit8",
-      "Digit9",
-      "Digit0",
-      "Minus",
-      "Equal",
-    ], // Starting C1
-    [
-      "KeyQ",
-      "KeyW",
-      "KeyE",
-      "KeyR",
-      "KeyT",
-      "KeyY",
-      "KeyU",
-      "KeyI",
-      "KeyO",
-      "KeyP",
-      "BracketLeft",
-      "BracketRight",
-    ], // Starting C2
-    [
-      "KeyA",
-      "KeyS",
-      "KeyD",
-      "KeyF",
-      "KeyG",
-      "KeyH",
-      "KeyJ",
-      "KeyK",
-      "KeyL",
-      "Semicolon",
-      "Quote",
-    ], // Starting C3
-    [
-      "KeyZ",
-      "KeyX",
-      "KeyC",
-      "KeyV",
-      "KeyB",
-      "KeyN",
-      "KeyM",
-      "Comma",
-      "Period",
-      "Slash",
-    ], // Starting C4
-  ];
-
-  keyRows.forEach((row, rowIndex) => {
-    let currentNote = 0; // Start with C
-    let currentOctave = rowIndex + 1; // Start octave based on row
-
-    row.forEach((key) => {
-      // Only map if we haven't exceeded C8
-      if (currentOctave < 8 || (currentOctave === 8 && currentNote === 0)) {
-        mapping[key] = {
-          note: currentNote as ChromaticNote,
-          octave: currentOctave,
-        };
-
-        // Move up a fifth (7 semitones)
-        currentNote = (currentNote + 7) % 12;
-        if (currentNote < 7) {
-          currentOctave++;
-        }
-      }
-    });
-  });
-
-  return mapping;
-};
-
-const createFourthsOnlyMapping = (): KeyboardMapping => {
-  const mapping: KeyboardMapping = {};
-
-  // Define rows of keys for fourths
-  const keyRows = [
-    [
-      "Digit1",
-      "Digit2",
-      "Digit3",
-      "Digit4",
-      "Digit5",
-      "Digit6",
-      "Digit7",
-      "Digit8",
-      "Digit9",
-      "Digit0",
-      "Minus",
-      "Equal",
-    ], // Starting C1
-    [
-      "KeyQ",
-      "KeyW",
-      "KeyE",
-      "KeyR",
-      "KeyT",
-      "KeyY",
-      "KeyU",
-      "KeyI",
-      "KeyO",
-      "KeyP",
-      "BracketLeft",
-      "BracketRight",
-    ], // Starting C2
-    [
-      "KeyA",
-      "KeyS",
-      "KeyD",
-      "KeyF",
-      "KeyG",
-      "KeyH",
-      "KeyJ",
-      "KeyK",
-      "KeyL",
-      "Semicolon",
-      "Quote",
-    ], // Starting C3
-    [
-      "KeyZ",
-      "KeyX",
-      "KeyC",
-      "KeyV",
-      "KeyB",
-      "KeyN",
-      "KeyM",
-      "Comma",
-      "Period",
-      "Slash",
-    ], // Starting C4
-  ];
-
-  keyRows.forEach((row, rowIndex) => {
-    let currentNote = 0; // Start with C
-    let currentOctave = rowIndex + 1; // Start octave based on row
-
-    row.forEach((key) => {
-      // Only map if we haven't exceeded C8
-      if (currentOctave < 8 || (currentOctave === 8 && currentNote === 0)) {
-        mapping[key] = {
-          note: currentNote as ChromaticNote,
-          octave: currentOctave,
-        };
-
-        // Move up a fourth (5 semitones)
-        currentNote = (currentNote + 5) % 12;
-        if (currentNote < 5) {
-          currentOctave++;
-        }
-      }
-    });
-  });
-
-  return mapping;
-};
-
-// Add this function before TASK_CONFIGS
-const createAugmentedScalesMapping = (): KeyboardMapping => {
-  const mapping: KeyboardMapping = {};
-
-  // Define the rows of keys
-  const keyRows = [
-    // 1-= row (C-based augmented)
-    [
-      "Digit1",
-      "Digit2",
-      "Digit3",
-      "Digit4",
-      "Digit5",
-      "Digit6",
-      "Digit7",
-      "Digit8",
-      "Digit9",
-      "Digit0",
-      "Minus",
-      "Equal",
-    ],
-    // q-] row (C#-based augmented)
-    [
-      "KeyQ",
-      "KeyW",
-      "KeyE",
-      "KeyR",
-      "KeyT",
-      "KeyY",
-      "KeyU",
-      "KeyI",
-      "KeyO",
-      "KeyP",
-      "BracketLeft",
-      "BracketRight",
-    ],
-    // a-' row (D-based augmented)
-    [
-      "KeyA",
-      "KeyS",
-      "KeyD",
-      "KeyF",
-      "KeyG",
-      "KeyH",
-      "KeyJ",
-      "KeyK",
-      "KeyL",
-      "Semicolon",
-      "Quote",
-    ],
-    // z-/ row (D#-based augmented)
-    [
-      "KeyZ",
-      "KeyX",
-      "KeyC",
-      "KeyV",
-      "KeyB",
-      "KeyN",
-      "KeyM",
-      "Comma",
-      "Period",
-      "Slash",
-    ],
-  ];
-
-  // Root notes for each row (C, C#, D, D#)
-  const rowRootNotes = [0, 1, 2, 3];
-
-  // Create mapping for each row
-  keyRows.forEach((row, rowIndex) => {
-    const rootNote = rowRootNotes[rowIndex];
-
-    row.forEach((key, keyIndex) => {
-      // Calculate the note and octave
-      const intervalSteps = Math.floor(keyIndex / 3); // How many complete augmented chords we've gone through
-      const noteInChord = keyIndex % 3; // Position within current augmented chord (0, 1, or 2)
-      const note = ((rootNote + noteInChord * 4) % 12) as ChromaticNote;
-      const octave =
-        2 + intervalSteps + Math.floor((rootNote + noteInChord * 4) / 12);
-
-      mapping[key] = { note, octave };
-    });
-  });
-
-  return mapping;
-};
-
-// Replace createPentatonicMapping with this version
-const createPentatonicMapping = (): KeyboardMapping => {
-  const mappingString = `C4 Eb4 F4 G4 Bb4 . . . . . . .
-C3 Eb3 F3 G3 Bb3 C7 Eb7 F7 G7 Bb7 . .
-C2 Eb2 F2 G2 Bb2 C6 Eb6 F6 G6 Bb6 .
-C1 Eb1 F1 G1 Bb1 C5 Eb5 F5 G5 Bb5`;
-
-  return processKeyboardString(mappingString);
-};
-
-// Add these helper functions before createHirajoshiMapping
+// Add these helper functions before creating mappings
 const parseNoteString = (
   noteStr: string
 ): { note: ChromaticNote; octave: number } => {
@@ -634,7 +293,126 @@ const processKeyboardString = (mappingStr: string): KeyboardMapping => {
   return mapping;
 };
 
-// Replace createHirajoshiMapping with this simpler version
+// Create the ascending chromatic mapping
+const createFlatChromaticMapping = (
+  sequence: Array<{ note: number; octave: number }>
+): KeyboardMapping => {
+  const mapping: KeyboardMapping = {};
+  const keySequence = [
+    // Bottom row
+    "KeyZ",
+    "KeyX",
+    "KeyC",
+    "KeyV",
+    "KeyB",
+    "KeyN",
+    "KeyM",
+    "Comma",
+    "Period",
+    "Slash",
+    // Middle row
+    "KeyA",
+    "KeyS",
+    "KeyD",
+    "KeyF",
+    "KeyG",
+    "KeyH",
+    "KeyJ",
+    "KeyK",
+    "KeyL",
+    "Semicolon",
+    "Quote",
+    // Top row
+    "KeyQ",
+    "KeyW",
+    "KeyE",
+    "KeyR",
+    "KeyT",
+    "KeyY",
+    "KeyU",
+    "KeyI",
+    "KeyO",
+    "KeyP",
+    "BracketLeft",
+    "BracketRight",
+    // Number row
+    "Digit1",
+    "Digit2",
+    "Digit3",
+    "Digit4",
+    "Digit5",
+    "Digit6",
+    "Digit7",
+    "Digit8",
+    "Digit9",
+    "Digit0",
+    "Minus",
+    "Equal",
+  ];
+
+  sequence.forEach(({ note, octave }, index) => {
+    if (index < keySequence.length) {
+      mapping[keySequence[index]] = { note, octave };
+    }
+  });
+
+  return mapping;
+};
+
+// Replace createTonicChordMapping with this version
+const createTonicChordMapping = (): KeyboardMapping => {
+  const mappingString = `E1 E2 E3 E4 E5 E6 E7 . . . . .
+G1 G2 G3 G4 G5 G6 G7 . . . . .
+C1 C2 C3 C4 C5 C6 C7 C8 . . .
+Eb1 Eb2 Eb3 Eb4 Eb5 Eb6 Eb7 . . .`;
+
+  return processKeyboardString(mappingString);
+};
+
+// Replace createFifthsOnlyMapping with this version
+const createFifthsOnlyMapping = (): KeyboardMapping => {
+  const mappingString = `
+C1 G1 D2 A2 E3 B3 F#4 C#5 G#5 D#6 A#6 F7
+C2 G2 D3 A3 E4 B4 F#5 C#6 G#6 D#7 A#7 F8
+C3 G3 D4 A4 E5 B5 F#6 C#7 G#7 D#8 A#8 .
+C4 G4 D5 A5 E6 B6 F#7 C#8 . . . .`;
+
+  return processKeyboardString(mappingString);
+};
+
+// Replace createFourthsOnlyMapping with this version
+const createFourthsOnlyMapping = (): KeyboardMapping => {
+  const mappingString = `
+C1 F1 Bb1 Eb2 Ab2 Db3 Gb3 B3 E4 A4 D5 G5
+C2 F2 Bb2 Eb3 Ab3 Db4 Gb4 B4 E5 A5 D6 G6
+C3 F3 Bb3 Eb4 Ab4 Db5 Gb5 B5 E6 A6 D7 G7
+C4 F4 Bb4 Eb5 Ab5 Db6 Gb6 B6 E7 A7 D8 G8`;
+
+  return processKeyboardString(mappingString);
+};
+
+// Replace createAugmentedScalesMapping with this version
+const createAugmentedScalesMapping = (): KeyboardMapping => {
+  const mappingString = `
+C2 E2 G#2 C3 E3 G#3 C4 E4 G#4 C5 E5 G#5
+C#2 F2 A2 C#3 F3 A3 C#4 F4 A4 C#5 F5 A5
+D2 F#2 A#2 D3 F#3 A#3 D4 F#4 A#4 D5 F#5 A#5
+D#2 G2 B2 D#3 G3 B3 D#4 G4 B4 D#5 G5 B5`;
+
+  return processKeyboardString(mappingString);
+};
+
+// Replace createPentatonicMapping with this version
+const createPentatonicMapping = (): KeyboardMapping => {
+  const mappingString = `C4 Eb4 F4 G4 Bb4 . . . . . . .
+C3 Eb3 F3 G3 Bb3 C7 Eb7 F7 G7 Bb7 . .
+C2 Eb2 F2 G2 Bb2 C6 Eb6 F6 G6 Bb6 .
+C1 Eb1 F1 G1 Bb1 C5 Eb5 F5 G5 Bb5`;
+
+  return processKeyboardString(mappingString);
+};
+
+// Replace createHirajoshiMapping with this version
 const createHirajoshiMapping = (): KeyboardMapping => {
   const mappingString = `C4 C#4 F4 F#4 Bb4 C8 . . . . . Bb0
 C3 C#3 F3 F#3 Bb3 C7 C#7 F7 F#7 Bb7
