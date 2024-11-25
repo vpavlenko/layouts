@@ -155,20 +155,6 @@ export const PianoController: React.FC = () => {
       const taskConfig = TASK_CONFIGS[taskId];
       if (!taskConfig) return;
 
-      setState((prev) => ({
-        ...prev,
-        taskProgress:
-          taskId === "free-play"
-            ? []
-            : [
-                {
-                  taskId,
-                  progress: taskConfig.total,
-                  status: "completed",
-                },
-              ],
-      }));
-
       setCurrentTaskId(taskId);
       navigate(`${URL_PREFIX}/${taskId}`);
     },

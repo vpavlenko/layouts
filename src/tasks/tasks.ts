@@ -2,7 +2,6 @@ import { ColorMode } from "../components/types";
 import { KeyboardMapping } from "../constants/keyboard";
 import { createSequenceKeyboardMapping } from "./mappings";
 
-export type RelativeNote = 0 | 2 | 4 | 5 | 7 | 9 | 11; // C D E F G A B
 export type ChromaticNote = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 
 export const TASK_SEQUENCE = [
@@ -20,11 +19,9 @@ export type TaskId = (typeof TASK_SEQUENCE)[number];
 
 export interface TaskConfig {
   title: string;
-  total: number;
   keyboardMapping?: KeyboardMapping;
   colorMode?: ColorMode;
   chromaticNotes?: number[];
-  playedNotes?: Set<string>;
 }
 
 // First, let's create a type for our key mappings
@@ -168,7 +165,6 @@ const createTaskConfig = (
   });
 
   return {
-    total: 4,
     chromaticNotes,
     keyboardMapping: fullMapping,
   };
@@ -444,7 +440,6 @@ export const TASK_CONFIGS: Record<TaskId, TaskConfig> = {
   },
   "play-chromatic-ascending-flat": {
     title: "Chromatic Sequences",
-    total: ASCENDING_KEY_SEQUENCE.length,
     keyboardMapping: createSequenceKeyboardMapping(
       ascendingSequence,
       ASCENDING_KEY_SEQUENCE
@@ -454,7 +449,6 @@ export const TASK_CONFIGS: Record<TaskId, TaskConfig> = {
   },
   "play-major-seconds-from-asharp0": {
     title: "Major Seconds from A#0",
-    total: majorSecondFromASharp0Sequence.length,
     keyboardMapping: createFlatChromaticMapping(majorSecondFromASharp0Sequence),
     colorMode: "flat-chromatic",
     chromaticNotes: Array.from(
@@ -463,7 +457,6 @@ export const TASK_CONFIGS: Record<TaskId, TaskConfig> = {
   },
   "play-dorian-scale": {
     title: "Dorian Scale",
-    total: SCALE_SEQUENCES.dorian.notes.length,
     keyboardMapping: createScaleKeyboardMapping(SCALE_SEQUENCES.dorian, [
       "lydian",
       "major",
@@ -481,7 +474,6 @@ export const TASK_CONFIGS: Record<TaskId, TaskConfig> = {
   },
   "play-locrian-scale": {
     title: "Locrian Scale",
-    total: SCALE_SEQUENCES.locrian.notes.length,
     keyboardMapping: createScaleKeyboardMapping(SCALE_SEQUENCES.locrian, [
       "dorianLow",
       "minor",
@@ -499,17 +491,14 @@ export const TASK_CONFIGS: Record<TaskId, TaskConfig> = {
   },
   "play-b-major-chord": {
     title: "B Major Chord",
-    total: 3,
     colorMode: "chromatic",
   },
   "play-b-minor-chord": {
     title: "B Minor Chord",
-    total: 3,
     colorMode: "chromatic",
   },
   "free-play": {
     title: "Free Play",
-    total: 0,
     colorMode: "chromatic",
   },
 };
