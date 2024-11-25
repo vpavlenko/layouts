@@ -41,21 +41,6 @@ interface PianoKeyProps {
   keyboardMapping?: KeyboardMapping;
 }
 
-// Add helper to check if a note is part of scale task mapping
-const isNoteInScaleMapping = (
-  note: number,
-  octave: number,
-  taskId: TaskId | null,
-  keyboardMapping?: KeyboardMapping
-): boolean => {
-  if (!taskId || !keyboardMapping) return true;
-
-  // Check if this note/octave combination exists in the mapping
-  return Object.values(keyboardMapping).some(
-    (mapping) => mapping.note === note && mapping.octave === octave
-  );
-};
-
 const PianoKey: React.FC<PianoKeyProps> = ({
   note,
   octave,
@@ -67,30 +52,11 @@ const PianoKey: React.FC<PianoKeyProps> = ({
   releaseNotes,
   isActive,
   activeTaskId,
-  keyboardMapping,
 }) => {
   const [isHovered, setIsHovered] = React.useState(false);
   const [isPressed, setIsPressed] = React.useState(false);
 
-  // Check if this note should be colored based on scale mapping
-  const shouldColorNote = isNoteInScaleMapping(
-    note,
-    octave,
-    activeTaskId,
-    keyboardMapping
-  );
-
-  // Determine which color mode to use for this note
-  const effectiveColorMode = (() => {
-    // For free play (no active task), use the passed colorMode directly
-    if (!activeTaskId) return colorMode;
-
-    if (colorMode === "flat-chromatic") return "flat-chromatic";
-
-    return shouldColorNote ? "chromatic" : "traditional";
-  })();
-
-  const colors = getColors(tonic, effectiveColorMode);
+  const colors = getColors(tonic, colorMode);
   const relativeNote = (note - tonic + 12) % 12;
   const isWhiteKey = WHITE_KEYS.includes(note);
 
@@ -126,7 +92,7 @@ const PianoKey: React.FC<PianoKeyProps> = ({
   const keyStyle = {
     ...style,
     backgroundColor:
-      effectiveColorMode === "traditional"
+      colorMode === "traditional"
         ? isWhiteKey
           ? "#FFFFFF"
           : "#000000" // Traditional colors
@@ -136,7 +102,7 @@ const PianoKey: React.FC<PianoKeyProps> = ({
     fontSize: "10px",
     textAlign: "center" as const,
     color:
-      effectiveColorMode === "traditional"
+      colorMode === "traditional"
         ? isWhiteKey
           ? "#000000"
           : "#FFFFFF" // Traditional mode: black on white, white on black
@@ -165,13 +131,13 @@ const PianoKey: React.FC<PianoKeyProps> = ({
         : "transform 1s ease-in-out, background-color 1s ease-in-out, box-shadow 1s ease-in-out",
     cursor: "pointer",
     zIndex: isHovered ? 3 : style.zIndex || 1,
-    border: effectiveColorMode === "traditional" ? "1px solid #333" : "none",
+    border: colorMode === "traditional" ? "1px solid #333" : "none",
     height: (() => {
-      if (effectiveColorMode === "flat-chromatic") {
+      if (colorMode === "flat-chromatic") {
         return PIANO_HEIGHT;
       }
       // For both traditional and chromatic modes
-      if (effectiveColorMode === "chromatic") {
+      if (colorMode === "chromatic") {
         return isWhiteKey
           ? PIANO_HEIGHT - 2
           : PIANO_HEIGHT * BLACK_KEY_HEIGHT_MULTIPLIER - 2;
@@ -181,10 +147,10 @@ const PianoKey: React.FC<PianoKeyProps> = ({
         : PIANO_HEIGHT * BLACK_KEY_HEIGHT_MULTIPLIER;
     })(),
     top: (() => {
-      if (effectiveColorMode === "flat-chromatic") {
+      if (colorMode === "flat-chromatic") {
         return 0;
       }
-      if (effectiveColorMode === "chromatic") {
+      if (colorMode === "chromatic") {
         return 1;
       }
       return 0;
