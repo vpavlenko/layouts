@@ -24,11 +24,9 @@ interface PianoKeyProps {
   octave: number;
   style: React.CSSProperties;
   keyboardKey?: string;
-  shiftedKeyboardKey?: string;
   onNoteStart: (note: number, octave: number) => void;
   onNoteEnd: (note: number, octave: number) => void;
   tonic: number;
-  isShiftPressed: boolean;
   colorMode: ColorMode;
   playNotes: (
     note: number,
@@ -63,9 +61,7 @@ const PianoKey: React.FC<PianoKeyProps> = ({
   octave,
   style,
   keyboardKey,
-  shiftedKeyboardKey,
   tonic,
-  isShiftPressed,
   colorMode,
   playNotes,
   releaseNotes,
@@ -206,58 +202,24 @@ const PianoKey: React.FC<PianoKeyProps> = ({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {(keyboardKey || shiftedKeyboardKey) && (
+      {keyboardKey && (
         <div
           style={{
             fontSize: "16px",
             fontWeight: "bold",
             marginBottom: "2px",
-            // fontFamily: "monospace",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             gap: "1px",
           }}
         >
-          {isShiftPressed
-            ? shiftedKeyboardKey && <div>{shiftedKeyboardKey}</div>
-            : keyboardKey && <div>{keyboardKey}</div>}
+          <div>{keyboardKey}</div>
         </div>
       )}
     </div>
   );
 };
-
-const getShiftedOctave = (octave: number, down: boolean = false): number => {
-  return down ? octave - 3 : octave + 3;
-};
-
-// Add this component definition before the Controls component
-const ShiftIndicator: React.FC<{ totalWidth: number }> = ({ totalWidth }) => (
-  <div
-    style={{
-      position: "absolute",
-      top: -30,
-      left: totalWidth * 0.58, // Start from the middle
-      width: totalWidth * 0.42, // Only cover right half
-      textAlign: "center",
-      color: "white",
-      fontSize: "14px",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      gap: "8px",
-    }}
-  >
-    <div
-      style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.3)" }}
-    />
-    <div>Shift</div>
-    <div
-      style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.3)" }}
-    />
-  </div>
-);
 
 // Replace the EXTRA_LOW_KEYS constant with a more structured octave range system
 interface OctaveRange {
@@ -368,7 +330,6 @@ export const PianoUI: React.FC<PianoUIProps> = ({
   taskId,
   setActiveKeyCodes,
 }) => {
-  const [isShiftPressed, setIsShiftPressed] = useState(false);
   const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
   const [activeNotes, setActiveNotes] = useState<
     Array<{ note: number; octave: number }>
@@ -382,7 +343,6 @@ export const PianoUI: React.FC<PianoUIProps> = ({
 
   useEffect(() => {
     const handleKeyDown = async (event: KeyboardEvent) => {
-      // Fix the type by explicitly typing the prev parameter
       setActiveKeyCodes((prev: Set<string>) => new Set([...prev, event.code]));
 
       const currentKeyboardMap = getKeyboardMap(colorMode, taskKeyboardMapping);
@@ -400,16 +360,12 @@ export const PianoUI: React.FC<PianoUIProps> = ({
         if (event.code in currentKeyboardMap) {
           const { note, octave } =
             currentKeyboardMap[event.code as keyof typeof currentKeyboardMap];
-          const actualOctave = event.shiftKey
-            ? getShiftedOctave(octave)
-            : octave;
-          await playNotes(note, actualOctave);
+          await playNotes(note, octave);
         }
       }
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {
-      // Fix the type by explicitly typing the prev parameter
       setActiveKeyCodes((prev: Set<string>) => {
         const next = new Set(prev);
         next.delete(event.code);
@@ -427,14 +383,7 @@ export const PianoUI: React.FC<PianoUIProps> = ({
       if (event.code in currentKeyboardMap) {
         const { note, octave } =
           currentKeyboardMap[event.code as keyof typeof currentKeyboardMap];
-
-        // Release both normal and shifted octave notes
-        const normalOctave = octave;
-        const shiftedOctave = getShiftedOctave(octave);
-
-        [normalOctave, shiftedOctave].forEach((currentOctave) => {
-          releaseNotes(note, currentOctave);
-        });
+        releaseNotes(note, octave);
       }
     };
 
@@ -454,28 +403,6 @@ export const PianoUI: React.FC<PianoUIProps> = ({
     taskKeyboardMapping,
     setActiveKeyCodes,
   ]);
-
-  useEffect(() => {
-    const handleGlobalKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Shift") {
-        setIsShiftPressed(true);
-      }
-    };
-
-    const handleGlobalKeyUp = (event: KeyboardEvent) => {
-      if (event.key === "Shift") {
-        setIsShiftPressed(false);
-      }
-    };
-
-    window.addEventListener("keydown", handleGlobalKeyDown);
-    window.addEventListener("keyup", handleGlobalKeyUp);
-
-    return () => {
-      window.removeEventListener("keydown", handleGlobalKeyDown);
-      window.removeEventListener("keyup", handleGlobalKeyUp);
-    };
-  }, []);
 
   useEffect(() => {
     const currentlyPlaying = fallingNotes
@@ -519,17 +446,11 @@ export const PianoUI: React.FC<PianoUIProps> = ({
 
   const commonKeyProps: Omit<
     PianoKeyProps,
-    | "note"
-    | "octave"
-    | "style"
-    | "keyboardKey"
-    | "shiftedKeyboardKey"
-    | "isActive"
+    "note" | "octave" | "style" | "keyboardKey" | "isActive"
   > = {
     onNoteStart: playNotes,
     onNoteEnd: releaseNotes,
     tonic,
-    isShiftPressed,
     colorMode,
     playNotes,
     releaseNotes,
@@ -579,18 +500,14 @@ export const PianoUI: React.FC<PianoUIProps> = ({
           marginRight: MARGIN_PX / 2,
         }}
       >
-        <>
-          <ShiftIndicator totalWidth={totalWidth} />
-          <PianoControls
-            tonic={tonic}
-            onTonicChange={setTonic}
-            colorMode={colorMode}
-            onColorModeChange={onColorModeChange}
-            currentVoicing={currentVoicing}
-            onVoicingChange={onVoicingChange}
-          />
-        </>
-
+        <PianoControls
+          tonic={tonic}
+          onTonicChange={setTonic}
+          colorMode={colorMode}
+          onColorModeChange={onColorModeChange}
+          currentVoicing={currentVoicing}
+          onVoicingChange={onVoicingChange}
+        />
         {Object.entries(OCTAVE_RANGES).map(([octave, range]) => {
           const octaveNum = parseInt(octave);
           return Array.from({ length: range.length }, (_, i) => {
@@ -617,7 +534,6 @@ export const PianoUI: React.FC<PianoUIProps> = ({
                   octave={octaveNum}
                   isActive={isNoteActive(noteNum, octaveNum)}
                   keyboardKey={getKeyboardKey(noteNum, octaveNum)}
-                  shiftedKeyboardKey={getKeyboardKey(noteNum, octaveNum)}
                   style={{
                     ...commonStyleProps,
                     width:
