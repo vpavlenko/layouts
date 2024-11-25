@@ -1,6 +1,18 @@
 import { ColorMode } from "../components/types";
 import { KeyboardMapping } from "../constants/keyboard";
-import { createSequenceKeyboardMapping } from "./mappings";
+
+export const createSequenceKeyboardMapping = (
+  sequence: Array<{ note: number; octave: number }>,
+  keys: string[]
+): KeyboardMapping => {
+  const mapping: KeyboardMapping = {};
+  sequence.forEach(({ note, octave }, index) => {
+    if (index < keys.length) {
+      mapping[keys[index]] = { note, octave };
+    }
+  });
+  return mapping;
+};
 
 export type ChromaticNote = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 
@@ -10,7 +22,6 @@ export interface TaskConfig {
   title: string;
   keyboardMapping?: KeyboardMapping;
   colorMode?: ColorMode;
-  chromaticNotes?: number[];
 }
 
 // First, let's create a type for our key mappings
@@ -121,43 +132,6 @@ const ASCENDING_KEY_SEQUENCE = [
   "Minus",
   "Equal",
 ];
-
-const createTaskConfig = (
-  targetNote: NoteMapping,
-  chromaticNotes: number[]
-): Omit<TaskConfig, "title"> => {
-  // Create a set of target notes for just this task
-  const targetNotes = new Set<string>();
-  [2, 3, 4, 5].forEach((octave) => {
-    targetNotes.add(`${targetNote.note}-${octave}`);
-  });
-
-  // Create the full keyboard mapping for white keys
-  const fullMapping: KeyboardMapping = {};
-  const whiteKeyMappings = [
-    NOTE_MAPPINGS.C,
-    NOTE_MAPPINGS.D,
-    NOTE_MAPPINGS.E,
-    NOTE_MAPPINGS.F,
-    NOTE_MAPPINGS.G,
-    NOTE_MAPPINGS.A,
-    NOTE_MAPPINGS.B,
-  ];
-
-  whiteKeyMappings.forEach((noteMapping) => {
-    noteMapping.keys.forEach((key, octaveOffset) => {
-      fullMapping[key] = {
-        note: noteMapping.note,
-        octave: octaveOffset + 2,
-      };
-    });
-  });
-
-  return {
-    chromaticNotes,
-    keyboardMapping: fullMapping,
-  };
-};
 
 // Add helper function to create sequences with intervals
 const createIntervalSequence = (
@@ -419,11 +393,33 @@ const createScaleKeyboardMapping = (
   return mapping;
 };
 
-// Convert TASK_CONFIGS from Record to Array
+// Remove the createTaskConfig function and directly define TASK_CONFIGS
 export const TASK_CONFIGS: TaskConfig[] = [
   {
     title: "White Keys",
-    ...createTaskConfig(NOTE_MAPPINGS.B, [0, 2, 4, 5, 7, 9, 11]),
+    keyboardMapping: (() => {
+      const fullMapping: KeyboardMapping = {};
+      const whiteKeyMappings = [
+        NOTE_MAPPINGS.C,
+        NOTE_MAPPINGS.D,
+        NOTE_MAPPINGS.E,
+        NOTE_MAPPINGS.F,
+        NOTE_MAPPINGS.G,
+        NOTE_MAPPINGS.A,
+        NOTE_MAPPINGS.B,
+      ];
+
+      whiteKeyMappings.forEach((noteMapping) => {
+        noteMapping.keys.forEach((key, octaveOffset) => {
+          fullMapping[key] = {
+            note: noteMapping.note,
+            octave: octaveOffset + 2,
+          };
+        });
+      });
+
+      return fullMapping;
+    })(),
   },
   {
     title: "Chromatic Sequences",
@@ -432,15 +428,11 @@ export const TASK_CONFIGS: TaskConfig[] = [
       ASCENDING_KEY_SEQUENCE
     ),
     colorMode: "flat-chromatic",
-    chromaticNotes: Array.from(new Set(ascendingSequence.map((n) => n.note))),
   },
   {
     title: "Major Seconds from A#0",
     keyboardMapping: createFlatChromaticMapping(majorSecondFromASharp0Sequence),
     colorMode: "flat-chromatic",
-    chromaticNotes: Array.from(
-      new Set(majorSecondFromASharp0Sequence.map((n) => n.note))
-    ),
   },
   {
     title: "Dorian Scale",
@@ -450,14 +442,6 @@ export const TASK_CONFIGS: TaskConfig[] = [
       "mixolydian",
     ]),
     colorMode: "chromatic",
-    chromaticNotes: Array.from(
-      new Set([
-        ...SCALE_SEQUENCES.lydian.notes.map((n) => n.note),
-        ...SCALE_SEQUENCES.major.notes.map((n) => n.note),
-        ...SCALE_SEQUENCES.mixolydian.notes.map((n) => n.note),
-        ...SCALE_SEQUENCES.dorian.notes.map((n) => n.note),
-      ])
-    ),
   },
   {
     title: "Locrian Scale",
@@ -467,14 +451,6 @@ export const TASK_CONFIGS: TaskConfig[] = [
       "phrygian",
     ]),
     colorMode: "chromatic",
-    chromaticNotes: Array.from(
-      new Set([
-        ...SCALE_SEQUENCES.dorianLow.notes.map((n) => n.note),
-        ...SCALE_SEQUENCES.minor.notes.map((n) => n.note),
-        ...SCALE_SEQUENCES.phrygian.notes.map((n) => n.note),
-        ...SCALE_SEQUENCES.locrian.notes.map((n) => n.note),
-      ])
-    ),
   },
   {
     title: "Free Play",

@@ -10,7 +10,7 @@ import {
 } from "../constants/keyboard";
 import { PianoControls } from "./PianoControls";
 import { Voicing } from "../constants/voicings";
-import { TASK_CONFIGS, TaskId } from "../tasks/tasks";
+import { TaskId } from "../tasks/tasks";
 import { PianoControllerState } from "./PianoController";
 
 const BLACK_KEYS = [1, 3, -1, 6, 8, 10, -1];
@@ -76,11 +76,6 @@ const PianoKey: React.FC<PianoKeyProps> = ({
   const [isHovered, setIsHovered] = React.useState(false);
   const [isPressed, setIsPressed] = React.useState(false);
 
-  // Get the current task's chromatic notes
-  const chromaticNotes = activeTaskId
-    ? TASK_CONFIGS[activeTaskId]?.chromaticNotes
-    : undefined;
-
   // Check if this note should be colored based on scale mapping
   const shouldColorNote = isNoteInScaleMapping(
     note,
@@ -96,9 +91,7 @@ const PianoKey: React.FC<PianoKeyProps> = ({
 
     if (colorMode === "flat-chromatic") return "flat-chromatic";
 
-    return shouldColorNote && chromaticNotes?.includes(note)
-      ? "chromatic"
-      : "traditional";
+    return shouldColorNote ? "chromatic" : "traditional";
   })();
 
   const colors = getColors(tonic, effectiveColorMode);
