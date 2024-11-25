@@ -6,9 +6,9 @@
 .simple-keyboard-base .hg-button {
   height: 20px !important;
   width: 20px !important;
-  border-radius: 3px !important;
+  border-radius: 0 !important;
   border: none !important;
-  margin: 1px !important;
+  margin: 0 !important;
   font-size: 16px !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -26,7 +26,7 @@
 .simple-keyboard-base .hg-row {
   display: flex !important;
   justify-content: flex-start !important;
-  margin: 2px 0 !important;
+  margin: 0 0 !important;
 }
 
 /* Row offsets for staggered layout */
