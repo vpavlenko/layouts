@@ -1,27 +1,32 @@
 import { ColorMode } from "../components/types";
 import { KeyboardMapping } from "../constants/keyboard";
-import { LESSONS } from "../data/lessons";
 import { createSequenceKeyboardMapping } from "./mappings";
-import { TASKS_ON_MAJOR_CHORDS, TASKS_ON_MINOR_CHORDS } from "./tasksOnChords";
 
 export type RelativeNote = 0 | 2 | 4 | 5 | 7 | 9 | 11; // C D E F G A B
 export type ChromaticNote = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 
+export const TASK_SEQUENCE = [
+  "play-b-across-octaves",
+  "play-f-sharp",
+  "play-chromatic-ascending-flat",
+  "play-major-seconds-from-asharp0",
+  "play-dorian-scale",
+  "play-locrian-scale",
+  "play-b-major-chord",
+  "play-b-minor-chord",
+  "free-play",
+] as const;
+
+export type TaskId = (typeof TASK_SEQUENCE)[number];
+
 export interface TaskConfig {
-  id: string;
+  title: string;
   total: number;
   keyboardMapping?: KeyboardMapping;
   colorMode?: ColorMode;
   chromaticNotes?: number[];
   playedNotes?: Set<string>;
 }
-
-const taskSequenceArray = LESSONS.reduce<string[]>(
-  (sequence, lesson) => [...sequence, ...lesson.taskIds],
-  []
-);
-
-export const TASK_SEQUENCE = taskSequenceArray;
 
 // First, let's create a type for our key mappings
 export type NoteMapping = {
@@ -146,7 +151,7 @@ const createTaskConfig = (
   targetNote: NoteMapping,
   chromaticNotes: number[],
   lessonNumber: number
-): TaskConfig => {
+): Omit<TaskConfig, "title"> => {
   // Create a set of target notes for just this task
   const targetNotes = new Set<string>();
   [2, 3, 4, 5].forEach((octave) => {
@@ -210,7 +215,6 @@ const createTaskConfig = (
   }
 
   return {
-    id: TASK_SEQUENCE[index],
     total: 4,
     chromaticNotes,
     keyboardMapping: fullMapping,
@@ -341,7 +345,6 @@ const SCALE_SEQUENCES = {
       { note: 0, octave: 3 }, // C (preview of next scale)
     ],
     keys: ["KeyZ", "KeyX", "KeyC", "KeyV", "KeyB", "KeyN", "KeyM", "KeyA"],
-    description: "Lydian scale (C D E F# G A B C)",
   },
   major: {
     notes: [
@@ -355,7 +358,6 @@ const SCALE_SEQUENCES = {
       { note: 0, octave: 4 }, // C (preview of next scale)
     ],
     keys: ["KeyA", "KeyS", "KeyD", "KeyF", "KeyG", "KeyH", "KeyJ", "KeyQ"],
-    description: "Major scale (C D E F G A B C)",
   },
   mixolydian: {
     notes: [
@@ -369,7 +371,6 @@ const SCALE_SEQUENCES = {
       { note: 0, octave: 5 }, // C (preview of next scale)
     ],
     keys: ["KeyQ", "KeyW", "KeyE", "KeyR", "KeyT", "KeyY", "KeyU", "Digit1"],
-    description: "Mixolydian scale (C D E F G A Bb C)",
   },
   dorian: {
     notes: [
@@ -392,7 +393,6 @@ const SCALE_SEQUENCES = {
       "Digit7",
       "Digit8",
     ],
-    description: "Dorian scale (C D Eb F G A Bb C)",
   },
   dorianLow: {
     notes: [
@@ -406,7 +406,6 @@ const SCALE_SEQUENCES = {
       { note: 0, octave: 3 }, // C (preview of next scale)
     ],
     keys: ["KeyZ", "KeyX", "KeyC", "KeyV", "KeyB", "KeyN", "KeyM", "KeyA"],
-    description: "Dorian scale in lower octave (C D Eb F G A Bb C)",
   },
   minor: {
     notes: [
@@ -420,7 +419,6 @@ const SCALE_SEQUENCES = {
       { note: 0, octave: 4 }, // C (preview of next scale)
     ],
     keys: ["KeyA", "KeyS", "KeyD", "KeyF", "KeyG", "KeyH", "KeyJ", "KeyQ"],
-    description: "Natural Minor scale (C D Eb F G Ab Bb C)",
   },
   phrygian: {
     notes: [
@@ -434,7 +432,6 @@ const SCALE_SEQUENCES = {
       { note: 0, octave: 5 }, // C (preview of next scale)
     ],
     keys: ["KeyQ", "KeyW", "KeyE", "KeyR", "KeyT", "KeyY", "KeyU", "Digit1"],
-    description: "Phrygian scale (C Db Eb F G Ab Bb C)",
   },
   locrian: {
     notes: [
@@ -457,7 +454,6 @@ const SCALE_SEQUENCES = {
       "Digit7",
       "Digit8",
     ],
-    description: "Locrian scale (C Db Eb F Gb Ab Bb C)",
   },
 } as const;
 
@@ -488,21 +484,22 @@ const createScaleKeyboardMapping = (
 // Add these new task definitions after the SCALE_SEQUENCES constant and before TASK_CONFIGS
 
 // Update TASK_CONFIGS with the modified scale tasks
-export const TASK_CONFIGS: Record<string, TaskConfig> = {
-  "play-b-across-octaves": createTaskConfig(
-    6,
-    NOTE_MAPPINGS.B,
-    [0, 2, 4, 5, 7, 9, 11],
-    1
-  ),
-  "play-f-sharp": createTaskConfig(
-    16,
-    NOTE_MAPPINGS["F#"],
-    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-    2
-  ),
+export const TASK_CONFIGS: Record<TaskId, TaskConfig> = {
+  "play-b-across-octaves": {
+    title: "White Keys",
+    ...createTaskConfig(6, NOTE_MAPPINGS.B, [0, 2, 4, 5, 7, 9, 11], 1),
+  },
+  "play-f-sharp": {
+    title: "Black Keys",
+    ...createTaskConfig(
+      16,
+      NOTE_MAPPINGS["F#"],
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+      2
+    ),
+  },
   "play-chromatic-ascending-flat": {
-    id: "play-chromatic-ascending-flat",
+    title: "Chromatic Sequences",
     total: ASCENDING_KEY_SEQUENCE.length,
     keyboardMapping: createSequenceKeyboardMapping(
       ascendingSequence,
@@ -511,9 +508,8 @@ export const TASK_CONFIGS: Record<string, TaskConfig> = {
     colorMode: "flat-chromatic",
     chromaticNotes: Array.from(new Set(ascendingSequence.map((n) => n.note))),
   },
-
   "play-major-seconds-from-asharp0": {
-    id: "play-major-seconds-from-asharp0",
+    title: "Major Seconds from A#0",
     total: majorSecondFromASharp0Sequence.length,
     keyboardMapping: createFlatChromaticMapping(majorSecondFromASharp0Sequence),
     colorMode: "flat-chromatic",
@@ -521,9 +517,8 @@ export const TASK_CONFIGS: Record<string, TaskConfig> = {
       new Set(majorSecondFromASharp0Sequence.map((n) => n.note))
     ),
   },
-
   "play-dorian-scale": {
-    id: "play-dorian-scale",
+    title: "Dorian Scale",
     total: SCALE_SEQUENCES.dorian.notes.length,
     keyboardMapping: createScaleKeyboardMapping(SCALE_SEQUENCES.dorian, [
       "lydian",
@@ -540,9 +535,8 @@ export const TASK_CONFIGS: Record<string, TaskConfig> = {
       ])
     ),
   },
-
   "play-locrian-scale": {
-    id: "play-locrian-scale",
+    title: "Locrian Scale",
     total: SCALE_SEQUENCES.locrian.notes.length,
     keyboardMapping: createScaleKeyboardMapping(SCALE_SEQUENCES.locrian, [
       "dorianLow",
@@ -559,7 +553,19 @@ export const TASK_CONFIGS: Record<string, TaskConfig> = {
       ])
     ),
   },
-
-  ...TASKS_ON_MAJOR_CHORDS,
-  ...TASKS_ON_MINOR_CHORDS,
+  "play-b-major-chord": {
+    title: "B Major Chord",
+    total: 3,
+    colorMode: "chromatic",
+  },
+  "play-b-minor-chord": {
+    title: "B Minor Chord",
+    total: 3,
+    colorMode: "chromatic",
+  },
+  "free-play": {
+    title: "Free Play",
+    total: 0,
+    colorMode: "chromatic",
+  },
 };

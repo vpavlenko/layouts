@@ -5,12 +5,11 @@ import { ColorMode } from "./types";
 import { VOICINGS } from "../constants/voicings";
 import { sampler } from "../audio/sampler";
 import { FallingNote } from "./FallingNotes";
-import { LessonsPanel } from "./LessonsPanel";
+import { TaskPanel } from "./TaskPanel";
 import { immediate } from "tone";
 import { useParams, useNavigate } from "react-router-dom";
-import { LESSONS } from "../data/lessons";
+import { TASK_SEQUENCE, TASK_CONFIGS, TaskId } from "../tasks/tasks";
 import { URL_PREFIX } from "../constants/routes";
-import { TASK_CONFIGS } from "../tasks/tasks";
 import { ensureSamplerLoaded } from "../audio/sampler";
 
 const NOTE_NAMES = [
@@ -32,20 +31,14 @@ export interface PianoControllerState {
   activeKeysSize: number;
 }
 
-const getActiveTaskId = (currentLessonId: number): string | null => {
-  const currentLesson = LESSONS.find((l) => l.id === currentLessonId);
-  if (!currentLesson || !currentLesson.taskIds.length) return null;
-  return currentLesson.taskIds[0];
-};
-
 export const PianoController: React.FC = () => {
   const [tonic, setTonic] = useState<number>(0);
   const [voicing, setVoicing] = useState<Voicing>("single");
   const [colorMode, setColorMode] = useState<ColorMode>("chromatic");
   const [fallingNotes, setFallingNotes] = useState<FallingNote[]>([]);
-  const [currentLessonId, setCurrentLessonId] = useState(1);
+  const [currentTaskId, setCurrentTaskId] = useState<TaskId>(TASK_SEQUENCE[0]);
   const navigate = useNavigate();
-  const { lessonId } = useParams();
+  const { taskId } = useParams();
   const [state, setState] = useState<PianoControllerState>({
     activeKeysSize: 0,
   });
@@ -53,18 +46,13 @@ export const PianoController: React.FC = () => {
   const [samplerReady, setSamplerReady] = useState(false);
   const [activeKeyCodes, setActiveKeyCodes] = useState<Set<string>>(new Set());
 
-  // Initialize currentLessonId from URL parameter
+  // Initialize currentTaskId from URL parameter
   useEffect(() => {
-    const parsedId = parseInt(lessonId || "1");
-    console.log("[lessonChange] Changing to lesson:", parsedId, {
-      currentLessonId,
-      lessonId,
-    });
-
-    if (!isNaN(parsedId) && LESSONS.some((lesson) => lesson.id === parsedId)) {
-      setCurrentLessonId(parsedId);
-    }
-  }, [lessonId]);
+    const validTaskId = TASK_SEQUENCE.includes(taskId as TaskId)
+      ? (taskId as TaskId)
+      : TASK_SEQUENCE[0];
+    setCurrentTaskId(validTaskId);
+  }, [taskId]);
 
   // Add effect to sync activeKeysSize
   useEffect(() => {
@@ -161,49 +149,40 @@ export const PianoController: React.FC = () => {
     [tonic, voicing]
   );
 
-  const handleLessonChange = useCallback(
-    (lessonId: number) => {
-      console.log("[lessonChange] Changing to lesson:", lessonId);
-      const currentLesson = LESSONS.find((l) => l.id === lessonId);
-      if (!currentLesson) return;
+  const handleTaskChange = useCallback(
+    (taskId: TaskId) => {
+      console.log("[taskChange] Changing to task:", taskId);
+      const taskConfig = TASK_CONFIGS[taskId];
+      if (!taskConfig) return;
 
-      // Get the last task ID for this lesson
-      const lastTaskId =
-        currentLesson.taskIds[currentLesson.taskIds.length - 1];
-
-      // Reset states but mark the last task as completed if it exists
       setState((prev) => ({
         ...prev,
-        taskProgress: lastTaskId
-          ? [
-              {
-                taskId: lastTaskId,
-                progress: TASK_CONFIGS[lastTaskId]?.total || 0,
-                status: "completed",
-              },
-            ]
-          : [],
+        taskProgress:
+          taskId === "free-play"
+            ? []
+            : [
+                {
+                  taskId,
+                  progress: taskConfig.total,
+                  status: "completed",
+                },
+              ],
       }));
 
-      setCurrentLessonId(lessonId);
-      navigate(`${URL_PREFIX}/${lessonId}`);
+      setCurrentTaskId(taskId);
+      navigate(`${URL_PREFIX}/${taskId}`);
     },
     [navigate]
   );
 
-  // Get the current active task ID
-  const currentActiveTaskId = getActiveTaskId(currentLessonId);
-
   return (
     <>
-      <LessonsPanel
-        currentLessonId={currentLessonId}
-        onLessonChange={handleLessonChange}
+      <TaskPanel
+        currentTaskId={currentTaskId}
+        onTaskChange={handleTaskChange}
         keyboardState={{
           activeKeyCodes,
-          taskKeyboardMapping: currentActiveTaskId
-            ? TASK_CONFIGS[currentActiveTaskId]?.keyboardMapping
-            : undefined,
+          taskKeyboardMapping: TASK_CONFIGS[currentTaskId]?.keyboardMapping,
         }}
       />
       {!samplerReady ? (
@@ -214,23 +193,15 @@ export const PianoController: React.FC = () => {
         <PianoUI
           tonic={tonic}
           setTonic={setTonic}
-          colorMode={
-            currentActiveTaskId
-              ? TASK_CONFIGS[currentActiveTaskId]?.colorMode || colorMode
-              : colorMode
-          }
+          colorMode={TASK_CONFIGS[currentTaskId]?.colorMode || colorMode}
           onColorModeChange={setColorMode}
           currentVoicing={voicing}
           onVoicingChange={setVoicing}
           playNotes={playNotes}
           releaseNotes={releaseNotes}
           fallingNotes={fallingNotes}
-          taskKeyboardMapping={
-            currentActiveTaskId
-              ? TASK_CONFIGS[currentActiveTaskId]?.keyboardMapping
-              : undefined
-          }
-          activeTaskId={currentActiveTaskId}
+          taskKeyboardMapping={TASK_CONFIGS[currentTaskId]?.keyboardMapping}
+          activeTaskId={currentTaskId}
           state={state}
           setActiveKeyCodes={setActiveKeyCodes}
         />

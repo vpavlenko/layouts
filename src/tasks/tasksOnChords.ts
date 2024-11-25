@@ -227,7 +227,6 @@ const createChordTaskConfig = (
   const useFlat = isMinorChord || index > 2;
 
   return {
-    id: `play-${chordName.toLowerCase()}-chord`,
     total: 3,
     keyboardMapping: mapping,
     colorMode: useFlat ? "flat-chromatic" : "chromatic",

@@ -1,24 +1,23 @@
 import React from "react";
-import { LESSONS } from "../data/lessons";
 import { Link } from "react-router-dom";
 import { URL_PREFIX } from "../constants/routes";
 import { KeyboardMapping } from "../constants/keyboard";
 import { Layout } from "./Layout";
-import { TASK_CONFIGS } from "../tasks/tasks";
+import { TASK_SEQUENCE, TASK_CONFIGS, TaskId } from "../tasks/tasks";
 
 interface KeyboardState {
   activeKeyCodes: Set<string>;
   taskKeyboardMapping?: KeyboardMapping;
 }
 
-interface LessonsPanelProps {
-  currentLessonId: number;
-  onLessonChange: (lessonId: number) => void;
+interface TaskPanelProps {
+  currentTaskId: TaskId;
+  onTaskChange: (taskId: TaskId) => void;
   keyboardState: KeyboardState;
 }
 
-export const LessonsPanel: React.FC<LessonsPanelProps> = React.memo(
-  ({ currentLessonId, onLessonChange, keyboardState }) => {
+export const TaskPanel: React.FC<TaskPanelProps> = React.memo(
+  ({ currentTaskId, onTaskChange, keyboardState }) => {
     return (
       <div className="fixed top-0 left-0 w-[600px] h-screen bg-gray-900 text-white flex flex-col">
         {/* Keyboard section */}
@@ -28,29 +27,28 @@ export const LessonsPanel: React.FC<LessonsPanelProps> = React.memo(
           </div>
         </div>
 
-        {/* Lessons List */}
+        {/* Tasks List */}
         <div className="flex-1 overflow-y-auto">
           <div className="p-4">
             <div className="grid gap-4">
-              {LESSONS.map((lesson, index) => {
-                const lastTaskId = lesson.taskIds[lesson.taskIds.length - 1];
-                const taskConfig = TASK_CONFIGS[lastTaskId];
-                const isCurrentLesson = lesson.id === currentLessonId;
+              {TASK_SEQUENCE.map((taskId, index) => {
+                const taskConfig = TASK_CONFIGS[taskId];
+                const isCurrentTask = taskId === currentTaskId;
 
                 return (
                   <Link
-                    key={lesson.id}
-                    to={`${URL_PREFIX}/${lesson.id}`}
-                    onClick={() => onLessonChange(lesson.id)}
+                    key={taskId}
+                    to={`${URL_PREFIX}/${taskId}`}
+                    onClick={() => onTaskChange(taskId)}
                     className={`p-4 rounded-lg border transition-all ${
-                      isCurrentLesson
+                      isCurrentTask
                         ? "bg-blue-600 border-blue-500 shadow-lg shadow-blue-500/20"
                         : "bg-gray-800 border-gray-700 hover:bg-gray-700"
                     }`}
                   >
                     <div className="mb-2">
                       <span className="text-lg">
-                        {index + 1}. {lesson.title}
+                        {index + 1}. {taskConfig.title}
                       </span>
                     </div>
                     {taskConfig?.keyboardMapping && (

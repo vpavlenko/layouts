@@ -10,7 +10,7 @@ import {
 } from "../constants/keyboard";
 import { PianoControls } from "./PianoControls";
 import { Voicing } from "../constants/voicings";
-import { TASK_CONFIGS } from "../tasks/tasks";
+import { TASK_CONFIGS, TaskId } from "../tasks/tasks";
 import { PianoControllerState } from "./PianoController";
 
 const BLACK_KEYS = [1, 3, -1, 6, 8, 10, -1];
@@ -39,7 +39,7 @@ interface PianoKeyProps {
     octave: number
   ) => Array<{ note: number; octave: number }>;
   isActive: boolean;
-  activeTaskId: string | null;
+  activeTaskId: TaskId | null;
   keyboardMapping?: KeyboardMapping;
 }
 
@@ -47,7 +47,7 @@ interface PianoKeyProps {
 const isNoteInScaleMapping = (
   note: number,
   octave: number,
-  taskId: string | null,
+  taskId: TaskId | null,
   keyboardMapping?: KeyboardMapping
 ): boolean => {
   if (!taskId || !keyboardMapping || !taskId.includes("scale")) return true;
@@ -362,7 +362,7 @@ interface PianoUIProps {
   ) => Array<{ note: number; octave: number }>;
   fallingNotes: FallingNote[];
   taskKeyboardMapping?: KeyboardMapping;
-  activeTaskId: string | null;
+  activeTaskId: TaskId | null;
   state: PianoControllerState;
   setActiveKeyCodes: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
@@ -592,20 +592,18 @@ export const PianoUI: React.FC<PianoUIProps> = ({
           marginRight: MARGIN_PX / 2,
         }}
       >
-        {/* Only show controls in Free Play mode (when no task is active) */}
-        {!activeTaskId && (
-          <>
-            <ShiftIndicator totalWidth={totalWidth} />
-            <PianoControls
-              tonic={tonic}
-              onTonicChange={setTonic}
-              colorMode={colorMode}
-              onColorModeChange={onColorModeChange}
-              currentVoicing={currentVoicing}
-              onVoicingChange={onVoicingChange}
-            />
-          </>
-        )}
+        <>
+          <ShiftIndicator totalWidth={totalWidth} />
+          <PianoControls
+            tonic={tonic}
+            onTonicChange={setTonic}
+            colorMode={colorMode}
+            onColorModeChange={onColorModeChange}
+            currentVoicing={currentVoicing}
+            onVoicingChange={onVoicingChange}
+          />
+        </>
+
         {Object.entries(OCTAVE_RANGES).map(([octave, range]) => {
           const octaveNum = parseInt(octave);
           return Array.from({ length: range.length }, (_, i) => {
