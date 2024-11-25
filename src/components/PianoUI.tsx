@@ -4,7 +4,6 @@ import { FallingNotes, FallingNote } from "./FallingNotes";
 import { ColorMode } from "./types";
 import { getColors, getLabelColorForNote } from "../utils/colors";
 import { KEY_DISPLAY_LABELS, KeyboardMapping } from "../constants/keyboard";
-import { PianoControls } from "./PianoControls";
 import { PianoControllerState } from "./PianoController";
 
 const getAbsoluteNote = (
@@ -522,12 +521,12 @@ export const PianoUI: React.FC<PianoUIProps> = ({
           marginRight: MARGIN_PX / 2,
         }}
       >
-        <PianoControls
+        {/* <PianoControls
           tonic={tonic}
           onTonicChange={setTonic}
           colorMode={colorMode}
           onColorModeChange={onColorModeChange}
-        />
+        /> */}
         {Object.entries(OCTAVE_RANGES).map(([octave, range]) => {
           const octaveNum = parseInt(octave);
           return Array.from({ length: range.length }, (_, i) => {

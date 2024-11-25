@@ -22,48 +22,54 @@ export const TaskPanel: React.FC<TaskPanelProps> = React.memo(
       <div className="fixed top-0 left-0 w-[600px] h-screen bg-gray-900 text-white flex flex-col">
         {/* Keyboard section */}
         <div className="bg-gray-900 p-4 border-b border-gray-800">
-          <div className="w-full flex justify-end">
-            <Layout keyboardState={keyboardState} />
+          <div className="flex items-center justify-between">
+            <div className="text-lg text-white">
+              {TASK_CONFIGS[taskId].title}
+            </div>
+            <Layout keyboardState={keyboardState} showLabels={true} />
           </div>
         </div>
 
         {/* Tasks List */}
         <div className="flex-1 overflow-y-auto">
-          <div className="">
-            <div className="grid">
-              {TASK_CONFIGS.map((taskConfig, index) => {
-                const isCurrentTask = index === taskId;
+          <div className="grid grid-cols-2">
+            {TASK_CONFIGS.map((taskConfig, index) => {
+              const isCurrentTask = index === taskId;
 
-                return (
-                  <Link
-                    key={index}
-                    to={`${URL_PREFIX}/${index}`}
-                    onClick={() => onTaskChange(index)}
-                    className={`p-4 border border-transparent transition-all ${
-                      isCurrentTask
-                        ? "bg-gray-800 border-blue-500"
-                        : "hover:bg-gray-800"
-                    }`}
-                  >
-                    <div className="flex items-start gap-4">
-                      <span className="text-lg flex-1 min-w-0">
-                        {index + 1}. {taskConfig.title}
-                      </span>
-                      {taskConfig?.keyboardMapping && (
-                        <div className="flex-none">
-                          <Layout
-                            keyboardState={{
-                              activeKeyCodes: new Set(),
-                              taskKeyboardMapping: taskConfig.keyboardMapping,
-                            }}
-                          />
-                        </div>
-                      )}
+              return (
+                <Link
+                  key={index}
+                  to={`${URL_PREFIX}/${index}`}
+                  onClick={() => onTaskChange(index)}
+                  className={`p-4 border border-transparent transition-all ${
+                    isCurrentTask
+                      ? "bg-gray-800 border-blue-500 shadow-[0_0_10px_0px_rgba(59,130,246,1)]"
+                      : "hover:bg-gray-800"
+                  }`}
+                >
+                  <div className="flex flex-col items-start w-full">
+                    {taskConfig?.keyboardMapping && (
+                      <div className="self-center mb-2">
+                        <Layout
+                          keyboardState={{
+                            activeKeyCodes: new Set(),
+                            taskKeyboardMapping: taskConfig.keyboardMapping,
+                          }}
+                          showLabels={false}
+                        />
+                      </div>
+                    )}
+                    <div
+                      className={`text-sm w-full ${
+                        isCurrentTask ? "text-white" : "text-gray-400"
+                      }`}
+                    >
+                      {taskConfig.title}
                     </div>
-                  </Link>
-                );
-              })}
-            </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>

@@ -11,6 +11,7 @@ interface KeyboardState {
 
 interface LayoutProps {
   keyboardState: KeyboardState;
+  showLabels?: boolean;
 }
 
 const KEYBOARD_LAYOUT = {
@@ -24,26 +25,39 @@ const KEYBOARD_LAYOUT = {
 
 const generateId = () => Math.random().toString(36).substring(2, 10);
 
-export const Layout: React.FC<LayoutProps> = ({ keyboardState }) => {
+export const Layout: React.FC<LayoutProps> = ({
+  keyboardState,
+  showLabels = true,
+}) => {
   const uid = useRef(generateId());
   const keyboardRef = useRef<HTMLDivElement>(null);
   const styleSheetRef = useRef<HTMLStyleElement | null>(null);
 
   // Create a single stylesheet for all keyboard styles
-  const createStyleSheet = useCallback((mapping: KeyboardMapping) => {
-    if (!styleSheetRef.current) {
-      styleSheetRef.current = document.createElement("style");
-      styleSheetRef.current.id = "piano-keyboard-styles";
-      document.head.appendChild(styleSheetRef.current);
-    }
+  const createStyleSheet = useCallback(
+    (mapping: KeyboardMapping) => {
+      if (!styleSheetRef.current) {
+        styleSheetRef.current = document.createElement("style");
+        styleSheetRef.current.id = "piano-keyboard-styles";
+        document.head.appendChild(styleSheetRef.current);
+      }
 
-    const colors = getColors(0, "chromatic");
-    let css = "";
+      const colors = getColors(0, "chromatic");
+      let css = "";
 
-    Object.entries(mapping).forEach(([keyCode, { note }]) => {
-      const backgroundColor = colors[note];
-      const textColor = getLabelColorForNote(note);
-      css += `
+      // Add base styles for when labels should be hidden
+      if (!showLabels) {
+        css += `
+        .keyboard-${uid.current} .simple-keyboard-base .hg-button {
+          font-size: 0 !important;
+        }
+      `;
+      }
+
+      Object.entries(mapping).forEach(([keyCode, { note }]) => {
+        const backgroundColor = colors[note];
+        const textColor = getLabelColorForNote(note);
+        css += `
         .keyboard-${uid.current} .simple-keyboard-base .hg-button.${keyCode}-mapped {
           background: ${backgroundColor} !important;
           color: ${textColor} !important;
@@ -52,33 +66,35 @@ export const Layout: React.FC<LayoutProps> = ({ keyboardState }) => {
         }
       `;
 
-      css += `
+        css += `
         .keyboard-${uid.current} .simple-keyboard-base .hg-button.${keyCode}-mapped.hg-active {
           transform: scale(0.9) !important;
         }
       `;
-    });
+      });
 
-    // Add styles for unmapped keys
-    Object.keys(KEY_DISPLAY_LABELS).forEach((keyCode) => {
-      if (!mapping[keyCode]) {
-        css += `
+      // Add styles for unmapped keys
+      Object.keys(KEY_DISPLAY_LABELS).forEach((keyCode) => {
+        if (!mapping[keyCode]) {
+          css += `
           .keyboard-${uid.current} .simple-keyboard-base .hg-button.${keyCode}-mapped {
             background: #000 !important;
             color: #000 !important;
           }
         `;
-      }
-    });
+        }
+      });
 
-    styleSheetRef.current.textContent = css;
+      styleSheetRef.current.textContent = css;
 
-    console.log("Applied keyboard styles:", {
-      mappingSize: Object.keys(mapping).length,
-      cssLength: css.length,
-      sampleStyle: css.split("}")[0] + "}",
-    });
-  }, []);
+      console.log("Applied keyboard styles:", {
+        mappingSize: Object.keys(mapping).length,
+        cssLength: css.length,
+        sampleStyle: css.split("}")[0] + "}",
+      });
+    },
+    [showLabels]
+  );
 
   // Apply styles when mapping changes
   useEffect(() => {
@@ -113,10 +129,10 @@ export const Layout: React.FC<LayoutProps> = ({ keyboardState }) => {
     const keys = "1234567890-=qwertyuiop[]asdfghjkl;'zxcvbnm,./";
     const display: Record<string, string> = {};
     keys.split("").forEach((key) => {
-      display[key] = key;
+      display[key] = showLabels ? key : "";
     });
     return display;
-  }, []);
+  }, [showLabels]);
 
   return (
     <div className={`w-[290px] keyboard-${uid.current}`} ref={keyboardRef}>
