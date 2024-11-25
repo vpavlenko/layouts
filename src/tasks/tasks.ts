@@ -359,73 +359,20 @@ const createFlatChromaticMapping = (
   return mapping;
 };
 
-// Replace createTonicChordMapping with this version
-const createTonicChordMapping = (): KeyboardMapping => {
-  const mappingString = `E1 E2 E3 E4 E5 E6 E7 . . . . .
-G1 G2 G3 G4 G5 G6 G7 . . . . .
-C1 C2 C3 C4 C5 C6 C7 C8 . . .
-Eb1 Eb2 Eb3 Eb4 Eb5 Eb6 Eb7 . . .`;
-
-  return processKeyboardString(mappingString);
+// Add a helper type for the internal task config format
+type InternalTaskConfig = {
+  keyboardMapping: string | KeyboardMapping;
+  colorMode?: ColorMode; // Make optional since we'll default to "chromatic"
 };
 
-// Replace createFifthsOnlyMapping with this version
-const createFifthsOnlyMapping = (): KeyboardMapping => {
-  const mappingString = `
-C1 G1 D2 A2 E3 B3 F#4 C#5 G#5 D#6 A#6 F7
-C2 G2 D3 A3 E4 B4 F#5 C#6 G#6 D#7 A#7 F8
-C3 G3 D4 A4 E5 B5 F#6 C#7 G#7 D#8 A#8 .
-C4 G4 D5 A5 E6 B6 F#7 C#8 . . . .`;
+// Add a template literal tag function for keyboard mappings
+export function keyboard(strings: TemplateStringsArray): KeyboardMapping {
+  return processKeyboardString(strings[0]);
+}
 
-  return processKeyboardString(mappingString);
-};
-
-// Replace createFourthsOnlyMapping with this version
-const createFourthsOnlyMapping = (): KeyboardMapping => {
-  const mappingString = `
-C1 F1 Bb1 Eb2 Ab2 Db3 Gb3 B3 E4 A4 D5 G5
-C2 F2 Bb2 Eb3 Ab3 Db4 Gb4 B4 E5 A5 D6 G6
-C3 F3 Bb3 Eb4 Ab4 Db5 Gb5 B5 E6 A6 D7 G7
-C4 F4 Bb4 Eb5 Ab5 Db6 Gb6 B6 E7 A7 D8 G8`;
-
-  return processKeyboardString(mappingString);
-};
-
-// Replace createAugmentedScalesMapping with this version
-const createAugmentedScalesMapping = (): KeyboardMapping => {
-  const mappingString = `
-C2 E2 G#2 C3 E3 G#3 C4 E4 G#4 C5 E5 G#5
-C#2 F2 A2 C#3 F3 A3 C#4 F4 A4 C#5 F5 A5
-D2 F#2 A#2 D3 F#3 A#3 D4 F#4 A#4 D5 F#5 A#5
-D#2 G2 B2 D#3 G3 B3 D#4 G4 B4 D#5 G5 B5`;
-
-  return processKeyboardString(mappingString);
-};
-
-// Replace createPentatonicMapping with this version
-const createPentatonicMapping = (): KeyboardMapping => {
-  const mappingString = `C4 Eb4 F4 G4 Bb4 . . . . . . .
-C3 Eb3 F3 G3 Bb3 C7 Eb7 F7 G7 Bb7 . .
-C2 Eb2 F2 G2 Bb2 C6 Eb6 F6 G6 Bb6 .
-C1 Eb1 F1 G1 Bb1 C5 Eb5 F5 G5 Bb5`;
-
-  return processKeyboardString(mappingString);
-};
-
-// Replace createHirajoshiMapping with this version
-const createHirajoshiMapping = (): KeyboardMapping => {
-  const mappingString = `C4 C#4 F4 F#4 Bb4 C8 . . . . . Bb0
-C3 C#3 F3 F#3 Bb3 C7 C#7 F7 F#7 Bb7
-C2 C#2 F2 F#2 Bb2 C6 C#6 F6 F#6 Bb6
-C1 C#1 F1 F#1 Bb1 C5 C#5 F5 F#5 Bb5`;
-
-  return processKeyboardString(mappingString);
-};
-
-// Remove the createTaskConfig function and directly define TASK_CONFIGS
-export const TASK_CONFIGS: TaskConfig[] = [
-  {
-    title: "White Keys",
+// Define tasks with a more concise format
+const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
+  "White Keys": {
     keyboardMapping: (() => {
       const fullMapping: KeyboardMapping = {};
       const whiteKeyMappings = [
@@ -449,59 +396,93 @@ export const TASK_CONFIGS: TaskConfig[] = [
 
       return fullMapping;
     })(),
-    colorMode: "chromatic",
   },
-  {
-    title: "Chromatic Sequences",
+
+  "Chromatic Sequences": {
     keyboardMapping: createSequenceKeyboardMapping(
       ascendingSequence,
       ASCENDING_KEY_SEQUENCE
     ),
     colorMode: "flat-chromatic",
   },
-  {
-    title: "Major Seconds from A#0",
+
+  "Major Seconds from A#0": {
     keyboardMapping: createFlatChromaticMapping(majorSecondFromASharp0Sequence),
     colorMode: "flat-chromatic",
   },
-  {
-    title: "Traditional Layout",
+
+  "Traditional Layout": {
     keyboardMapping: TRADITIONAL_KEYBOARD_MAP,
-    colorMode: "chromatic",
   },
-  {
-    title: "Flat Chromatic Layout",
+
+  "Flat Chromatic Layout": {
     keyboardMapping: FLAT_CHROMATIC_KEYBOARD_MAP,
     colorMode: "flat-chromatic",
   },
-  {
-    title: "Major/minor Tonic Chord",
-    keyboardMapping: createTonicChordMapping(),
-    colorMode: "chromatic",
+
+  "Major/minor Tonic Chord": {
+    keyboardMapping: keyboard`
+      E1 E2 E3 E4 E5 E6 E7 . . . . .
+      G1 G2 G3 G4 G5 G6 G7 . . . . .
+      C1 C2 C3 C4 C5 C6 C7 C8 . . .
+      Eb1 Eb2 Eb3 Eb4 Eb5 Eb6 Eb7 . . .
+    `,
   },
-  {
-    title: "Fifths Only",
-    keyboardMapping: createFifthsOnlyMapping(),
-    colorMode: "chromatic",
+
+  "Fifths Only": {
+    keyboardMapping: keyboard`
+      C1 G1 D2 A2 E3 B3 F#4 C#5 G#5 D#6 A#6 F7
+      C2 G2 D3 A3 E4 B4 F#5 C#6 G#6 D#7 A#7 F8
+      C3 G3 D4 A4 E5 B5 F#6 C#7 G#7 D#8 A#8 .
+      C4 G4 D5 A5 E6 B6 F#7 C#8 . . . .
+    `,
   },
-  {
-    title: "Fourths Only",
-    keyboardMapping: createFourthsOnlyMapping(),
-    colorMode: "chromatic",
+
+  "Fourths Only": {
+    keyboardMapping: keyboard`
+      C1 F1 Bb1 Eb2 Ab2 Db3 Gb3 B3 E4 A4 D5 G5
+      C2 F2 Bb2 Eb3 Ab3 Db4 Gb4 B4 E5 A5 D6 G6
+      C3 F3 Bb3 Eb4 Ab4 Db5 Gb5 B5 E6 A6 D7 G7
+      C4 F4 Bb4 Eb5 Ab5 Db6 Gb6 B6 E7 A7 D8 G8
+    `,
   },
-  {
-    title: "Four Augmented Scales",
-    keyboardMapping: createAugmentedScalesMapping(),
-    colorMode: "chromatic",
+
+  "Four Augmented Scales": {
+    keyboardMapping: keyboard`
+      C2 E2 G#2 C3 E3 G#3 C4 E4 G#4 C5 E5 G#5
+      C#2 F2 A2 C#3 F3 A3 C#4 F4 A4 C#5 F5 A5
+      D2 F#2 A#2 D3 F#3 A#3 D4 F#4 A#4 D5 F#5 A#5
+      D#2 G2 B2 D#3 G3 B3 D#4 G4 B4 D#5 G5 B5
+    `,
   },
-  {
-    title: "Minor Pentatonic",
-    keyboardMapping: createPentatonicMapping(),
-    colorMode: "chromatic",
+
+  "Minor Pentatonic": {
+    keyboardMapping: keyboard`
+      C4 Eb4 F4 G4 Bb4 . . . . . . .
+      C3 Eb3 F3 G3 Bb3 C7 Eb7 F7 G7 Bb7 . .
+      C2 Eb2 F2 G2 Bb2 C6 Eb6 F6 G6 Bb6 .
+      C1 Eb1 F1 G1 Bb1 C5 Eb5 F5 G5 Bb5
+    `,
   },
-  {
-    title: "Hirajoshi Scale",
-    keyboardMapping: createHirajoshiMapping(),
-    colorMode: "chromatic",
+
+  "Hirajoshi Scale": {
+    keyboardMapping: keyboard`
+      C4 C#4 F4 F#4 Bb4 C8 . . . . . Bb0
+      C3 C#3 F3 F#3 Bb3 C7 C#7 F7 F#7 Bb7
+      C2 C#2 F2 F#2 Bb2 C6 C#6 F6 F#6 Bb6
+      C1 C#1 F1 F#1 Bb1 C5 C#5 F5 F#5 Bb5
+    `,
   },
-];
+};
+
+// Transform internal format to exported format
+export const TASK_CONFIGS: TaskConfig[] = Object.entries(INTERNAL_TASKS).map(
+  ([title, config]) => ({
+    title,
+    keyboardMapping:
+      typeof config.keyboardMapping === "string"
+        ? processKeyboardString(config.keyboardMapping)
+        : config.keyboardMapping,
+    colorMode: config.colorMode ?? "chromatic",
+  })
+);
