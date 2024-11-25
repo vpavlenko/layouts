@@ -19,8 +19,6 @@ interface PianoKeyProps {
   octave: number;
   style: React.CSSProperties;
   keyboardKey?: string;
-  onNoteStart: (note: number, octave: number) => void;
-  onNoteEnd: (note: number, octave: number) => void;
   tonic: number;
   colorMode: ColorMode;
   playNotes: (
@@ -32,7 +30,6 @@ interface PianoKeyProps {
     octave: number
   ) => Array<{ note: number; octave: number }>;
   isActive: boolean;
-  keyboardMapping?: KeyboardMapping;
 }
 
 const PianoKey: React.FC<PianoKeyProps> = ({
@@ -401,8 +398,6 @@ export const PianoUI: React.FC<PianoUIProps> = ({
     PianoKeyProps,
     "note" | "octave" | "style" | "keyboardKey" | "isActive"
   > = {
-    onNoteStart: playNotes,
-    onNoteEnd: releaseNotes,
     tonic,
     colorMode,
     playNotes,
@@ -500,7 +495,6 @@ export const PianoUI: React.FC<PianoUIProps> = ({
                     zIndex:
                       colorMode === "flat-chromatic" ? 1 : isWhiteKey ? 1 : 2,
                   }}
-                  keyboardMapping={keyboardMapping}
                 />
               );
             }
