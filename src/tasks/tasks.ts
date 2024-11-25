@@ -397,6 +397,47 @@ const createScaleKeyboardMapping = (
   return mapping;
 };
 
+// Add this before TASK_CONFIGS
+const createTonicChordMapping = (): KeyboardMapping => {
+  const mapping: KeyboardMapping = {};
+
+  // Map G notes (G1-G7)
+  ["KeyQ", "KeyW", "KeyE", "KeyR", "KeyT", "KeyY", "KeyU"].forEach(
+    (key, index) => {
+      mapping[key] = { note: 7, octave: index + 1 };
+    }
+  );
+
+  // Map C notes (C1-C8)
+  ["KeyA", "KeyS", "KeyD", "KeyF", "KeyG", "KeyH", "KeyJ", "KeyK"].forEach(
+    (key, index) => {
+      mapping[key] = { note: 0, octave: index + 1 };
+    }
+  );
+
+  // Map E notes (E1-E7)
+  [
+    "Digit1",
+    "Digit2",
+    "Digit3",
+    "Digit4",
+    "Digit5",
+    "Digit6",
+    "Digit7",
+  ].forEach((key, index) => {
+    mapping[key] = { note: 4, octave: index + 1 };
+  });
+
+  // Map Eb notes (Eb1-Eb7)
+  ["KeyZ", "KeyX", "KeyC", "KeyV", "KeyB", "KeyN", "KeyM"].forEach(
+    (key, index) => {
+      mapping[key] = { note: 3, octave: index + 1 };
+    }
+  );
+
+  return mapping;
+};
+
 // Remove the createTaskConfig function and directly define TASK_CONFIGS
 export const TASK_CONFIGS: TaskConfig[] = [
   {
@@ -466,5 +507,10 @@ export const TASK_CONFIGS: TaskConfig[] = [
     title: "Flat Chromatic Layout",
     keyboardMapping: FLAT_CHROMATIC_KEYBOARD_MAP,
     colorMode: "flat-chromatic",
+  },
+  {
+    title: "Major/minor Tonic Chord",
+    keyboardMapping: createTonicChordMapping(),
+    colorMode: "chromatic",
   },
 ];
