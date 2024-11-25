@@ -67,7 +67,13 @@ interface PianoKeyProps {
     octave: number
   ) => Array<{ note: number; octave: number }>;
   isActive: boolean;
+  keyboardMapping: KeyboardMapping;
 }
+
+const UNMAPPED_KEY_STYLES = {
+  whiteKey: "#444", // Light gray for unmapped white keys
+  blackKey: "#111", // Dark gray for unmapped black keys
+};
 
 const PianoKey: React.FC<PianoKeyProps> = ({
   note,
@@ -79,6 +85,7 @@ const PianoKey: React.FC<PianoKeyProps> = ({
   playNotes,
   releaseNotes,
   isActive,
+  keyboardMapping,
 }) => {
   const [isHovered, setIsHovered] = React.useState(false);
   const [isPressed, setIsPressed] = React.useState(false);
@@ -118,22 +125,41 @@ const PianoKey: React.FC<PianoKeyProps> = ({
 
   const keyStyle = {
     ...style,
-    backgroundColor:
-      colorMode === "traditional"
-        ? isWhiteKey
-          ? "#FFFFFF"
-          : "#000000" // Traditional colors
-        : colors[note], // Chromatic/flat-chromatic colors
+    backgroundColor: (() => {
+      if (colorMode === "traditional") {
+        return isWhiteKey ? "#FFFFFF" : "#000000";
+      }
+
+      if (isNoteInMapping(note, octave, tonic, keyboardMapping)) {
+        return colors[note]; // Chromatic/flat-chromatic colors for mapped notes
+      }
+
+      return isWhiteKey
+        ? UNMAPPED_KEY_STYLES.whiteKey
+        : UNMAPPED_KEY_STYLES.blackKey;
+    })(),
     position: "absolute" as const,
     userSelect: "none" as const,
     fontSize: "10px",
     textAlign: "center" as const,
-    color:
-      colorMode === "traditional"
-        ? isWhiteKey
-          ? "#000000"
-          : "#FFFFFF" // Traditional mode: black on white, white on black
-        : getLabelColorForNote(relativeNote), // Chromatic modes: use special colors
+    color: (() => {
+      if (colorMode === "traditional") {
+        return isWhiteKey ? "#000000" : "#FFFFFF";
+      }
+      if (isNoteInMapping(note, octave, tonic, keyboardMapping)) {
+        return getLabelColorForNote(relativeNote);
+      }
+      return "#999999"; // Light gray text for unmapped keys
+    })(),
+    border: (() => {
+      if (colorMode === "traditional") {
+        return "1px solid #333";
+      }
+      if (!isNoteInMapping(note, octave, tonic, keyboardMapping)) {
+        return "1px solid black"; // Traditional border for unmapped keys
+      }
+      return "none";
+    })(),
     display: "flex",
     flexDirection: "column" as const,
     justifyContent: "flex-end" as const,
@@ -158,7 +184,6 @@ const PianoKey: React.FC<PianoKeyProps> = ({
         : "transform 1s ease-in-out, background-color 1s ease-in-out, box-shadow 1s ease-in-out",
     cursor: "pointer",
     zIndex: isHovered ? 3 : style.zIndex || 1,
-    border: colorMode === "traditional" ? "1px solid #333" : "none",
     height: (() => {
       if (colorMode === "flat-chromatic") {
         return PIANO_HEIGHT;
@@ -285,6 +310,21 @@ const calculateKeyLeftPosition = (
   );
 
   return keyWidth * (isWhiteKey ? whiteKeyCount : whiteKeyCount - 0.5);
+};
+
+// Add this helper function near the top of the file
+const isNoteInMapping = (
+  note: number,
+  octave: number,
+  tonic: number,
+  keyboardMapping: KeyboardMapping
+): boolean => {
+  const absoluteNote = getAbsoluteNote(note, octave, tonic);
+  return Object.values(keyboardMapping).some(
+    (mapping) =>
+      mapping.note === absoluteNote.note &&
+      mapping.octave === absoluteNote.octave
+  );
 };
 
 interface PianoUIProps {
@@ -441,6 +481,7 @@ export const PianoUI: React.FC<PianoUIProps> = ({
     colorMode,
     playNotes,
     releaseNotes,
+    keyboardMapping,
   };
 
   const c1Left = calculateKeyLeftPosition(0, 1, keyWidth, "traditional");
