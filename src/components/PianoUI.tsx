@@ -5,7 +5,6 @@ import { ColorMode } from "./types";
 import { getColors, getLabelColorForNote } from "../utils/colors";
 import { KEY_DISPLAY_LABELS, KeyboardMapping } from "../constants/keyboard";
 import { PianoControls } from "./PianoControls";
-import { Voicing } from "../constants/voicings";
 import { PianoControllerState } from "./PianoController";
 
 const getAbsoluteNote = (
@@ -332,8 +331,6 @@ interface PianoUIProps {
   setTonic: (tonic: number) => void;
   colorMode: ColorMode;
   onColorModeChange: (mode: ColorMode) => void;
-  currentVoicing: Voicing;
-  onVoicingChange: (voicing: Voicing) => void;
   playNotes: (
     note: number,
     octave: number
@@ -353,8 +350,6 @@ export const PianoUI: React.FC<PianoUIProps> = ({
   setTonic,
   colorMode,
   onColorModeChange,
-  currentVoicing,
-  onVoicingChange,
   playNotes,
   releaseNotes,
   fallingNotes,
@@ -532,8 +527,6 @@ export const PianoUI: React.FC<PianoUIProps> = ({
           onTonicChange={setTonic}
           colorMode={colorMode}
           onColorModeChange={onColorModeChange}
-          currentVoicing={currentVoicing}
-          onVoicingChange={onVoicingChange}
         />
         {Object.entries(OCTAVE_RANGES).map(([octave, range]) => {
           const octaveNum = parseInt(octave);

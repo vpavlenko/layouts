@@ -65,8 +65,8 @@ export type NoteInSequence = {
 // Create the ascending sequence starting from A0
 const createAscendingChromaticSequence = (): NoteInSequence[] => {
   const sequence: NoteInSequence[] = [];
-  let currentNote = 9 as ChromaticNote; // A
-  let currentOctave = 0;
+  let currentNote = 0 as ChromaticNote; // A
+  let currentOctave = 2;
 
   while (!(currentNote === 0 && currentOctave === 8)) {
     sequence.push({ note: currentNote, octave: currentOctave });

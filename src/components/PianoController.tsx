@@ -1,8 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { PianoUI } from "./PianoUI";
-import { Voicing } from "../constants/voicings";
 import { ColorMode } from "./types";
-import { VOICINGS } from "../constants/voicings";
 import { sampler } from "../audio/sampler";
 import { FallingNote } from "./FallingNotes";
 import { TaskPanel } from "./TaskPanel";
@@ -33,7 +31,6 @@ export interface PianoControllerState {
 
 export const PianoController: React.FC = () => {
   const [tonic, setTonic] = useState<number>(0);
-  const [voicing, setVoicing] = useState<Voicing>("single");
   const [colorMode, setColorMode] = useState<ColorMode>("chromatic");
   const [fallingNotes, setFallingNotes] = useState<FallingNote[]>([]);
   const [taskId, setTaskId] = useState<TaskId>(0);
@@ -86,35 +83,24 @@ export const PianoController: React.FC = () => {
       const relativeNote = (note - tonic + 12) % 12;
       console.log("Calculated relative note:", relativeNote);
 
-      const notesToPlay = VOICINGS[voicing].getNotes(relativeNote, octave);
-      console.log("Notes to play:", notesToPlay);
+      const noteString = `${NOTE_NAMES[(note + tonic) % 12]}${octave}`;
+      sampler.triggerAttack(noteString, immediate());
 
-      // Play the notes
-      const playedNotes = notesToPlay.map(({ note: n, octave: o }) => {
-        const absoluteNote = (n + tonic) % 12;
-        const noteString = `${NOTE_NAMES[absoluteNote]}${o}`;
-        sampler.triggerAttack(noteString, immediate());
+      // Create falling note
+      const newNote: FallingNote = {
+        id: `${note}-${octave}-${Date.now()}`,
+        note: (note + tonic) % 12,
+        octave,
+        startTime: Date.now(),
+        endTime: null,
+      };
 
-        // Create falling note
-        const newNote: FallingNote = {
-          id: `${absoluteNote}-${o}-${Date.now()}`,
-          note: absoluteNote,
-          octave: o,
-          startTime: Date.now(),
-          endTime: null,
-        };
-
-        setFallingNotes((prev) => [...prev, newNote]);
-
-        return { note: absoluteNote, octave: o };
-      });
-
-      // Add to active keys
+      setFallingNotes((prev) => [...prev, newNote]);
       setActiveKeys((prev) => new Set([...prev, `${note}-${octave}`]));
 
-      return playedNotes;
+      return [{ note: (note + tonic) % 12, octave }];
     },
-    [samplerReady, tonic, voicing]
+    [samplerReady, tonic]
   );
 
   const releaseNotes = useCallback(
@@ -124,35 +110,31 @@ export const PianoController: React.FC = () => {
         `[releaseNotes] Releasing ${noteKey}, active keys: ${activeKeys.size}`
       );
 
-      // Remove from active keys
       setActiveKeys((prev) => {
         const next = new Set(prev);
         next.delete(`${note}-${octave}`);
         return next;
       });
 
-      // Handle note release logic
-      const relativeNote = (note - tonic + 12) % 12;
-      const notesToRelease = VOICINGS[voicing].getNotes(relativeNote, octave);
+      const noteString = `${NOTE_NAMES[(note + tonic) % 12]}${octave}`;
+      sampler.triggerRelease(noteString);
 
-      return notesToRelease.map(({ note: n, octave: o }) => {
-        const absoluteNote = (n + tonic) % 12;
-        const noteString = `${NOTE_NAMES[absoluteNote]}${o}`;
-        sampler.triggerRelease(noteString);
+      setFallingNotes((prev) =>
+        prev.map((n) => {
+          if (
+            n.note === (note + tonic) % 12 &&
+            n.octave === octave &&
+            !n.endTime
+          ) {
+            return { ...n, endTime: Date.now() };
+          }
+          return n;
+        })
+      );
 
-        setFallingNotes((prev) =>
-          prev.map((n) => {
-            if (n.note === absoluteNote && n.octave === o && !n.endTime) {
-              return { ...n, endTime: Date.now() };
-            }
-            return n;
-          })
-        );
-
-        return { note: absoluteNote, octave: o };
-      });
+      return [{ note: (note + tonic) % 12, octave }];
     },
-    [tonic, voicing]
+    [tonic]
   );
 
   const handleTaskChange = useCallback(
@@ -184,8 +166,6 @@ export const PianoController: React.FC = () => {
           setTonic={setTonic}
           colorMode={TASK_CONFIGS[taskId].colorMode}
           onColorModeChange={setColorMode}
-          currentVoicing={voicing}
-          onVoicingChange={setVoicing}
           playNotes={playNotes}
           releaseNotes={releaseNotes}
           fallingNotes={fallingNotes}

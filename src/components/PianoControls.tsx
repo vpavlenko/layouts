@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { ColorMode } from "./types";
-import { Voicing, VOICINGS } from "../constants/voicings";
 
 interface TonicPickerProps {
   tonic: number;
@@ -13,10 +12,7 @@ interface ColorModeToggleProps {
   onColorModeChange: (mode: ColorMode) => void;
 }
 
-interface ControlsProps extends TonicPickerProps, ColorModeToggleProps {
-  currentVoicing: Voicing;
-  onVoicingChange: (voicing: Voicing) => void;
-}
+interface ControlsProps extends TonicPickerProps, ColorModeToggleProps {}
 
 const TonicPicker: React.FC<TonicPickerProps> = ({ tonic, onTonicChange }) => {
   const [showPicker, setShowPicker] = useState(false);
@@ -198,37 +194,11 @@ const ColorModeToggle: React.FC<ColorModeToggleProps> = ({
   );
 };
 
-const VoicingPicker: React.FC<{
-  currentVoicing: Voicing;
-  onVoicingChange: (voicing: Voicing) => void;
-}> = ({ currentVoicing, onVoicingChange }) => (
-  <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-    {(Object.entries(VOICINGS) as [Voicing, { label: string }][]).map(
-      ([voicing, config]) => (
-        <span
-          key={voicing}
-          onClick={() => onVoicingChange(voicing)}
-          style={{
-            cursor: "pointer",
-            opacity: voicing === currentVoicing ? 1 : 0.6,
-            fontWeight: voicing === currentVoicing ? "bold" : "normal",
-            transition: "all 0.2s",
-          }}
-        >
-          {config.label}
-        </span>
-      )
-    )}
-  </div>
-);
-
 export const PianoControls: React.FC<ControlsProps> = ({
   tonic,
   onTonicChange,
   colorMode,
   onColorModeChange,
-  currentVoicing,
-  onVoicingChange,
 }) => (
   <div
     style={{
@@ -242,10 +212,6 @@ export const PianoControls: React.FC<ControlsProps> = ({
     }}
   >
     <TonicPicker tonic={tonic} onTonicChange={onTonicChange} />
-    <VoicingPicker
-      currentVoicing={currentVoicing}
-      onVoicingChange={onVoicingChange}
-    />
     <ColorModeToggle
       colorMode={colorMode}
       onColorModeChange={onColorModeChange}
