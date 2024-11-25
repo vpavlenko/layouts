@@ -46,6 +46,8 @@ export const PianoController: React.FC = () => {
   const [samplerReady, setSamplerReady] = useState(false);
   const [activeKeyCodes, setActiveKeyCodes] = useState<Set<string>>(new Set());
 
+  console.log("colorMode", colorMode);
+
   // Initialize taskId from URL parameter
   useEffect(() => {
     const parsedTaskId = parseInt(urlTaskId || "5");
@@ -180,15 +182,14 @@ export const PianoController: React.FC = () => {
         <PianoUI
           tonic={tonic}
           setTonic={setTonic}
-          colorMode={TASK_CONFIGS[taskId]?.colorMode || colorMode}
+          colorMode={TASK_CONFIGS[taskId].colorMode}
           onColorModeChange={setColorMode}
           currentVoicing={voicing}
           onVoicingChange={setVoicing}
           playNotes={playNotes}
           releaseNotes={releaseNotes}
           fallingNotes={fallingNotes}
-          taskKeyboardMapping={TASK_CONFIGS[taskId].keyboardMapping}
-          taskId={taskId}
+          keyboardMapping={TASK_CONFIGS[taskId].keyboardMapping}
           state={state}
           setActiveKeyCodes={setActiveKeyCodes}
         />

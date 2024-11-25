@@ -460,7 +460,7 @@ export const TASK_CONFIGS: TaskConfig[] = [
   {
     title: "Traditional Layout",
     keyboardMapping: TRADITIONAL_KEYBOARD_MAP,
-    colorMode: "traditional",
+    colorMode: "chromatic",
   },
   {
     title: "Flat Chromatic Layout",

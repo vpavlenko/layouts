@@ -6,7 +6,6 @@ import { getColors, getLabelColorForNote } from "../utils/colors";
 import { KEY_DISPLAY_LABELS, KeyboardMapping } from "../constants/keyboard";
 import { PianoControls } from "./PianoControls";
 import { Voicing } from "../constants/voicings";
-import { TaskId } from "../tasks/tasks";
 import { PianoControllerState } from "./PianoController";
 
 const BLACK_KEYS = [1, 3, -1, 6, 8, 10, -1];
@@ -33,7 +32,6 @@ interface PianoKeyProps {
     octave: number
   ) => Array<{ note: number; octave: number }>;
   isActive: boolean;
-  activeTaskId: TaskId | null;
   keyboardMapping?: KeyboardMapping;
 }
 
@@ -47,7 +45,6 @@ const PianoKey: React.FC<PianoKeyProps> = ({
   playNotes,
   releaseNotes,
   isActive,
-  activeTaskId,
 }) => {
   const [isHovered, setIsHovered] = React.useState(false);
   const [isPressed, setIsPressed] = React.useState(false);
@@ -122,7 +119,7 @@ const PianoKey: React.FC<PianoKeyProps> = ({
           }`
         : "none",
     transition:
-      activeTaskId || isPressed || isHovered
+      isPressed || isHovered
         ? "transform 0.1s ease-in-out, background-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out"
         : "transform 1s ease-in-out, background-color 1s ease-in-out, box-shadow 1s ease-in-out",
     cursor: "pointer",
@@ -272,8 +269,7 @@ interface PianoUIProps {
     octave: number
   ) => Array<{ note: number; octave: number }>;
   fallingNotes: FallingNote[];
-  taskKeyboardMapping: KeyboardMapping;
-  taskId: TaskId;
+  keyboardMapping: KeyboardMapping;
   state: PianoControllerState;
   setActiveKeyCodes: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
@@ -288,8 +284,7 @@ export const PianoUI: React.FC<PianoUIProps> = ({
   playNotes,
   releaseNotes,
   fallingNotes,
-  taskKeyboardMapping,
-  taskId,
+  keyboardMapping,
   setActiveKeyCodes,
 }) => {
   const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
@@ -307,11 +302,9 @@ export const PianoUI: React.FC<PianoUIProps> = ({
     const handleKeyDown = async (event: KeyboardEvent) => {
       setActiveKeyCodes((prev: Set<string>) => new Set([...prev, event.code]));
 
-      const currentKeyboardMap = taskKeyboardMapping;
-
-      if (event.ctrlKey && event.code in currentKeyboardMap) {
+      if (event.ctrlKey && event.code in keyboardMapping) {
         const { note } =
-          currentKeyboardMap[event.code as keyof typeof currentKeyboardMap];
+          keyboardMapping[event.code as keyof typeof keyboardMapping];
         setTonic(note % 12);
         return;
       }
@@ -319,9 +312,9 @@ export const PianoUI: React.FC<PianoUIProps> = ({
       if (!activeKeys.has(event.code)) {
         setActiveKeys((prev) => new Set([...prev, event.code]));
 
-        if (event.code in currentKeyboardMap) {
+        if (event.code in keyboardMapping) {
           const { note, octave } =
-            currentKeyboardMap[event.code as keyof typeof currentKeyboardMap];
+            keyboardMapping[event.code as keyof typeof keyboardMapping];
           await playNotes(note, octave);
         }
       }
@@ -334,17 +327,15 @@ export const PianoUI: React.FC<PianoUIProps> = ({
         return next;
       });
 
-      const currentKeyboardMap = taskKeyboardMapping;
-
       setActiveKeys((prev) => {
         const next = new Set(prev);
         next.delete(event.code);
         return next;
       });
 
-      if (event.code in currentKeyboardMap) {
+      if (event.code in keyboardMapping) {
         const { note, octave } =
-          currentKeyboardMap[event.code as keyof typeof currentKeyboardMap];
+          keyboardMapping[event.code as keyof typeof keyboardMapping];
         releaseNotes(note, octave);
       }
     };
@@ -362,7 +353,7 @@ export const PianoUI: React.FC<PianoUIProps> = ({
     releaseNotes,
     setTonic,
     colorMode,
-    taskKeyboardMapping,
+    keyboardMapping,
     setActiveKeyCodes,
   ]);
 
@@ -416,7 +407,6 @@ export const PianoUI: React.FC<PianoUIProps> = ({
     colorMode,
     playNotes,
     releaseNotes,
-    activeTaskId: taskId,
   };
 
   const c1Left = calculateKeyLeftPosition(0, 1, keyWidth, "traditional");
@@ -424,10 +414,7 @@ export const PianoUI: React.FC<PianoUIProps> = ({
 
   // Modify the key rendering logic to only show relevant keys
   const getKeyboardKey = (noteNum: number, octaveNum: number) => {
-    const currentKeyboardMap = taskKeyboardMapping;
-
-    // Find the matching key for this note/octave combination
-    const matchingKey = Object.entries(currentKeyboardMap).find(
+    const matchingKey = Object.entries(keyboardMapping).find(
       ([, value]) => value.note === noteNum && value.octave === octaveNum
     )?.[0];
 
@@ -513,8 +500,7 @@ export const PianoUI: React.FC<PianoUIProps> = ({
                     zIndex:
                       colorMode === "flat-chromatic" ? 1 : isWhiteKey ? 1 : 2,
                   }}
-                  activeTaskId={taskId}
-                  keyboardMapping={taskKeyboardMapping}
+                  keyboardMapping={keyboardMapping}
                 />
               );
             }
