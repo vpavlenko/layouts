@@ -1,5 +1,3 @@
-import React from "react";
-
 export interface Lesson {
   id: number;
   title: string;

@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useState } from "react";
 import { LESSONS } from "../data/lessons";
 import { Bars3Icon, ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { URL_PREFIX } from "../constants/routes";
 import { KeyboardMapping } from "../constants/keyboard";
 import { Layout } from "./Layout";
+import { TASK_CONFIGS } from "../tasks/tasks";
 
 interface KeyboardState {
   activeKeyCodes: Set<string>;
@@ -14,24 +15,16 @@ interface KeyboardState {
 interface LessonsPanelProps {
   currentLessonId: number;
   onLessonChange: (lessonId: number) => void;
-  activeTaskId: string | null;
   keyboardState: KeyboardState;
 }
 
 export const LessonsPanel: React.FC<LessonsPanelProps> = React.memo(
-  ({ currentLessonId, onLessonChange, activeTaskId, keyboardState }) => {
+  ({ currentLessonId, onLessonChange, keyboardState }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const currentLessonIndex = LESSONS.findIndex(
       (lesson) => lesson.id === currentLessonId
     );
-    const currentLesson = LESSONS[currentLessonIndex];
-    const previousLesson =
-      currentLessonIndex > 0 ? LESSONS[currentLessonIndex - 1] : null;
-    const nextLesson =
-      currentLessonIndex < LESSONS.length - 1
-        ? LESSONS[currentLessonIndex + 1]
-        : null;
 
     return (
       <div className="fixed top-0 left-0 w-[600px] h-screen bg-gray-900 text-white flex flex-col">
@@ -42,91 +35,68 @@ export const LessonsPanel: React.FC<LessonsPanelProps> = React.memo(
           </div>
         </div>
 
-        {/* Menu Header */}
-        <div className="bg-gray-900 z-20 p-8 pb-4 border-b border-gray-800">
-          <div className="flex items-center gap-2 mb-4">
+        {/* Header */}
+        <div className="bg-gray-900 z-20 p-4 border-b border-gray-800">
+          <div className="flex items-center gap-2">
             <div className="flex gap-2">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 bg-gray-800 rounded border border-gray-700 hover:bg-gray-700 relative z-20 pointer-events-auto"
+                className="p-2 bg-gray-800 rounded border border-gray-700 hover:bg-gray-700"
               >
                 <Bars3Icon className="w-6 h-6" />
               </button>
               <Link
                 to={`${URL_PREFIX}/mappings`}
-                className="p-2 bg-gray-800 rounded border border-gray-700 hover:bg-gray-700 relative z-20 pointer-events-auto"
+                className="p-2 bg-gray-800 rounded border border-gray-700 hover:bg-gray-700"
               >
                 <ShoppingBagIcon className="w-6 h-6" />
               </Link>
             </div>
-
-            <div className="flex-1 flex gap-2">
-              <div className={`flex-1 ${nextLesson ? "w-1/2" : "w-full"}`}>
-                {previousLesson && (
-                  <Link
-                    to={`${URL_PREFIX}/${previousLesson.id}`}
-                    onClick={() => onLessonChange(previousLesson.id)}
-                    className="block w-full p-2 bg-gray-800 rounded border border-gray-700 text-gray-400 hover:bg-gray-700 text-left select-none"
-                  >
-                    ← {currentLessonIndex}. {previousLesson.title}
-                  </Link>
-                )}
-              </div>
-
-              <div className={`flex-1 ${previousLesson ? "w-1/2" : "w-full"}`}>
-                {nextLesson && (
-                  <Link
-                    to={`${URL_PREFIX}/${nextLesson.id}`}
-                    onClick={() => onLessonChange(nextLesson.id)}
-                    className="block w-full p-2 rounded border text-right select-none transition-all duration-300 bg-blue-600 hover:bg-blue-500 border-blue-500 text-white shadow-lg shadow-blue-500/20"
-                  >
-                    {currentLessonIndex + 2}. {nextLesson.title} →
-                  </Link>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="w-full text-white font-semibold text-[28px]">
-            {currentLessonIndex + 1}. {currentLesson.title}
+            <h1 className="text-2xl font-bold">Lessons</h1>
           </div>
         </div>
 
-        {/* Menu Overlay */}
-        {isMenuOpen && (
-          <div className="absolute inset-0 bg-gray-900 z-30 overflow-y-auto">
-            <div className="p-8">
-              <div className="flex items-center gap-2 mb-4">
-                <button
-                  onClick={() => setIsMenuOpen(false)}
-                  className="p-2 bg-gray-800 rounded border border-gray-700 hover:bg-gray-700"
-                >
-                  <Bars3Icon className="w-6 h-6" />
-                </button>
-              </div>
-              <div className="flex flex-col gap-2">
-                {LESSONS.map((lesson, index) => (
+        {/* Lessons List */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-4">
+            <div className="grid gap-4">
+              {LESSONS.map((lesson, index) => {
+                const lastTaskId = lesson.taskIds[lesson.taskIds.length - 1];
+                const taskConfig = TASK_CONFIGS[lastTaskId];
+                const isCurrentLesson = lesson.id === currentLessonId;
+
+                return (
                   <Link
                     key={lesson.id}
                     to={`${URL_PREFIX}/${lesson.id}`}
-                    onClick={() => {
-                      onLessonChange(lesson.id);
-                      setIsMenuOpen(false);
-                    }}
-                    className={`mt-2 text-left cursor-pointer hover:text-white ${
-                      lesson.id === currentLessonId
-                        ? "text-white"
-                        : "text-gray-400"
+                    onClick={() => onLessonChange(lesson.id)}
+                    className={`p-4 rounded-lg border transition-all ${
+                      isCurrentLesson
+                        ? "bg-blue-600 border-blue-500 shadow-lg shadow-blue-500/20"
+                        : "bg-gray-800 border-gray-700 hover:bg-gray-700"
                     }`}
                   >
-                    <span>{index + 1}. </span>
-                    {lesson.title}
+                    <div className="mb-2">
+                      <span className="text-lg">
+                        {index + 1}. {lesson.title}
+                      </span>
+                    </div>
+                    {taskConfig?.keyboardMapping && (
+                      <div className="mt-2">
+                        <Layout
+                          keyboardState={{
+                            activeKeyCodes: new Set(),
+                            taskKeyboardMapping: taskConfig.keyboardMapping,
+                          }}
+                        />
+                      </div>
+                    )}
                   </Link>
-                ))}
-              </div>
+                );
+              })}
             </div>
           </div>
-        )}
+        </div>
       </div>
     );
   }

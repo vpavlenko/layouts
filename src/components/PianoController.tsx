@@ -241,7 +241,6 @@ export const PianoController: React.FC = () => {
       <LessonsPanel
         currentLessonId={currentLessonId}
         onLessonChange={handleLessonChange}
-        activeTaskId={currentActiveTaskId}
         keyboardState={{
           activeKeyCodes,
           taskKeyboardMapping: currentActiveTaskId
