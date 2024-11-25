@@ -29,8 +29,8 @@ export const TaskPanel: React.FC<TaskPanelProps> = React.memo(
 
         {/* Tasks List */}
         <div className="flex-1 overflow-y-auto">
-          <div className="p-4">
-            <div className="grid gap-4">
+          <div className="">
+            <div className="grid">
               {TASK_CONFIGS.map((taskConfig, index) => {
                 const isCurrentTask = index === taskId;
 
@@ -39,27 +39,27 @@ export const TaskPanel: React.FC<TaskPanelProps> = React.memo(
                     key={index}
                     to={`${URL_PREFIX}/${index}`}
                     onClick={() => onTaskChange(index)}
-                    className={`p-4 rounded-lg border transition-all ${
+                    className={`p-4 border border-transparent transition-all ${
                       isCurrentTask
-                        ? "bg-blue-600 border-blue-500 shadow-lg shadow-blue-500/20"
-                        : "bg-gray-800 border-gray-700 hover:bg-gray-700"
+                        ? "bg-gray-800 border-blue-500"
+                        : "hover:bg-gray-800"
                     }`}
                   >
-                    <div className="mb-2">
-                      <span className="text-lg">
+                    <div className="flex items-start gap-4">
+                      <span className="text-lg flex-1 min-w-0">
                         {index + 1}. {taskConfig.title}
                       </span>
+                      {taskConfig?.keyboardMapping && (
+                        <div className="flex-none">
+                          <Layout
+                            keyboardState={{
+                              activeKeyCodes: new Set(),
+                              taskKeyboardMapping: taskConfig.keyboardMapping,
+                            }}
+                          />
+                        </div>
+                      )}
                     </div>
-                    {taskConfig?.keyboardMapping && (
-                      <div className="mt-2">
-                        <Layout
-                          keyboardState={{
-                            activeKeyCodes: new Set(),
-                            taskKeyboardMapping: taskConfig.keyboardMapping,
-                          }}
-                        />
-                      </div>
-                    )}
                   </Link>
                 );
               })}

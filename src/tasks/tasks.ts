@@ -438,83 +438,172 @@ const createTonicChordMapping = (): KeyboardMapping => {
   return mapping;
 };
 
-// Add these functions before TASK_CONFIGS
-
-const createFifthsMapping = (): KeyboardMapping => {
+const createFifthsOnlyMapping = (): KeyboardMapping => {
   const mapping: KeyboardMapping = {};
-  const topRowKeys = [
-    "KeyQ",
-    "KeyW",
-    "KeyE",
-    "KeyR",
-    "KeyT",
-    "KeyY",
-    "KeyU",
-    "KeyI",
-    "KeyO",
-    "KeyP",
-    "BracketLeft",
-    "BracketRight",
+
+  // Define rows of keys for fifths
+  const keyRows = [
+    [
+      "Digit1",
+      "Digit2",
+      "Digit3",
+      "Digit4",
+      "Digit5",
+      "Digit6",
+      "Digit7",
+      "Digit8",
+      "Digit9",
+      "Digit0",
+      "Minus",
+      "Equal",
+    ], // Starting C1
+    [
+      "KeyQ",
+      "KeyW",
+      "KeyE",
+      "KeyR",
+      "KeyT",
+      "KeyY",
+      "KeyU",
+      "KeyI",
+      "KeyO",
+      "KeyP",
+      "BracketLeft",
+      "BracketRight",
+    ], // Starting C2
+    [
+      "KeyA",
+      "KeyS",
+      "KeyD",
+      "KeyF",
+      "KeyG",
+      "KeyH",
+      "KeyJ",
+      "KeyK",
+      "KeyL",
+      "Semicolon",
+      "Quote",
+    ], // Starting C3
+    [
+      "KeyZ",
+      "KeyX",
+      "KeyC",
+      "KeyV",
+      "KeyB",
+      "KeyN",
+      "KeyM",
+      "Comma",
+      "Period",
+      "Slash",
+    ], // Starting C4
   ];
 
-  // Start with C1, each fifth up: C -> G -> D -> A -> E -> B -> F# -> C# -> G# -> D# -> A# -> F
-  let currentNote = 0; // Start with C
-  let currentOctave = 1;
+  keyRows.forEach((row, rowIndex) => {
+    let currentNote = 0; // Start with C
+    let currentOctave = rowIndex + 1; // Start octave based on row
 
-  topRowKeys.forEach((key) => {
-    mapping[key] = {
-      note: currentNote as ChromaticNote,
-      octave: currentOctave,
-    };
+    row.forEach((key) => {
+      // Only map if we haven't exceeded C8
+      if (currentOctave < 8 || (currentOctave === 8 && currentNote === 0)) {
+        mapping[key] = {
+          note: currentNote as ChromaticNote,
+          octave: currentOctave,
+        };
 
-    // Move up a fifth (7 semitones)
-    currentNote = (currentNote + 7) % 12;
-    if (currentNote < 7) currentOctave++; // Increment octave when wrapping around
+        // Move up a fifth (7 semitones)
+        currentNote = (currentNote + 7) % 12;
+        if (currentNote < 7) {
+          currentOctave++;
+        }
+      }
+    });
   });
 
   return mapping;
 };
 
-const createFourthsMapping = (): KeyboardMapping => {
+const createFourthsOnlyMapping = (): KeyboardMapping => {
   const mapping: KeyboardMapping = {};
-  const numberRowKeys = [
-    "Digit1",
-    "Digit2",
-    "Digit3",
-    "Digit4",
-    "Digit5",
-    "Digit6",
-    "Digit7",
-    "Digit8",
-    "Digit9",
-    "Digit0",
-    "Minus",
-    "Equal",
+
+  // Define rows of keys for fourths
+  const keyRows = [
+    [
+      "Digit1",
+      "Digit2",
+      "Digit3",
+      "Digit4",
+      "Digit5",
+      "Digit6",
+      "Digit7",
+      "Digit8",
+      "Digit9",
+      "Digit0",
+      "Minus",
+      "Equal",
+    ], // Starting C1
+    [
+      "KeyQ",
+      "KeyW",
+      "KeyE",
+      "KeyR",
+      "KeyT",
+      "KeyY",
+      "KeyU",
+      "KeyI",
+      "KeyO",
+      "KeyP",
+      "BracketLeft",
+      "BracketRight",
+    ], // Starting C2
+    [
+      "KeyA",
+      "KeyS",
+      "KeyD",
+      "KeyF",
+      "KeyG",
+      "KeyH",
+      "KeyJ",
+      "KeyK",
+      "KeyL",
+      "Semicolon",
+      "Quote",
+    ], // Starting C3
+    [
+      "KeyZ",
+      "KeyX",
+      "KeyC",
+      "KeyV",
+      "KeyB",
+      "KeyN",
+      "KeyM",
+      "Comma",
+      "Period",
+      "Slash",
+    ], // Starting C4
   ];
 
-  // Start with C1, each fourth up: C -> F -> Bb -> Eb -> Ab -> Db -> Gb -> B -> E -> A -> D -> G
-  let currentNote = 0; // Start with C
-  let currentOctave = 1;
+  keyRows.forEach((row, rowIndex) => {
+    let currentNote = 0; // Start with C
+    let currentOctave = rowIndex + 1; // Start octave based on row
 
-  numberRowKeys.forEach((key) => {
-    mapping[key] = {
-      note: currentNote as ChromaticNote,
-      octave: currentOctave,
-    };
+    row.forEach((key) => {
+      // Only map if we haven't exceeded C8
+      if (currentOctave < 8 || (currentOctave === 8 && currentNote === 0)) {
+        mapping[key] = {
+          note: currentNote as ChromaticNote,
+          octave: currentOctave,
+        };
 
-    // Move up a fourth (5 semitones)
-    currentNote = (currentNote + 5) % 12;
-    if (currentNote < 5) currentOctave++; // Increment octave when wrapping around
+        // Move up a fourth (5 semitones)
+        currentNote = (currentNote + 5) % 12;
+        if (currentNote < 5) {
+          currentOctave++;
+        }
+      }
+    });
   });
 
   return mapping;
-};
-
-const createFifthsFourthsMapping = (): KeyboardMapping => {
-  return {
-    ...createFifthsMapping(),
-    ...createFourthsMapping(),
-  };
 };
 
 // Add this function before TASK_CONFIGS
@@ -595,7 +684,7 @@ const createAugmentedScalesMapping = (): KeyboardMapping => {
       const noteInChord = keyIndex % 3; // Position within current augmented chord (0, 1, or 2)
       const note = ((rootNote + noteInChord * 4) % 12) as ChromaticNote;
       const octave =
-        1 + intervalSteps + Math.floor((rootNote + noteInChord * 4) / 12);
+        2 + intervalSteps + Math.floor((rootNote + noteInChord * 4) / 12);
 
       mapping[key] = { note, octave };
     });
@@ -680,8 +769,13 @@ export const TASK_CONFIGS: TaskConfig[] = [
     colorMode: "chromatic",
   },
   {
-    title: "Fifths and Fourths",
-    keyboardMapping: createFifthsFourthsMapping(),
+    title: "Fifths Only",
+    keyboardMapping: createFifthsOnlyMapping(),
+    colorMode: "chromatic",
+  },
+  {
+    title: "Fourths Only",
+    keyboardMapping: createFourthsOnlyMapping(),
     colorMode: "chromatic",
   },
   {
