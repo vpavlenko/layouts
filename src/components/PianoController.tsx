@@ -48,12 +48,12 @@ export const PianoController: React.FC = () => {
 
   // Initialize taskId from URL parameter
   useEffect(() => {
-    const parsedTaskId = parseInt(urlTaskId || "0");
+    const parsedTaskId = parseInt(urlTaskId || "5");
     const validTaskId =
       isNaN(parsedTaskId) ||
       parsedTaskId < 0 ||
       parsedTaskId >= TASK_CONFIGS.length
-        ? 0
+        ? 5
         : parsedTaskId;
     setTaskId(validTaskId);
   }, [urlTaskId]);
@@ -169,7 +169,7 @@ export const PianoController: React.FC = () => {
         onTaskChange={handleTaskChange}
         keyboardState={{
           activeKeyCodes,
-          taskKeyboardMapping: TASK_CONFIGS[taskId]?.keyboardMapping,
+          taskKeyboardMapping: TASK_CONFIGS[taskId].keyboardMapping,
         }}
       />
       {!samplerReady ? (
@@ -187,7 +187,7 @@ export const PianoController: React.FC = () => {
           playNotes={playNotes}
           releaseNotes={releaseNotes}
           fallingNotes={fallingNotes}
-          taskKeyboardMapping={TASK_CONFIGS[taskId]?.keyboardMapping}
+          taskKeyboardMapping={TASK_CONFIGS[taskId].keyboardMapping}
           taskId={taskId}
           state={state}
           setActiveKeyCodes={setActiveKeyCodes}

@@ -3,11 +3,7 @@ import { useState, useEffect } from "react";
 import { FallingNotes, FallingNote } from "./FallingNotes";
 import { ColorMode } from "./types";
 import { getColors, getLabelColorForNote } from "../utils/colors";
-import {
-  getKeyboardMap,
-  KEY_DISPLAY_LABELS,
-  KeyboardMapping,
-} from "../constants/keyboard";
+import { KEY_DISPLAY_LABELS, KeyboardMapping } from "../constants/keyboard";
 import { PianoControls } from "./PianoControls";
 import { Voicing } from "../constants/voicings";
 import { TaskId } from "../tasks/tasks";
@@ -276,7 +272,7 @@ interface PianoUIProps {
     octave: number
   ) => Array<{ note: number; octave: number }>;
   fallingNotes: FallingNote[];
-  taskKeyboardMapping?: KeyboardMapping;
+  taskKeyboardMapping: KeyboardMapping;
   taskId: TaskId;
   state: PianoControllerState;
   setActiveKeyCodes: React.Dispatch<React.SetStateAction<Set<string>>>;
@@ -311,7 +307,7 @@ export const PianoUI: React.FC<PianoUIProps> = ({
     const handleKeyDown = async (event: KeyboardEvent) => {
       setActiveKeyCodes((prev: Set<string>) => new Set([...prev, event.code]));
 
-      const currentKeyboardMap = getKeyboardMap(colorMode, taskKeyboardMapping);
+      const currentKeyboardMap = taskKeyboardMapping;
 
       if (event.ctrlKey && event.code in currentKeyboardMap) {
         const { note } =
@@ -338,7 +334,7 @@ export const PianoUI: React.FC<PianoUIProps> = ({
         return next;
       });
 
-      const currentKeyboardMap = getKeyboardMap(colorMode, taskKeyboardMapping);
+      const currentKeyboardMap = taskKeyboardMapping;
 
       setActiveKeys((prev) => {
         const next = new Set(prev);
@@ -428,7 +424,7 @@ export const PianoUI: React.FC<PianoUIProps> = ({
 
   // Modify the key rendering logic to only show relevant keys
   const getKeyboardKey = (noteNum: number, octaveNum: number) => {
-    const currentKeyboardMap = getKeyboardMap(colorMode, taskKeyboardMapping);
+    const currentKeyboardMap = taskKeyboardMapping;
 
     // Find the matching key for this note/octave combination
     const matchingKey = Object.entries(currentKeyboardMap).find(

@@ -1,5 +1,9 @@
 import { ColorMode } from "../components/types";
-import { KeyboardMapping } from "../constants/keyboard";
+import {
+  FLAT_CHROMATIC_KEYBOARD_MAP,
+  KeyboardMapping,
+  TRADITIONAL_KEYBOARD_MAP,
+} from "../constants/keyboard";
 
 export const createSequenceKeyboardMapping = (
   sequence: Array<{ note: number; octave: number }>,
@@ -20,8 +24,8 @@ export type TaskId = number;
 
 export interface TaskConfig {
   title: string;
-  keyboardMapping?: KeyboardMapping;
-  colorMode?: ColorMode;
+  keyboardMapping: KeyboardMapping;
+  colorMode: ColorMode;
 }
 
 // First, let's create a type for our key mappings
@@ -420,6 +424,7 @@ export const TASK_CONFIGS: TaskConfig[] = [
 
       return fullMapping;
     })(),
+    colorMode: "chromatic",
   },
   {
     title: "Chromatic Sequences",
@@ -453,7 +458,13 @@ export const TASK_CONFIGS: TaskConfig[] = [
     colorMode: "chromatic",
   },
   {
-    title: "Free Play",
-    colorMode: "chromatic",
+    title: "Traditional Layout",
+    keyboardMapping: TRADITIONAL_KEYBOARD_MAP,
+    colorMode: "traditional",
+  },
+  {
+    title: "Flat Chromatic Layout",
+    keyboardMapping: FLAT_CHROMATIC_KEYBOARD_MAP,
+    colorMode: "flat-chromatic",
   },
 ];
