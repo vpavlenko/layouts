@@ -1,9 +1,5 @@
 import { ColorMode } from "../components/types";
-import {
-  FLAT_CHROMATIC_KEYBOARD_MAP,
-  KeyboardMapping,
-  TRADITIONAL_KEYBOARD_MAP,
-} from "../constants/keyboard";
+import { KeyboardMapping } from "../constants/keyboard";
 
 export type ChromaticNote = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 
@@ -183,11 +179,21 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
   },
 
   "Traditional Layout": {
-    keyboardMapping: TRADITIONAL_KEYBOARD_MAP,
+    keyboardMapping: keyboard`
+      . F#3 G#3 A#3 . C#4 D#4 . F#4 G#4 A#4
+      F3 G3 A3 B3 C4 D4 E4 F4 G4 A4 B4 C5
+      . C#2 D#2 . F#2 G#2 A#2 . C#3 D#3
+      C2 D2 E2 F2 G2 A2 B2 C3 D3 E3
+  `,
   },
 
   "Flat Chromatic Layout": {
-    keyboardMapping: FLAT_CHROMATIC_KEYBOARD_MAP,
+    keyboardMapping: keyboard`
+      A4 A#4 B4 C5 C#5 D5 D#5 E5 F5 F#5 G5 G#5 
+      A3 A#3 B3 C4 C#4 D4 D#4 E4 F4 F#4 G4 G#4 
+      A#2 B2 C3 C#3 D3 D#3 E3 F3 F#3 G3 G#3
+      C2 C#2 D2 D#2 E2 F2 F#2 G2 G#2 A2 
+  `,
     colorMode: "flat-chromatic",
   },
 
@@ -229,7 +235,7 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
 
   "Minor Pentatonic": {
     keyboardMapping: keyboard`
-      C4 Eb4 F4 G4 Bb4 . . . . . . .
+      C4 Eb4 F4 G4 Bb4 C8 . . . . . Bb0
       C3 Eb3 F3 G3 Bb3 C7 Eb7 F7 G7 Bb7 . .
       C2 Eb2 F2 G2 Bb2 C6 Eb6 F6 G6 Bb6 .
       C1 Eb1 F1 G1 Bb1 C5 Eb5 F5 G5 Bb5
