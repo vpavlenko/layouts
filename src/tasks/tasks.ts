@@ -247,156 +247,6 @@ const createFlatChromaticMapping = (
   return mapping;
 };
 
-// First define the scale sequences
-const SCALE_SEQUENCES = {
-  lydian: {
-    notes: [
-      { note: 0, octave: 2 }, // C
-      { note: 2, octave: 2 }, // D
-      { note: 4, octave: 2 }, // E
-      { note: 6, octave: 2 }, // F#
-      { note: 7, octave: 2 }, // G
-      { note: 9, octave: 2 }, // A
-      { note: 11, octave: 2 }, // B
-      { note: 0, octave: 3 }, // C (preview of next scale)
-    ],
-    keys: ["KeyZ", "KeyX", "KeyC", "KeyV", "KeyB", "KeyN", "KeyM", "KeyA"],
-  },
-  major: {
-    notes: [
-      { note: 0, octave: 3 }, // C
-      { note: 2, octave: 3 }, // D
-      { note: 4, octave: 3 }, // E
-      { note: 5, octave: 3 }, // F
-      { note: 7, octave: 3 }, // G
-      { note: 9, octave: 3 }, // A
-      { note: 11, octave: 3 }, // B
-      { note: 0, octave: 4 }, // C (preview of next scale)
-    ],
-    keys: ["KeyA", "KeyS", "KeyD", "KeyF", "KeyG", "KeyH", "KeyJ", "KeyQ"],
-  },
-  mixolydian: {
-    notes: [
-      { note: 0, octave: 4 }, // C
-      { note: 2, octave: 4 }, // D
-      { note: 4, octave: 4 }, // E
-      { note: 5, octave: 4 }, // F
-      { note: 7, octave: 4 }, // G
-      { note: 9, octave: 4 }, // A
-      { note: 10, octave: 4 }, // Bb
-      { note: 0, octave: 5 }, // C (preview of next scale)
-    ],
-    keys: ["KeyQ", "KeyW", "KeyE", "KeyR", "KeyT", "KeyY", "KeyU", "Digit1"],
-  },
-  dorian: {
-    notes: [
-      { note: 0, octave: 5 }, // C
-      { note: 2, octave: 5 }, // D
-      { note: 3, octave: 5 }, // Eb
-      { note: 5, octave: 5 }, // F
-      { note: 7, octave: 5 }, // G
-      { note: 9, octave: 5 }, // A
-      { note: 10, octave: 5 }, // Bb
-      { note: 0, octave: 6 }, // C (final)
-    ],
-    keys: [
-      "Digit1",
-      "Digit2",
-      "Digit3",
-      "Digit4",
-      "Digit5",
-      "Digit6",
-      "Digit7",
-      "Digit8",
-    ],
-  },
-  dorianLow: {
-    notes: [
-      { note: 0, octave: 2 }, // C
-      { note: 2, octave: 2 }, // D
-      { note: 3, octave: 2 }, // Eb
-      { note: 5, octave: 2 }, // F
-      { note: 7, octave: 2 }, // G
-      { note: 9, octave: 2 }, // A
-      { note: 10, octave: 2 }, // Bb
-      { note: 0, octave: 3 }, // C (preview of next scale)
-    ],
-    keys: ["KeyZ", "KeyX", "KeyC", "KeyV", "KeyB", "KeyN", "KeyM", "KeyA"],
-  },
-  minor: {
-    notes: [
-      { note: 0, octave: 3 }, // C
-      { note: 2, octave: 3 }, // D
-      { note: 3, octave: 3 }, // Eb
-      { note: 5, octave: 3 }, // F
-      { note: 7, octave: 3 }, // G
-      { note: 8, octave: 3 }, // Ab
-      { note: 10, octave: 3 }, // Bb
-      { note: 0, octave: 4 }, // C (preview of next scale)
-    ],
-    keys: ["KeyA", "KeyS", "KeyD", "KeyF", "KeyG", "KeyH", "KeyJ", "KeyQ"],
-  },
-  phrygian: {
-    notes: [
-      { note: 0, octave: 4 }, // C
-      { note: 1, octave: 4 }, // Db
-      { note: 3, octave: 4 }, // Eb
-      { note: 5, octave: 4 }, // F
-      { note: 7, octave: 4 }, // G
-      { note: 8, octave: 4 }, // Ab
-      { note: 10, octave: 4 }, // Bb
-      { note: 0, octave: 5 }, // C (preview of next scale)
-    ],
-    keys: ["KeyQ", "KeyW", "KeyE", "KeyR", "KeyT", "KeyY", "KeyU", "Digit1"],
-  },
-  locrian: {
-    notes: [
-      { note: 0, octave: 5 }, // C
-      { note: 1, octave: 5 }, // Db
-      { note: 3, octave: 5 }, // Eb
-      { note: 5, octave: 5 }, // F
-      { note: 6, octave: 5 }, // Gb
-      { note: 8, octave: 5 }, // Ab
-      { note: 10, octave: 5 }, // Bb
-      { note: 0, octave: 6 }, // C (final)
-    ],
-    keys: [
-      "Digit1",
-      "Digit2",
-      "Digit3",
-      "Digit4",
-      "Digit5",
-      "Digit6",
-      "Digit7",
-      "Digit8",
-    ],
-  },
-} as const;
-
-// Helper to create cumulative keyboard mapping from scale definitions
-const createScaleKeyboardMapping = (
-  currentScale: (typeof SCALE_SEQUENCES)[keyof typeof SCALE_SEQUENCES],
-  previousScales: Array<keyof typeof SCALE_SEQUENCES> = []
-): KeyboardMapping => {
-  const mapping: KeyboardMapping = {};
-
-  // Add mappings from previous scales first
-  previousScales.forEach((scaleName) => {
-    const scale = SCALE_SEQUENCES[scaleName];
-    scale.notes.slice(0, -1).forEach(({ note, octave }, index) => {
-      // Exclude the last C
-      mapping[scale.keys[index]] = { note, octave };
-    });
-  });
-
-  // Add current scale's mappings
-  currentScale.notes.forEach(({ note, octave }, index) => {
-    mapping[currentScale.keys[index]] = { note, octave };
-  });
-
-  return mapping;
-};
-
 // Add this before TASK_CONFIGS
 const createTonicChordMapping = (): KeyboardMapping => {
   const mapping: KeyboardMapping = {};
@@ -725,36 +575,126 @@ const createPentatonicMapping = (): KeyboardMapping => {
   return mapping;
 };
 
-// Add this function before TASK_CONFIGS
-const createHirajoshiMapping = (): KeyboardMapping => {
+// Add these helper functions before createHirajoshiMapping
+const parseNoteString = (
+  noteStr: string
+): { note: ChromaticNote; octave: number } => {
+  const note = noteStr.replace(/[0-9]/g, "");
+  const octave = parseInt(noteStr.match(/\d+/)?.[0] || "0");
+
+  const noteMap: Record<string, ChromaticNote> = {
+    C: 0,
+    "C#": 1,
+    Db: 1,
+    D: 2,
+    "D#": 3,
+    Eb: 3,
+    E: 4,
+    F: 5,
+    "F#": 6,
+    Gb: 6,
+    G: 7,
+    "G#": 8,
+    Ab: 8,
+    A: 9,
+    "A#": 10,
+    Bb: 10,
+    B: 11,
+  };
+
+  return {
+    note: noteMap[note] as ChromaticNote,
+    octave,
+  };
+};
+
+const KEYBOARD_ROWS = [
+  [
+    "Digit1",
+    "Digit2",
+    "Digit3",
+    "Digit4",
+    "Digit5",
+    "Digit6",
+    "Digit7",
+    "Digit8",
+    "Digit9",
+    "Digit0",
+    "Minus",
+    "Equal",
+  ],
+  [
+    "KeyQ",
+    "KeyW",
+    "KeyE",
+    "KeyR",
+    "KeyT",
+    "KeyY",
+    "KeyU",
+    "KeyI",
+    "KeyO",
+    "KeyP",
+    "BracketLeft",
+    "BracketRight",
+  ],
+  [
+    "KeyA",
+    "KeyS",
+    "KeyD",
+    "KeyF",
+    "KeyG",
+    "KeyH",
+    "KeyJ",
+    "KeyK",
+    "KeyL",
+    "Semicolon",
+    "Quote",
+  ],
+  [
+    "KeyZ",
+    "KeyX",
+    "KeyC",
+    "KeyV",
+    "KeyB",
+    "KeyN",
+    "KeyM",
+    "Comma",
+    "Period",
+    "Slash",
+  ],
+];
+
+const processKeyboardString = (mappingStr: string): KeyboardMapping => {
   const mapping: KeyboardMapping = {};
 
-  // Define the Hirajoshi scale notes (C, C#, F, F#, Bb)
-  const hirajoshiNotes: ChromaticNote[] = [0, 1, 5, 6, 10];
+  // Split into rows
+  const rows = mappingStr.trim().split("\n");
 
-  // Define rows of keys for each octave
-  const keyRows = [
-    ["KeyZ", "KeyX", "KeyC", "KeyV", "KeyB"], // Octave 1
-    ["KeyA", "KeyS", "KeyD", "KeyF", "KeyG"], // Octave 2
-    ["KeyQ", "KeyW", "KeyE", "KeyR", "KeyT"], // Octave 3
-    ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5"], // Octave 4
-    ["KeyN", "KeyM", "Comma", "Period", "Slash"], // Octave 5
-    ["KeyH", "KeyJ", "KeyK", "KeyL", "Semicolon"], // Octave 6
-    ["KeyY", "KeyU", "KeyI", "KeyO", "KeyP"], // Octave 7
-  ];
+  // Process each row
+  rows.forEach((row, rowIndex) => {
+    const notes = row.trim().split(/\s+/);
+    const keyRow = KEYBOARD_ROWS[rowIndex];
+    if (!keyRow) return;
 
-  // Map each row to its corresponding octave
-  keyRows.forEach((row, rowIndex) => {
-    const octave = rowIndex + 1;
-    row.forEach((key, noteIndex) => {
-      mapping[key] = {
-        note: hirajoshiNotes[noteIndex],
-        octave,
-      };
+    notes.forEach((noteStr, noteIndex) => {
+      const key = keyRow[noteIndex];
+      if (!key || noteStr === ".") return;
+
+      mapping[key] = parseNoteString(noteStr);
     });
   });
 
   return mapping;
+};
+
+// Replace createHirajoshiMapping with this simpler version
+const createHirajoshiMapping = (): KeyboardMapping => {
+  const mappingString = `C4 C#4 F4 F#4 Bb4 C8 . . . . . Bb0
+C3 C#3 F3 F#3 Bb3 C7 C#7 F7 F#7 Bb7
+C2 C#2 F2 F#2 Bb2 C6 C#6 F6 F#6 Bb6
+C1 C#1 F1 F#1 Bb1 C5 C#5 F5 F#5 Bb5`;
+
+  return processKeyboardString(mappingString);
 };
 
 // Remove the createTaskConfig function and directly define TASK_CONFIGS
@@ -798,24 +738,6 @@ export const TASK_CONFIGS: TaskConfig[] = [
     title: "Major Seconds from A#0",
     keyboardMapping: createFlatChromaticMapping(majorSecondFromASharp0Sequence),
     colorMode: "flat-chromatic",
-  },
-  {
-    title: "Dorian Scale",
-    keyboardMapping: createScaleKeyboardMapping(SCALE_SEQUENCES.dorian, [
-      "lydian",
-      "major",
-      "mixolydian",
-    ]),
-    colorMode: "chromatic",
-  },
-  {
-    title: "Locrian Scale",
-    keyboardMapping: createScaleKeyboardMapping(SCALE_SEQUENCES.locrian, [
-      "dorianLow",
-      "minor",
-      "phrygian",
-    ]),
-    colorMode: "chromatic",
   },
   {
     title: "Traditional Layout",
