@@ -438,6 +438,85 @@ const createTonicChordMapping = (): KeyboardMapping => {
   return mapping;
 };
 
+// Add these functions before TASK_CONFIGS
+
+const createFifthsMapping = (): KeyboardMapping => {
+  const mapping: KeyboardMapping = {};
+  const topRowKeys = [
+    "KeyQ",
+    "KeyW",
+    "KeyE",
+    "KeyR",
+    "KeyT",
+    "KeyY",
+    "KeyU",
+    "KeyI",
+    "KeyO",
+    "KeyP",
+    "BracketLeft",
+    "BracketRight",
+  ];
+
+  // Start with C1, each fifth up: C -> G -> D -> A -> E -> B -> F# -> C# -> G# -> D# -> A# -> F
+  let currentNote = 0; // Start with C
+  let currentOctave = 1;
+
+  topRowKeys.forEach((key) => {
+    mapping[key] = {
+      note: currentNote as ChromaticNote,
+      octave: currentOctave,
+    };
+
+    // Move up a fifth (7 semitones)
+    currentNote = (currentNote + 7) % 12;
+    if (currentNote < 7) currentOctave++; // Increment octave when wrapping around
+  });
+
+  return mapping;
+};
+
+const createFourthsMapping = (): KeyboardMapping => {
+  const mapping: KeyboardMapping = {};
+  const numberRowKeys = [
+    "Digit1",
+    "Digit2",
+    "Digit3",
+    "Digit4",
+    "Digit5",
+    "Digit6",
+    "Digit7",
+    "Digit8",
+    "Digit9",
+    "Digit0",
+    "Minus",
+    "Equal",
+  ];
+
+  // Start with C1, each fourth up: C -> F -> Bb -> Eb -> Ab -> Db -> Gb -> B -> E -> A -> D -> G
+  let currentNote = 0; // Start with C
+  let currentOctave = 1;
+
+  numberRowKeys.forEach((key) => {
+    mapping[key] = {
+      note: currentNote as ChromaticNote,
+      octave: currentOctave,
+    };
+
+    // Move up a fourth (5 semitones)
+    currentNote = (currentNote + 5) % 12;
+    if (currentNote < 5) currentOctave++; // Increment octave when wrapping around
+  });
+
+  return mapping;
+};
+
+const createFifthsFourthsMapping = (): KeyboardMapping => {
+  return {
+    ...createFifthsMapping(),
+    ...createFourthsMapping(),
+  };
+};
+
 // Remove the createTaskConfig function and directly define TASK_CONFIGS
 export const TASK_CONFIGS: TaskConfig[] = [
   {
@@ -511,6 +590,11 @@ export const TASK_CONFIGS: TaskConfig[] = [
   {
     title: "Major/minor Tonic Chord",
     keyboardMapping: createTonicChordMapping(),
+    colorMode: "chromatic",
+  },
+  {
+    title: "Fifths and Fourths",
+    keyboardMapping: createFifthsFourthsMapping(),
     colorMode: "chromatic",
   },
 ];
