@@ -5,19 +5,6 @@ import {
   TRADITIONAL_KEYBOARD_MAP,
 } from "../constants/keyboard";
 
-export const createSequenceKeyboardMapping = (
-  sequence: Array<{ note: number; octave: number }>,
-  keys: string[]
-): KeyboardMapping => {
-  const mapping: KeyboardMapping = {};
-  sequence.forEach(({ note, octave }, index) => {
-    if (index < keys.length) {
-      mapping[keys[index]] = { note, octave };
-    }
-  });
-  return mapping;
-};
-
 export type ChromaticNote = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 
 export type TaskId = number;
@@ -35,151 +22,11 @@ export type NoteMapping = {
   keys: string[]; // Array of keys that can trigger this note
 };
 
-// Create a function to generate both keyboard mapping and key display
-export const createNoteMapping = (
-  note: ChromaticNote,
-  keys: [string, string, string, string] // Four keys for four octaves
-): NoteMapping => ({
-  note,
-  octave: 0, // Base octave, will be adjusted in usage
-  keys,
-});
-
-// Define our note mappings centrally
-export const NOTE_MAPPINGS = {
-  C: createNoteMapping(0, ["KeyZ", "KeyA", "KeyQ", "Digit1"]),
-  D: createNoteMapping(2, ["KeyX", "KeyS", "KeyW", "Digit2"]),
-  E: createNoteMapping(4, ["KeyC", "KeyD", "KeyE", "Digit3"]),
-  F: createNoteMapping(5, ["KeyV", "KeyF", "KeyR", "Digit4"]),
-  G: createNoteMapping(7, ["KeyB", "KeyG", "KeyT", "Digit5"]),
-  A: createNoteMapping(9, ["KeyN", "KeyH", "KeyY", "Digit6"]),
-  B: createNoteMapping(11, ["KeyM", "KeyJ", "KeyU", "Digit7"]),
-} as const;
-
 // Add new type for sequence checking
 export type NoteInSequence = {
   note: ChromaticNote;
   octave: number;
 };
-
-// Create the ascending sequence starting from A0
-const createAscendingChromaticSequence = (): NoteInSequence[] => {
-  const sequence: NoteInSequence[] = [];
-  let currentNote = 0 as ChromaticNote; // A
-  let currentOctave = 2;
-
-  while (!(currentNote === 0 && currentOctave === 8)) {
-    sequence.push({ note: currentNote, octave: currentOctave });
-
-    // Move to next note
-    const nextNote = (currentNote + 1) % 12;
-    currentNote = nextNote as ChromaticNote;
-    if (nextNote === 0) {
-      currentOctave++;
-    }
-  }
-
-  // Add final C8
-  sequence.push({ note: 0 as ChromaticNote, octave: 8 });
-
-  return sequence;
-};
-
-// Create the ascending and descending sequences
-const ascendingSequence = createAscendingChromaticSequence();
-
-// Define key sequence for ascending (left to right)
-const ASCENDING_KEY_SEQUENCE = [
-  "KeyZ",
-  "KeyX",
-  "KeyC",
-  "KeyV",
-  "KeyB",
-  "KeyN",
-  "KeyM",
-  "Comma",
-  "Period",
-  "Slash",
-  "KeyA",
-  "KeyS",
-  "KeyD",
-  "KeyF",
-  "KeyG",
-  "KeyH",
-  "KeyJ",
-  "KeyK",
-  "KeyL",
-  "Semicolon",
-  "Quote",
-  "KeyQ",
-  "KeyW",
-  "KeyE",
-  "KeyR",
-  "KeyT",
-  "KeyY",
-  "KeyU",
-  "KeyI",
-  "KeyO",
-  "KeyP",
-  "BracketLeft",
-  "BracketRight",
-  "Digit1",
-  "Digit2",
-  "Digit3",
-  "Digit4",
-  "Digit5",
-  "Digit6",
-  "Digit7",
-  "Digit8",
-  "Digit9",
-  "Digit0",
-  "Minus",
-  "Equal",
-];
-
-// Add helper function to create sequences with intervals
-const createIntervalSequence = (
-  startNote: ChromaticNote,
-  startOctave: number,
-  interval: number
-): NoteInSequence[] => {
-  const sequence: NoteInSequence[] = [];
-  let currentNote = startNote;
-  let currentOctave = startOctave;
-
-  // Add safety limit to prevent infinite loops
-  const maxLength = 100; // Reasonable maximum length
-
-  while (sequence.length < maxLength && currentOctave < 8) {
-    sequence.push({ note: currentNote, octave: currentOctave });
-
-    // Calculate next note and octave
-    let nextNote = currentNote + interval;
-    let nextOctave = currentOctave;
-
-    // If we cross over 11, we need to adjust both note and octave
-    if (nextNote > 11) {
-      nextNote = nextNote % 12;
-      nextOctave++;
-    }
-
-    currentNote = nextNote as ChromaticNote;
-    currentOctave = nextOctave;
-
-    // Break if we reach or exceed C8
-    if (currentOctave >= 8) {
-      break;
-    }
-  }
-
-  return sequence;
-};
-
-const majorSecondFromASharp0Sequence = createIntervalSequence(
-  10 as ChromaticNote,
-  0,
-  2
-); // Start from A#0
 
 // Add these helper functions before creating mappings
 const parseNoteString = (
@@ -293,72 +140,6 @@ const processKeyboardString = (mappingStr: string): KeyboardMapping => {
   return mapping;
 };
 
-// Create the ascending chromatic mapping
-const createFlatChromaticMapping = (
-  sequence: Array<{ note: number; octave: number }>
-): KeyboardMapping => {
-  const mapping: KeyboardMapping = {};
-  const keySequence = [
-    // Bottom row
-    "KeyZ",
-    "KeyX",
-    "KeyC",
-    "KeyV",
-    "KeyB",
-    "KeyN",
-    "KeyM",
-    "Comma",
-    "Period",
-    "Slash",
-    // Middle row
-    "KeyA",
-    "KeyS",
-    "KeyD",
-    "KeyF",
-    "KeyG",
-    "KeyH",
-    "KeyJ",
-    "KeyK",
-    "KeyL",
-    "Semicolon",
-    "Quote",
-    // Top row
-    "KeyQ",
-    "KeyW",
-    "KeyE",
-    "KeyR",
-    "KeyT",
-    "KeyY",
-    "KeyU",
-    "KeyI",
-    "KeyO",
-    "KeyP",
-    "BracketLeft",
-    "BracketRight",
-    // Number row
-    "Digit1",
-    "Digit2",
-    "Digit3",
-    "Digit4",
-    "Digit5",
-    "Digit6",
-    "Digit7",
-    "Digit8",
-    "Digit9",
-    "Digit0",
-    "Minus",
-    "Equal",
-  ];
-
-  sequence.forEach(({ note, octave }, index) => {
-    if (index < keySequence.length) {
-      mapping[keySequence[index]] = { note, octave };
-    }
-  });
-
-  return mapping;
-};
-
 // Add a helper type for the internal task config format
 type InternalTaskConfig = {
   keyboardMapping: string | KeyboardMapping;
@@ -373,41 +154,31 @@ export function keyboard(strings: TemplateStringsArray): KeyboardMapping {
 // Define tasks with a more concise format
 const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
   "White Keys": {
-    keyboardMapping: (() => {
-      const fullMapping: KeyboardMapping = {};
-      const whiteKeyMappings = [
-        NOTE_MAPPINGS.C,
-        NOTE_MAPPINGS.D,
-        NOTE_MAPPINGS.E,
-        NOTE_MAPPINGS.F,
-        NOTE_MAPPINGS.G,
-        NOTE_MAPPINGS.A,
-        NOTE_MAPPINGS.B,
-      ];
-
-      whiteKeyMappings.forEach((noteMapping) => {
-        noteMapping.keys.forEach((key, octaveOffset) => {
-          fullMapping[key] = {
-            note: noteMapping.note,
-            octave: octaveOffset + 2,
-          };
-        });
-      });
-
-      return fullMapping;
-    })(),
+    keyboardMapping: keyboard`
+      C5 D5 E5 F5 G5 A5 B5 . . . . .
+      C4 D4 E4 F4 G4 A4 B4 . . . . .
+      C3 D3 E3 F3 G3 A3 B3 . . . .
+      C2 D2 E2 F2 G2 A2 B2 . . .
+    `,
   },
 
   "Chromatic Sequences": {
-    keyboardMapping: createSequenceKeyboardMapping(
-      ascendingSequence,
-      ASCENDING_KEY_SEQUENCE
-    ),
+    keyboardMapping: keyboard`
+      C7 C#7 D7 D#7 E7 F7 F#7 G7 G#7 A7 A#7 B7
+      C5 C#5 D5 D#5 E5 F5 F#5 G5 G#5 A5 A#5 B5
+      C3 C#3 D3 D#3 E3 F3 F#3 G3 G#3 A3 A#3 B3
+      C2 C#2 D2 D#2 E2 F2 F#2 G2 G#2 A2 A#2 B2
+    `,
     colorMode: "flat-chromatic",
   },
 
   "Major Seconds from A#0": {
-    keyboardMapping: createFlatChromaticMapping(majorSecondFromASharp0Sequence),
+    keyboardMapping: keyboard`
+      A#6 C7 D7 E7 F#7 G#7 A#7 . . .
+      A#4 C5 D5 E5 F#5 G#5 A#5 C6 D6 E6 . .
+      A#2 C3 D3 E3 F#3 G#3 A#3 C4 D4 E4 F#4 .
+      A#0 C1 D1 E1 F#1 G#1 A#1 C2 D2 E2 F#2 G#2
+    `,
     colorMode: "flat-chromatic",
   },
 
