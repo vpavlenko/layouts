@@ -41,10 +41,10 @@ export const TaskPanel: React.FC<TaskPanelProps> = React.memo(
                   key={index}
                   to={`${URL_PREFIX}/${index}`}
                   onClick={() => onTaskChange(index)}
-                  className={`p-4 border border-transparent transition-all ${
+                  className={`p-4 border transition-all ${
                     isCurrentTask
-                      ? "bg-gray-800 border-blue-500 shadow-[0_0_10px_0px_rgba(59,130,246,1)]"
-                      : "hover:bg-gray-800"
+                      ? "bg-gray-800 border-blue-500/70"
+                      : "hover:bg-gray-800 border-transparent"
                   }`}
                 >
                   <div className="flex flex-col items-start w-full">
