@@ -7,7 +7,6 @@ export type ChromaticNote = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 
 export const TASK_SEQUENCE = [
   "play-b-across-octaves",
-  "play-f-sharp",
   "play-chromatic-ascending-flat",
   "play-major-seconds-from-asharp0",
   "play-dorian-scale",
@@ -54,15 +53,6 @@ export const NOTE_MAPPINGS = {
   G: createNoteMapping(7, ["KeyB", "KeyG", "KeyT", "Digit5"]),
   A: createNoteMapping(9, ["KeyN", "KeyH", "KeyY", "Digit6"]),
   B: createNoteMapping(11, ["KeyM", "KeyJ", "KeyU", "Digit7"]),
-  "C#": createNoteMapping(1, ["KeyZ", "KeyA", "KeyQ", "Digit1"]), // Same keys as C for black keys
-  "E-again": createNoteMapping(4, ["KeyV", "KeyF", "KeyR", "Digit4"]),
-  "D#": createNoteMapping(3, ["KeyC", "KeyD", "KeyE", "Digit3"]),
-  "A-again": createNoteMapping(9, ["Comma", "KeyK", "KeyI", "Digit8"]),
-  "G#": createNoteMapping(8, ["KeyM", "KeyJ", "KeyU", "Digit7"]),
-  "B-again": createNoteMapping(11, ["Slash", "Semicolon", "KeyP", "Digit0"]),
-  "A#": createNoteMapping(10, ["Period", "KeyL", "KeyO", "Digit9"]),
-  "F-again": createNoteMapping(5, ["KeyB", "KeyG", "KeyT", "Digit5"]),
-  "F#": createNoteMapping(6, ["KeyN", "KeyH", "KeyY", "Digit6"]),
 } as const;
 
 // Add new type for sequence checking
@@ -147,10 +137,8 @@ const ASCENDING_KEY_SEQUENCE = [
 ];
 
 const createTaskConfig = (
-  index: number,
   targetNote: NoteMapping,
-  chromaticNotes: number[],
-  lessonNumber: number
+  chromaticNotes: number[]
 ): Omit<TaskConfig, "title"> => {
   // Create a set of target notes for just this task
   const targetNotes = new Set<string>();
@@ -158,61 +146,26 @@ const createTaskConfig = (
     targetNotes.add(`${targetNote.note}-${octave}`);
   });
 
-  // Create the full keyboard mapping that includes all previous notes
+  // Create the full keyboard mapping for white keys
   const fullMapping: KeyboardMapping = {};
+  const whiteKeyMappings = [
+    NOTE_MAPPINGS.C,
+    NOTE_MAPPINGS.D,
+    NOTE_MAPPINGS.E,
+    NOTE_MAPPINGS.F,
+    NOTE_MAPPINGS.G,
+    NOTE_MAPPINGS.A,
+    NOTE_MAPPINGS.B,
+  ];
 
-  if (lessonNumber === 1) {
-    // Lesson 1: Progressive mapping from C to B
-    const relevantMappings = [
-      NOTE_MAPPINGS.C,
-      NOTE_MAPPINGS.D,
-      NOTE_MAPPINGS.E,
-      NOTE_MAPPINGS.F,
-      NOTE_MAPPINGS.G,
-      NOTE_MAPPINGS.A,
-      NOTE_MAPPINGS.B,
-    ].slice(0, index + 1);
-
-    relevantMappings.forEach((noteMapping) => {
-      if (noteMapping) {
-        noteMapping.keys.forEach((key, octaveOffset) => {
-          fullMapping[key] = {
-            note: noteMapping.note,
-            octave: octaveOffset + 2,
-          };
-        });
-      }
+  whiteKeyMappings.forEach((noteMapping) => {
+    noteMapping.keys.forEach((key, octaveOffset) => {
+      fullMapping[key] = {
+        note: noteMapping.note,
+        octave: octaveOffset + 2,
+      };
     });
-  } else if (lessonNumber === 2) {
-    // Lesson 2: Progressive mapping for black keys
-    const lesson2Mappings = [
-      NOTE_MAPPINGS.D,
-      NOTE_MAPPINGS["C#"],
-      NOTE_MAPPINGS["E-again"],
-      NOTE_MAPPINGS["D#"],
-      NOTE_MAPPINGS["A-again"],
-      NOTE_MAPPINGS["G#"],
-      NOTE_MAPPINGS["B-again"],
-      NOTE_MAPPINGS["A#"],
-      NOTE_MAPPINGS["F-again"],
-      NOTE_MAPPINGS["F#"],
-    ];
-
-    // Calculate the index within lesson 2
-    const lesson2Index = index - 7; // Since lesson 2 starts at index 7
-    const relevantMappings = lesson2Mappings.slice(0, lesson2Index + 1);
-
-    relevantMappings.forEach((noteMapping) => {
-      if (noteMapping) {
-        noteMapping.keys.forEach((key, octaveOffset) => {
-          fullMapping[key] = {
-            note: noteMapping.note,
-            octave: octaveOffset + 2,
-          };
-        });
-      }
-    });
-  }
+  });
 
   return {
     total: 4,
@@ -487,16 +440,7 @@ const createScaleKeyboardMapping = (
 export const TASK_CONFIGS: Record<TaskId, TaskConfig> = {
   "play-b-across-octaves": {
     title: "White Keys",
-    ...createTaskConfig(6, NOTE_MAPPINGS.B, [0, 2, 4, 5, 7, 9, 11], 1),
-  },
-  "play-f-sharp": {
-    title: "Black Keys",
-    ...createTaskConfig(
-      16,
-      NOTE_MAPPINGS["F#"],
-      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-      2
-    ),
+    ...createTaskConfig(NOTE_MAPPINGS.B, [0, 2, 4, 5, 7, 9, 11]),
   },
   "play-chromatic-ascending-flat": {
     title: "Chromatic Sequences",
