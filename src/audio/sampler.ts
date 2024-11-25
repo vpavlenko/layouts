@@ -85,6 +85,21 @@ sampler.triggerRelease = function (...args) {
   return originalTriggerRelease.apply(this, args);
 };
 
+export const getAudioContextState = () => {
+  return Tone.getContext().state;
+};
+
+export const startAudioContext = async () => {
+  try {
+    await Tone.start();
+    console.log("Audio context started successfully");
+    return true;
+  } catch (error) {
+    console.error("Failed to start audio context:", error);
+    throw error;
+  }
+};
+
 export const ensureSamplerLoaded = async () => {
   if (samplerLoaded) {
     return;
@@ -116,8 +131,7 @@ export const ensureSamplerLoaded = async () => {
   });
 
   await loadingPromise;
-  await Tone.start();
-  console.log("Audio context started");
+  console.log("Sampler loaded, audio context state:", getAudioContextState());
 };
 
 export const resumeAudioContext = async () => {

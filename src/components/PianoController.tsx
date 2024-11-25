@@ -8,7 +8,11 @@ import { immediate } from "tone";
 import { useParams, useNavigate } from "react-router-dom";
 import { TASK_CONFIGS, TaskId } from "../tasks/tasks";
 import { URL_PREFIX } from "../constants/routes";
-import { ensureSamplerLoaded } from "../audio/sampler";
+import {
+  ensureSamplerLoaded,
+  getAudioContextState,
+  startAudioContext,
+} from "../audio/sampler";
 
 const NOTE_NAMES = [
   "C",
@@ -42,6 +46,8 @@ export const PianoController: React.FC = () => {
   const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
   const [samplerReady, setSamplerReady] = useState(false);
   const [activeKeyCodes, setActiveKeyCodes] = useState<Set<string>>(new Set());
+  const [audioContextState, setAudioContextState] =
+    useState<string>("suspended");
 
   console.log("colorMode", colorMode);
 
@@ -69,6 +75,7 @@ export const PianoController: React.FC = () => {
   useEffect(() => {
     const loadSampler = async () => {
       await ensureSamplerLoaded();
+      setAudioContextState(getAudioContextState());
       setSamplerReady(true);
     };
 
@@ -146,6 +153,15 @@ export const PianoController: React.FC = () => {
     [navigate]
   );
 
+  const handleStartAudio = async () => {
+    try {
+      await startAudioContext();
+      setAudioContextState(getAudioContextState());
+    } catch (error) {
+      console.error("Failed to start audio context:", error);
+    }
+  };
+
   return (
     <>
       <TaskPanel
@@ -159,6 +175,16 @@ export const PianoController: React.FC = () => {
       {!samplerReady ? (
         <div className="fixed top-0 left-[600px] right-0 bottom-0 bg-black flex items-center justify-center text-white">
           Loading piano sounds...
+        </div>
+      ) : audioContextState === "suspended" ? (
+        <div className="fixed top-0 left-[600px] right-0 bottom-0 bg-black flex flex-col items-center justify-center text-white gap-4">
+          <p>Click to enable piano sounds</p>
+          <button
+            onClick={handleStartAudio}
+            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
+          >
+            Start Audio
+          </button>
         </div>
       ) : (
         <PianoUI
