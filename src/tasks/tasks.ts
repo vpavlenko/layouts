@@ -247,45 +247,14 @@ const createFlatChromaticMapping = (
   return mapping;
 };
 
-// Add this before TASK_CONFIGS
+// Replace createTonicChordMapping with this version
 const createTonicChordMapping = (): KeyboardMapping => {
-  const mapping: KeyboardMapping = {};
+  const mappingString = `E1 E2 E3 E4 E5 E6 E7 . . . . .
+G1 G2 G3 G4 G5 G6 G7 . . . . .
+C1 C2 C3 C4 C5 C6 C7 C8 . . .
+Eb1 Eb2 Eb3 Eb4 Eb5 Eb6 Eb7 . . .`;
 
-  // Map G notes (G1-G7)
-  ["KeyQ", "KeyW", "KeyE", "KeyR", "KeyT", "KeyY", "KeyU"].forEach(
-    (key, index) => {
-      mapping[key] = { note: 7, octave: index + 1 };
-    }
-  );
-
-  // Map C notes (C1-C8)
-  ["KeyA", "KeyS", "KeyD", "KeyF", "KeyG", "KeyH", "KeyJ", "KeyK"].forEach(
-    (key, index) => {
-      mapping[key] = { note: 0, octave: index + 1 };
-    }
-  );
-
-  // Map E notes (E1-E7)
-  [
-    "Digit1",
-    "Digit2",
-    "Digit3",
-    "Digit4",
-    "Digit5",
-    "Digit6",
-    "Digit7",
-  ].forEach((key, index) => {
-    mapping[key] = { note: 4, octave: index + 1 };
-  });
-
-  // Map Eb notes (Eb1-Eb7)
-  ["KeyZ", "KeyX", "KeyC", "KeyV", "KeyB", "KeyN", "KeyM"].forEach(
-    (key, index) => {
-      mapping[key] = { note: 3, octave: index + 1 };
-    }
-  );
-
-  return mapping;
+  return processKeyboardString(mappingString);
 };
 
 const createFifthsOnlyMapping = (): KeyboardMapping => {
@@ -543,36 +512,14 @@ const createAugmentedScalesMapping = (): KeyboardMapping => {
   return mapping;
 };
 
-// Add this function before TASK_CONFIGS
+// Replace createPentatonicMapping with this version
 const createPentatonicMapping = (): KeyboardMapping => {
-  const mapping: KeyboardMapping = {};
+  const mappingString = `C4 Eb4 F4 G4 Bb4 . . . . . . .
+C3 Eb3 F3 G3 Bb3 C7 Eb7 F7 G7 Bb7 . .
+C2 Eb2 F2 G2 Bb2 C6 Eb6 F6 G6 Bb6 .
+C1 Eb1 F1 G1 Bb1 C5 Eb5 F5 G5 Bb5`;
 
-  // Define the pentatonic scale notes (C, Eb, F, G, Bb)
-  const pentatonicNotes: ChromaticNote[] = [0, 3, 5, 7, 10];
-
-  // Define rows of keys for each octave
-  const keyRows = [
-    ["KeyZ", "KeyX", "KeyC", "KeyV", "KeyB"], // Octave 1
-    ["KeyA", "KeyS", "KeyD", "KeyF", "KeyG"], // Octave 2
-    ["KeyQ", "KeyW", "KeyE", "KeyR", "KeyT"], // Octave 3
-    ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5"], // Octave 4
-    ["KeyN", "KeyM", "Comma", "Period", "Slash"], // Octave 5
-    ["KeyH", "KeyJ", "KeyK", "KeyL", "Semicolon"], // Octave 6
-    ["KeyY", "KeyU", "KeyI", "KeyO", "KeyP"], // Octave 7
-  ];
-
-  // Map each row to its corresponding octave
-  keyRows.forEach((row, rowIndex) => {
-    const octave = rowIndex + 1;
-    row.forEach((key, noteIndex) => {
-      mapping[key] = {
-        note: pentatonicNotes[noteIndex],
-        octave,
-      };
-    });
-  });
-
-  return mapping;
+  return processKeyboardString(mappingString);
 };
 
 // Add these helper functions before createHirajoshiMapping
