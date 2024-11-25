@@ -8,6 +8,43 @@ import { PianoControls } from "./PianoControls";
 import { Voicing } from "../constants/voicings";
 import { PianoControllerState } from "./PianoController";
 
+const getAbsoluteNote = (
+  note: number,
+  octave: number,
+  tonic: number
+): { note: number; octave: number } => {
+  // Subtract the tonic to get back to the absolute note
+  const absoluteNote = (note - tonic + 12) % 12;
+
+  // Calculate octave adjustment if we wrapped around
+  const octaveAdjustment = note - tonic < 0 ? -1 : 0;
+
+  return {
+    note: absoluteNote,
+    octave: octave + octaveAdjustment,
+  };
+};
+
+const getRelativeNote = (
+  note: number,
+  octave: number,
+  tonic: number
+): { note: number; octave: number } => {
+  // Calculate the MIDI number
+  const midiNumber = note + octave * 12 + tonic;
+
+  // Calculate the relative note position
+  const relativeNote = midiNumber % 12;
+
+  // Calculate the relative octave
+  const relativeOctave = Math.floor(midiNumber / 12);
+
+  return {
+    note: relativeNote,
+    octave: relativeOctave,
+  };
+};
+
 const BLACK_KEYS = [1, 3, -1, 6, 8, 10, -1];
 const WHITE_KEYS = [0, 2, 4, 5, 7, 9, 11];
 
@@ -312,7 +349,8 @@ export const PianoUI: React.FC<PianoUIProps> = ({
         if (event.code in keyboardMapping) {
           const { note, octave } =
             keyboardMapping[event.code as keyof typeof keyboardMapping];
-          await playNotes(note, octave);
+          const relativeNote = getRelativeNote(note, octave, tonic);
+          await playNotes(relativeNote.note, relativeNote.octave);
         }
       }
     };
@@ -333,7 +371,8 @@ export const PianoUI: React.FC<PianoUIProps> = ({
       if (event.code in keyboardMapping) {
         const { note, octave } =
           keyboardMapping[event.code as keyof typeof keyboardMapping];
-        releaseNotes(note, octave);
+        const relativeNote = getRelativeNote(note, octave, tonic);
+        releaseNotes(relativeNote.note, relativeNote.octave);
       }
     };
 
@@ -409,8 +448,11 @@ export const PianoUI: React.FC<PianoUIProps> = ({
 
   // Modify the key rendering logic to only show relevant keys
   const getKeyboardKey = (noteNum: number, octaveNum: number) => {
+    const absoluteNote = getAbsoluteNote(noteNum, octaveNum, tonic);
+
     const matchingKey = Object.entries(keyboardMapping).find(
-      ([, value]) => value.note === noteNum && value.octave === octaveNum
+      ([, value]) =>
+        value.note === absoluteNote.note && value.octave === absoluteNote.octave
     )?.[0];
 
     if (matchingKey) {
