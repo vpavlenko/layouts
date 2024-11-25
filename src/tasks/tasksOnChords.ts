@@ -1,6 +1,5 @@
 import { KeyboardMapping } from "../constants/keyboard";
 import { TaskConfig } from "./tasks";
-import { createSetChecker } from "./checkers";
 
 // First combine major and minor chord mappings
 const CHORD_MAPPINGS = {
@@ -223,10 +222,6 @@ const createChordTaskConfig = (
     mapping[CHORD_MAPPINGS[chordName].keys[i]] = note;
   });
 
-  const targetNotes = new Set(
-    CHORD_MAPPINGS[chordName].notes.map((n) => `${n.note}-${n.octave}`)
-  );
-
   // Use flat-chromatic for tasks after first two major chords and all minor chords
   const isMinorChord = chordName.includes("minor");
   const useFlat = isMinorChord || index > 2;
@@ -237,7 +232,6 @@ const createChordTaskConfig = (
     keyboardMapping: mapping,
     colorMode: useFlat ? "flat-chromatic" : "chromatic",
     chromaticNotes: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-    checker: createSetChecker(targetNotes),
   };
 };
 

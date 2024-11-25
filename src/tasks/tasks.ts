@@ -1,11 +1,6 @@
 import { ColorMode } from "../components/types";
 import { KeyboardMapping } from "../constants/keyboard";
 import { LESSONS } from "../data/lessons";
-import {
-  createSequenceChecker,
-  createSetChecker,
-  TaskChecker,
-} from "./checkers";
 import { createSequenceKeyboardMapping } from "./mappings";
 import { TASKS_ON_MAJOR_CHORDS, TASKS_ON_MINOR_CHORDS } from "./tasksOnChords";
 
@@ -18,7 +13,6 @@ export interface TaskConfig {
   keyboardMapping?: KeyboardMapping;
   colorMode?: ColorMode;
   chromaticNotes?: number[];
-  checker: TaskChecker;
   playedNotes?: Set<string>;
 }
 
@@ -147,7 +141,6 @@ const ASCENDING_KEY_SEQUENCE = [
   "Equal",
 ];
 
-// Update createTaskConfig to use the new checker creators
 const createTaskConfig = (
   index: number,
   targetNote: NoteMapping,
@@ -159,9 +152,6 @@ const createTaskConfig = (
   [2, 3, 4, 5].forEach((octave) => {
     targetNotes.add(`${targetNote.note}-${octave}`);
   });
-
-  // Create the checker using the new creator function
-  const checker = createSetChecker(targetNotes);
 
   // Create the full keyboard mapping that includes all previous notes
   const fullMapping: KeyboardMapping = {};
@@ -224,7 +214,6 @@ const createTaskConfig = (
     total: 4,
     chromaticNotes,
     keyboardMapping: fullMapping,
-    checker,
   };
 };
 
@@ -521,7 +510,6 @@ export const TASK_CONFIGS: Record<string, TaskConfig> = {
     ),
     colorMode: "flat-chromatic",
     chromaticNotes: Array.from(new Set(ascendingSequence.map((n) => n.note))),
-    checker: createSequenceChecker(ascendingSequence),
   },
 
   "play-major-seconds-from-asharp0": {
@@ -532,7 +520,6 @@ export const TASK_CONFIGS: Record<string, TaskConfig> = {
     chromaticNotes: Array.from(
       new Set(majorSecondFromASharp0Sequence.map((n) => n.note))
     ),
-    checker: createSequenceChecker(majorSecondFromASharp0Sequence),
   },
 
   "play-dorian-scale": {
@@ -552,7 +539,6 @@ export const TASK_CONFIGS: Record<string, TaskConfig> = {
         ...SCALE_SEQUENCES.dorian.notes.map((n) => n.note),
       ])
     ),
-    checker: createSequenceChecker([...SCALE_SEQUENCES.dorian.notes]),
   },
 
   "play-locrian-scale": {
@@ -572,7 +558,6 @@ export const TASK_CONFIGS: Record<string, TaskConfig> = {
         ...SCALE_SEQUENCES.locrian.notes.map((n) => n.note),
       ])
     ),
-    checker: createSequenceChecker([...SCALE_SEQUENCES.locrian.notes]),
   },
 
   ...TASKS_ON_MAJOR_CHORDS,
