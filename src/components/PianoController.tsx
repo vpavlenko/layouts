@@ -44,10 +44,6 @@ export const PianoController: React.FC = () => {
   const [colorMode, setColorMode] = useState<ColorMode>("chromatic");
   const [fallingNotes, setFallingNotes] = useState<FallingNote[]>([]);
   const [currentLessonId, setCurrentLessonId] = useState(1);
-  const [playbackTimeouts, setPlaybackTimeouts] = useState<number[]>([]);
-  const [currentlyPlayingId, setCurrentlyPlayingId] = useState<string | null>(
-    null
-  );
   const navigate = useNavigate();
   const { lessonId } = useParams();
   const [state, setState] = useState<PianoControllerState>({
@@ -165,27 +161,6 @@ export const PianoController: React.FC = () => {
     [tonic, voicing]
   );
 
-  const stopProgression = useCallback(() => {
-    console.log("stopProgression called, current ID:", currentlyPlayingId);
-    setCurrentlyPlayingId(null);
-
-    // Get all currently playing notes from falling notes
-    const playingNotes = fallingNotes
-      .filter((note) => !note.endTime)
-      .map(({ note, octave }) => ({ note, octave }));
-
-    console.log("Releasing notes:", playingNotes);
-
-    // Release each note properly through the releaseNotes function
-    playingNotes.forEach(({ note, octave }) => {
-      releaseNotes(note, octave);
-    });
-
-    // Clear all scheduled timeouts
-    playbackTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
-    setPlaybackTimeouts([]);
-  }, [playbackTimeouts, fallingNotes, releaseNotes]);
-
   const handleLessonChange = useCallback(
     (lessonId: number) => {
       console.log("[lessonChange] Changing to lesson:", lessonId);
@@ -215,23 +190,6 @@ export const PianoController: React.FC = () => {
     },
     [navigate]
   );
-
-  useEffect(() => {
-    const handleSpaceKey = (e: KeyboardEvent) => {
-      // Only handle space if there's something playing and it's not part of input
-      if (
-        e.code === "Space" &&
-        currentlyPlayingId &&
-        !["INPUT", "TEXTAREA"].includes((e.target as HTMLElement).tagName)
-      ) {
-        e.preventDefault(); // Prevent page scroll
-        stopProgression();
-      }
-    };
-
-    window.addEventListener("keydown", handleSpaceKey);
-    return () => window.removeEventListener("keydown", handleSpaceKey);
-  }, [currentlyPlayingId, stopProgression]);
 
   // Get the current active task ID
   const currentActiveTaskId = getActiveTaskId(currentLessonId);
@@ -267,8 +225,6 @@ export const PianoController: React.FC = () => {
           playNotes={playNotes}
           releaseNotes={releaseNotes}
           fallingNotes={fallingNotes}
-          currentlyPlayingId={currentlyPlayingId}
-          onStopPlaying={stopProgression}
           taskKeyboardMapping={
             currentActiveTaskId
               ? TASK_CONFIGS[currentActiveTaskId]?.keyboardMapping

@@ -5,9 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  '@heroicons/react':
-    specifier: ^2.1.5
-    version: 2.1.5(react@18.3.1)
   canvas-confetti:
     specifier: ^1.9.3
     version: 1.9.3
@@ -544,14 +541,6 @@ packages:
     dependencies:
       levn: 0.4.1
     dev: true
-
-  /@heroicons/react@2.1.5(react@18.3.1):
-    resolution: {integrity: sha512-FuzFN+BsHa+7OxbvAERtgBTNeZpUjgM/MIizfVkSCL2/edriN0Hx/DWRCR//aPYwO5QX/YlgLGXk+E3PcfZwjA==, tarball: https://registry.npmjs.org/@heroicons/react/-/react-2.1.5.tgz}
-    peerDependencies:
-      react: '>= 16'
-    dependencies:
-      react: 18.3.1
-    dev: false
 
   /@humanfs/core@0.19.1:
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==, tarball: https://registry.npmjs.org/@humanfs/core/-/core-0.19.1.tgz}

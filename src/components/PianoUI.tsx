@@ -10,7 +10,6 @@ import {
 } from "../constants/keyboard";
 import { PianoControls } from "./PianoControls";
 import { Voicing } from "../constants/voicings";
-import { StopIcon } from "@heroicons/react/24/solid";
 import { TASK_CONFIGS } from "../tasks/tasks";
 import { PianoControllerState } from "./PianoController";
 
@@ -362,8 +361,6 @@ interface PianoUIProps {
     octave: number
   ) => Array<{ note: number; octave: number }>;
   fallingNotes: FallingNote[];
-  currentlyPlayingId: string | null;
-  onStopPlaying: () => void;
   taskKeyboardMapping?: KeyboardMapping;
   activeTaskId: string | null;
   state: PianoControllerState;
@@ -380,8 +377,6 @@ export const PianoUI: React.FC<PianoUIProps> = ({
   playNotes,
   releaseNotes,
   fallingNotes,
-  currentlyPlayingId,
-  onStopPlaying,
   taskKeyboardMapping,
   activeTaskId,
   setActiveKeyCodes,
@@ -588,12 +583,6 @@ export const PianoUI: React.FC<PianoUIProps> = ({
         overflow: "hidden",
       }}
     >
-      {currentlyPlayingId && (
-        <StopIcon
-          className="w-8 h-8 text-red-500 hover:text-red-400 cursor-pointer absolute bottom-4 left-4 z-50"
-          onClick={onStopPlaying}
-        />
-      )}
       <div
         style={{
           position: "relative",
