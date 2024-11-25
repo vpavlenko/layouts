@@ -64,8 +64,8 @@ export const Layout: React.FC<LayoutProps> = ({ keyboardState }) => {
       if (!mapping[keyCode]) {
         css += `
           .keyboard-${uid.current} .simple-keyboard-base .hg-button.${keyCode}-mapped {
-            background: #444 !important;
-            color: rgba(255, 255, 255, 0.3) !important;
+            background: #000 !important;
+            color: #000 !important;
           }
         `;
       }
