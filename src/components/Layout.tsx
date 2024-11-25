@@ -47,6 +47,14 @@ export const Layout: React.FC<LayoutProps> = ({ keyboardState }) => {
         .keyboard-${uid.current} .simple-keyboard-base .hg-button.${keyCode}-mapped {
           background: ${backgroundColor} !important;
           color: ${textColor} !important;
+          transform: scale(1);
+          transition: transform 0.1s ease-in-out;
+        }
+      `;
+
+      css += `
+        .keyboard-${uid.current} .simple-keyboard-base .hg-button.${keyCode}-mapped.hg-active {
+          transform: scale(0.9) !important;
         }
       `;
     });
@@ -55,7 +63,7 @@ export const Layout: React.FC<LayoutProps> = ({ keyboardState }) => {
     Object.keys(KEY_DISPLAY_LABELS).forEach((keyCode) => {
       if (!mapping[keyCode]) {
         css += `
-          .keyboard-${uid.current}  .simple-keyboard-base .hg-button.${keyCode}-mapped {
+          .keyboard-${uid.current} .simple-keyboard-base .hg-button.${keyCode}-mapped {
             background: #444 !important;
             color: rgba(255, 255, 255, 0.3) !important;
           }
@@ -93,10 +101,12 @@ export const Layout: React.FC<LayoutProps> = ({ keyboardState }) => {
     if (!mapping) return [];
 
     return Object.entries(KEY_DISPLAY_LABELS).map(([keyCode, label]) => ({
-      class: `${keyCode}-mapped`,
+      class: `${keyCode}-mapped${
+        keyboardState.activeKeyCodes.has(keyCode) ? " hg-active" : ""
+      }`,
       buttons: label.toLowerCase(),
     }));
-  }, [keyboardState.taskKeyboardMapping]);
+  }, [keyboardState.taskKeyboardMapping, keyboardState.activeKeyCodes]);
 
   // Function to get display mapping
   const getDisplay = useCallback(() => {
