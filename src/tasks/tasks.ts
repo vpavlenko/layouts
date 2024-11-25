@@ -693,6 +693,38 @@ const createAugmentedScalesMapping = (): KeyboardMapping => {
   return mapping;
 };
 
+// Add this function before TASK_CONFIGS
+const createPentatonicMapping = (): KeyboardMapping => {
+  const mapping: KeyboardMapping = {};
+
+  // Define the pentatonic scale notes (C, Eb, F, G, Bb)
+  const pentatonicNotes: ChromaticNote[] = [0, 3, 5, 7, 10];
+
+  // Define rows of keys for each octave
+  const keyRows = [
+    ["KeyZ", "KeyX", "KeyC", "KeyV", "KeyB"], // Octave 1
+    ["KeyA", "KeyS", "KeyD", "KeyF", "KeyG"], // Octave 2
+    ["KeyQ", "KeyW", "KeyE", "KeyR", "KeyT"], // Octave 3
+    ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5"], // Octave 4
+    ["KeyN", "KeyM", "Comma", "Period", "Slash"], // Octave 5
+    ["KeyH", "KeyJ", "KeyK", "KeyL", "Semicolon"], // Octave 6
+    ["KeyY", "KeyU", "KeyI", "KeyO", "KeyP"], // Octave 7
+  ];
+
+  // Map each row to its corresponding octave
+  keyRows.forEach((row, rowIndex) => {
+    const octave = rowIndex + 1;
+    row.forEach((key, noteIndex) => {
+      mapping[key] = {
+        note: pentatonicNotes[noteIndex],
+        octave,
+      };
+    });
+  });
+
+  return mapping;
+};
+
 // Remove the createTaskConfig function and directly define TASK_CONFIGS
 export const TASK_CONFIGS: TaskConfig[] = [
   {
@@ -781,6 +813,11 @@ export const TASK_CONFIGS: TaskConfig[] = [
   {
     title: "Four Augmented Scales",
     keyboardMapping: createAugmentedScalesMapping(),
+    colorMode: "chromatic",
+  },
+  {
+    title: "Minor Pentatonic",
+    keyboardMapping: createPentatonicMapping(),
     colorMode: "chromatic",
   },
 ];
