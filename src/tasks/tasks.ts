@@ -517,6 +517,93 @@ const createFifthsFourthsMapping = (): KeyboardMapping => {
   };
 };
 
+// Add this function before TASK_CONFIGS
+const createAugmentedScalesMapping = (): KeyboardMapping => {
+  const mapping: KeyboardMapping = {};
+
+  // Define the rows of keys
+  const keyRows = [
+    // 1-= row (C-based augmented)
+    [
+      "Digit1",
+      "Digit2",
+      "Digit3",
+      "Digit4",
+      "Digit5",
+      "Digit6",
+      "Digit7",
+      "Digit8",
+      "Digit9",
+      "Digit0",
+      "Minus",
+      "Equal",
+    ],
+    // q-] row (C#-based augmented)
+    [
+      "KeyQ",
+      "KeyW",
+      "KeyE",
+      "KeyR",
+      "KeyT",
+      "KeyY",
+      "KeyU",
+      "KeyI",
+      "KeyO",
+      "KeyP",
+      "BracketLeft",
+      "BracketRight",
+    ],
+    // a-' row (D-based augmented)
+    [
+      "KeyA",
+      "KeyS",
+      "KeyD",
+      "KeyF",
+      "KeyG",
+      "KeyH",
+      "KeyJ",
+      "KeyK",
+      "KeyL",
+      "Semicolon",
+      "Quote",
+    ],
+    // z-/ row (D#-based augmented)
+    [
+      "KeyZ",
+      "KeyX",
+      "KeyC",
+      "KeyV",
+      "KeyB",
+      "KeyN",
+      "KeyM",
+      "Comma",
+      "Period",
+      "Slash",
+    ],
+  ];
+
+  // Root notes for each row (C, C#, D, D#)
+  const rowRootNotes = [0, 1, 2, 3];
+
+  // Create mapping for each row
+  keyRows.forEach((row, rowIndex) => {
+    const rootNote = rowRootNotes[rowIndex];
+
+    row.forEach((key, keyIndex) => {
+      // Calculate the note and octave
+      const intervalSteps = Math.floor(keyIndex / 3); // How many complete augmented chords we've gone through
+      const noteInChord = keyIndex % 3; // Position within current augmented chord (0, 1, or 2)
+      const note = ((rootNote + noteInChord * 4) % 12) as ChromaticNote;
+      const octave =
+        1 + intervalSteps + Math.floor((rootNote + noteInChord * 4) / 12);
+
+      mapping[key] = { note, octave };
+    });
+  });
+
+  return mapping;
+};
+
 // Remove the createTaskConfig function and directly define TASK_CONFIGS
 export const TASK_CONFIGS: TaskConfig[] = [
   {
@@ -595,6 +682,11 @@ export const TASK_CONFIGS: TaskConfig[] = [
   {
     title: "Fifths and Fourths",
     keyboardMapping: createFifthsFourthsMapping(),
+    colorMode: "chromatic",
+  },
+  {
+    title: "Four Augmented Scales",
+    keyboardMapping: createAugmentedScalesMapping(),
     colorMode: "chromatic",
   },
 ];
