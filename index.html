@@ -5,9 +5,21 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <title>Rawl Piano</title>
-    <script type="module" crossorigin src="/layouts/assets/index-h97XG57A.js"></script>
-    <link rel="stylesheet" crossorigin href="/layouts/assets/index-B8Oq6EyI.css">
+    <title>Piano Layouts</title>
+    <script>
+      (function() {
+        const redirect = sessionStorage.getItem('redirect');
+        if (redirect) {
+          sessionStorage.removeItem('redirect');
+          const segments = redirect.split('/');
+          if (segments.length && !isNaN(segments[0])) {
+            history.replaceState(null, null, '/layouts/' + redirect);
+          }
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/layouts/assets/index-DyihYrbj.js"></script>
+    <link rel="stylesheet" crossorigin href="/layouts/assets/index-CgplX_Sf.css">
   </head>
   <body>
     <div id="root"></div>
