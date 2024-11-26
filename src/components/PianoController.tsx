@@ -108,11 +108,6 @@ export const PianoController: React.FC = () => {
 
   const releaseNotes = useCallback(
     (note: number, octave: number) => {
-      const noteKey = `${note}-${octave}`;
-      console.log(
-        `[releaseNotes] Releasing ${noteKey}, active keys: ${activeKeys.size}`
-      );
-
       setActiveKeys((prev) => {
         const next = new Set(prev);
         next.delete(`${note}-${octave}`);
@@ -157,6 +152,27 @@ export const PianoController: React.FC = () => {
       console.error("Failed to start audio context:", error);
     }
   };
+
+  // Add this near the other useEffect hooks
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        console.log("Tab went to background");
+
+        // Release all active notes
+        activeKeys.forEach((keyString) => {
+          const [note, octave] = keyString.split("-").map(Number);
+          releaseNotes(note, octave);
+        });
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [activeKeys, releaseNotes]);
 
   return (
     <>
