@@ -198,7 +198,7 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
   "Applied in Minor": {
     keyboardMapping: keyboard`
     Bb3 C4 G3  D4 Ab3  Eb4 Bb3 F4 C4  G4 Bb3 Db4
-    G3 Ab3 E3   Bb3 F3 C4 G3  D4 A3  Eb4 G3
+    G3 Ab3 E3   Bb3 F3 C4 G3  D4 A3  Eb4 G3 Ab4
     Eb3 F3 C#3 G3 D3 Ab3 E3  B3 F#3 C4 Eb3
     C3 D3 A2   Eb3 Bb2  F3 C3  G3 D3  Ab3 
     `,
