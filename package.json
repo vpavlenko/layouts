@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "deploy": "vite build && gh-pages -d dist",
+    "deploy": "vite build && cp public/404.html dist/ && gh-pages -d dist",
     "lint": "eslint .",
     "preview": "vite preview"
   },

@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { URL_PREFIX } from "../constants/routes";
 import { KeyboardMapping } from "../constants/keyboard";
 import { Layout } from "./Layout";
 import { TASK_CONFIGS, TaskId } from "../tasks/tasks";
@@ -37,11 +36,10 @@ export const TaskPanel: React.FC<TaskPanelProps> = React.memo(
               const isCurrentTask = index === taskId;
 
               return (
-                <Link
+                <div
                   key={index}
-                  to={`${URL_PREFIX}/${index}`}
                   onClick={() => onTaskChange(index)}
-                  className={`p-4 border transition-all ${
+                  className={`p-4 border transition-all cursor-pointer ${
                     isCurrentTask
                       ? "bg-gray-800 border-blue-500/70"
                       : "hover:bg-gray-800 border-transparent"
@@ -67,7 +65,7 @@ export const TaskPanel: React.FC<TaskPanelProps> = React.memo(
                       {taskConfig.title}
                     </div>
                   </div>
-                </Link>
+                </div>
               );
             })}
           </div>

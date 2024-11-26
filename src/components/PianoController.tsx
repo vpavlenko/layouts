@@ -139,7 +139,7 @@ export const PianoController: React.FC = () => {
     (newTaskId: TaskId) => {
       console.log("[taskChange] Changing to task:", newTaskId);
       setTaskId(newTaskId);
-      navigate(`/${newTaskId}`);
+      navigate(`/layouts/${newTaskId}`);
     },
     [navigate]
   );
