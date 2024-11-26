@@ -68,7 +68,7 @@ export const Layout: React.FC<LayoutProps> = ({
 
         css += `
         .keyboard-${uid.current} .simple-keyboard-base .hg-button.${keyCode}-mapped.hg-active {
-          transform: scale(0.9) !important;
+          transform: scale(0.8) !important;
         }
       `;
       });
