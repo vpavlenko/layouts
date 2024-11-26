@@ -4,7 +4,7 @@ import { FallingNotes, FallingNote } from "./FallingNotes";
 import { ColorMode } from "./types";
 import { getColors, getLabelColorForNote } from "../utils/colors";
 import { KEY_DISPLAY_LABELS, KeyboardMapping } from "../constants/keyboard";
-import { PianoControllerState } from "./PianoController";
+import { PianoControls } from "./PianoControls";
 
 const getAbsoluteNote = (
   note: number,
@@ -339,14 +339,13 @@ interface PianoUIProps {
   ) => Array<{ note: number; octave: number }>;
   fallingNotes: FallingNote[];
   keyboardMapping: KeyboardMapping;
-  state: PianoControllerState;
   setActiveKeyCodes: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
 export const PianoUI: React.FC<PianoUIProps> = ({
   tonic,
   setTonic,
-  colorMode,
+  colorMode: initialColorMode,
   playNotes,
   releaseNotes,
   fallingNotes,
@@ -357,6 +356,12 @@ export const PianoUI: React.FC<PianoUIProps> = ({
   const [activeNotes, setActiveNotes] = useState<
     Array<{ note: number; octave: number }>
   >([]);
+  const [localColorMode, setLocalColorMode] =
+    useState<ColorMode>(initialColorMode);
+
+  useEffect(() => {
+    setLocalColorMode(initialColorMode);
+  }, [initialColorMode]);
 
   const isNoteActive = (note: number, octave: number) => {
     return activeNotes.some(
@@ -420,7 +425,7 @@ export const PianoUI: React.FC<PianoUIProps> = ({
     playNotes,
     releaseNotes,
     setTonic,
-    colorMode,
+    localColorMode,
     keyboardMapping,
     setActiveKeyCodes,
   ]);
@@ -470,7 +475,7 @@ export const PianoUI: React.FC<PianoUIProps> = ({
     "note" | "octave" | "style" | "keyboardKey" | "isActive"
   > = {
     tonic,
-    colorMode,
+    colorMode: localColorMode,
     playNotes,
     releaseNotes,
     keyboardMapping,
@@ -519,12 +524,12 @@ export const PianoUI: React.FC<PianoUIProps> = ({
           marginRight: MARGIN_PX / 2,
         }}
       >
-        {/* <PianoControls
+        <PianoControls
           tonic={tonic}
           onTonicChange={setTonic}
-          colorMode={colorMode}
-          onColorModeChange={onColorModeChange}
-        /> */}
+          colorMode={localColorMode}
+          onColorModeChange={setLocalColorMode}
+        />
         {Object.entries(OCTAVE_RANGES).map(([octave, range]) => {
           const octaveNum = parseInt(octave);
           return Array.from({ length: range.length }, (_, i) => {
@@ -533,13 +538,15 @@ export const PianoUI: React.FC<PianoUIProps> = ({
 
             const commonStyleProps = {
               width:
-                colorMode === "flat-chromatic" ? keyWidth * (7 / 12) : keyWidth,
+                localColorMode === "flat-chromatic"
+                  ? keyWidth * (7 / 12)
+                  : keyWidth,
               height: PIANO_HEIGHT,
               borderRadius: "0 0 5px 5px",
             };
 
             if (
-              colorMode === "flat-chromatic" ||
+              localColorMode === "flat-chromatic" ||
               isWhiteKey ||
               BLACK_KEYS.indexOf(noteNum) !== -1
             ) {
@@ -554,7 +561,7 @@ export const PianoUI: React.FC<PianoUIProps> = ({
                   style={{
                     ...commonStyleProps,
                     width:
-                      colorMode === "flat-chromatic"
+                      localColorMode === "flat-chromatic"
                         ? keyWidth * (7 / 12)
                         : isWhiteKey
                         ? keyWidth
@@ -563,10 +570,14 @@ export const PianoUI: React.FC<PianoUIProps> = ({
                       noteNum,
                       octaveNum,
                       keyWidth,
-                      colorMode
+                      localColorMode
                     ),
                     zIndex:
-                      colorMode === "flat-chromatic" ? 1 : isWhiteKey ? 1 : 2,
+                      localColorMode === "flat-chromatic"
+                        ? 1
+                        : isWhiteKey
+                        ? 1
+                        : 2,
                   }}
                 />
               );
@@ -577,7 +588,7 @@ export const PianoUI: React.FC<PianoUIProps> = ({
         <FallingNotes
           notes={fallingNotes}
           tonic={tonic}
-          colorMode={colorMode}
+          colorMode={localColorMode}
           fallingNoteWidth={(keyWidth / 6) * 7}
           referencePoints={{
             c1: { note: 12, left: c1Left },

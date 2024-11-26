@@ -6,7 +6,6 @@ import { TaskPanel } from "./TaskPanel";
 import { immediate } from "tone";
 import { useParams, useNavigate } from "react-router-dom";
 import { TASK_CONFIGS, TaskId } from "../tasks/tasks";
-import { URL_PREFIX } from "../constants/routes";
 import {
   ensureSamplerLoaded,
   getAudioContextState,
@@ -38,9 +37,6 @@ export const PianoController: React.FC = () => {
   const [taskId, setTaskId] = useState<TaskId>(0);
   const navigate = useNavigate();
   const { taskId: urlTaskId } = useParams();
-  const [state, setState] = useState<PianoControllerState>({
-    activeKeysSize: 0,
-  });
   const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
   const [samplerReady, setSamplerReady] = useState(false);
   const [activeKeyCodes, setActiveKeyCodes] = useState<Set<string>>(new Set());
@@ -58,14 +54,6 @@ export const PianoController: React.FC = () => {
         : parsedTaskId;
     setTaskId(validTaskId);
   }, [urlTaskId]);
-
-  // Add effect to sync activeKeysSize
-  useEffect(() => {
-    setState((prev) => ({
-      ...prev,
-      activeKeysSize: activeKeys.size,
-    }));
-  }, [activeKeys.size]);
 
   // Move sampler loading to an earlier useEffect
   useEffect(() => {
@@ -207,7 +195,6 @@ export const PianoController: React.FC = () => {
           releaseNotes={releaseNotes}
           fallingNotes={fallingNotes}
           keyboardMapping={TASK_CONFIGS[taskId].keyboardMapping}
-          state={state}
           setActiveKeyCodes={setActiveKeyCodes}
         />
       )}

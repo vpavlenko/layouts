@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { KeyboardMapping } from "../constants/keyboard";
 import { Layout } from "./Layout";
 import { TASK_CONFIGS, TaskId } from "../tasks/tasks";
