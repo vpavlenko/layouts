@@ -319,6 +319,15 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
     C3 C#3 D3 D#3 E3 F3 F#3 G3 G#3 A3 A#3 B3 C4
     `,
   },
+
+  "Gravity Falls Opening": {
+    keyboardMapping: keyboard`
+    Eb3 G3 C4 D4 B3   Bb4 C5 D5 Eb5 F5 G5 Ab5 Bb5 B5
+    C3 Eb3 Ab3 Bb3 G3 Bb3 C4 D4 Eb4 F4 G4 Ab4 
+    G2 Bb2 Eb3 F3 D3  Bb5 B5 C6
+    C2 Eb2 Ab2 Bb2 G2 Bb4 B4 C5
+    `,
+  },
 };
 
 // Transform internal format to exported format
