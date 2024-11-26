@@ -283,6 +283,24 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
       C4 Eb4 G4 C5 Eb5 G5 C6 Eb6 G6 C7
     `,
   },
+
+  "Chain of Dominants": {
+    keyboardMapping: keyboard`
+    Bb3 F4 C4 G4 D4 A4 E4 B4 F#4 C#5 G#4 D#5
+    G3 D4 A3 E4 B3 F#4 C#4 G#4 D#4 A#4 F4 C5
+    E3 B3 F#3 C#4 G#3 D#4 A#3 F4 C4 G4 D4
+    C3 G3 D3 A3 E3 B3 F#3 C#4 G#3 D#4 A#3 F4
+    `,
+  },
+
+  "Minor Scale": {
+    keyboardMapping: keyboard`
+    G1 Ab1 Bb1 C2 D2 Eb2 F2 G2 Ab2 B2 C3 D3
+    G2 Ab2 Bb2 C3 D3 Eb3 F3 G3 Ab3 B3 C4 D4
+    G3 Ab3 Bb3 C4 D4 Eb4 F4 G4 Ab4 B4 C5 D5
+    G4 Ab4 Bb4 C5 D5 Eb5 F5 G5 Ab5 Bb5
+    `,
+  },
 };
 
 // Transform internal format to exported format
