@@ -66,21 +66,34 @@ export const PianoController: React.FC = () => {
     loadSampler();
   }, []);
 
-  // Update playNotes to handle loading state
+  // Update playNotes to handle the tonic offset correctly
   const playNotes = useCallback(
     async (note: number, octave: number) => {
       if (!samplerReady) return [];
 
-      const relativeNote = (note - tonic + 12) % 12;
-      console.log("Calculated relative note:", relativeNote);
+      console.log("[PianoController] playNotes input:", {
+        note,
+        octave,
+        tonic,
+      });
 
-      const noteString = `${NOTE_NAMES[(note + tonic) % 12]}${octave}`;
+      // For mouse clicks, note is already absolute
+      // For key presses, note is relative and needs to be converted
+      const absoluteNote = note % 12;
+      const noteString = `${NOTE_NAMES[absoluteNote]}${octave}`;
+
+      console.log("[PianoController] Playing note:", {
+        absoluteNote,
+        noteString,
+        originalNote: note,
+        tonic,
+      });
+
       sampler.triggerAttack(noteString, immediate());
 
-      // Create falling note
       const newNote: FallingNote = {
         id: `${note}-${octave}-${Date.now()}`,
-        note: (note + tonic) % 12,
+        note: absoluteNote,
         octave,
         startTime: Date.now(),
         endTime: null,
@@ -89,36 +102,47 @@ export const PianoController: React.FC = () => {
       setFallingNotes((prev) => [...prev, newNote]);
       setActiveKeys((prev) => new Set([...prev, `${note}-${octave}`]));
 
-      return [{ note: (note + tonic) % 12, octave }];
+      return [{ note: absoluteNote, octave }];
     },
     [samplerReady, tonic]
   );
 
   const releaseNotes = useCallback(
     (note: number, octave: number) => {
+      console.log("[PianoController] releaseNotes input:", {
+        note,
+        octave,
+        tonic,
+      });
+
       setActiveKeys((prev) => {
         const next = new Set(prev);
         next.delete(`${note}-${octave}`);
         return next;
       });
 
-      const noteString = `${NOTE_NAMES[(note + tonic) % 12]}${octave}`;
+      const absoluteNote = note % 12;
+      const noteString = `${NOTE_NAMES[absoluteNote]}${octave}`;
+
+      console.log("[PianoController] Releasing note:", {
+        absoluteNote,
+        noteString,
+        originalNote: note,
+        tonic,
+      });
+
       sampler.triggerRelease(noteString);
 
       setFallingNotes((prev) =>
         prev.map((n) => {
-          if (
-            n.note === (note + tonic) % 12 &&
-            n.octave === octave &&
-            !n.endTime
-          ) {
+          if (n.note === absoluteNote && n.octave === octave && !n.endTime) {
             return { ...n, endTime: Date.now() };
           }
           return n;
         })
       );
 
-      return [{ note: (note + tonic) % 12, octave }];
+      return [{ note: absoluteNote, octave }];
     },
     [tonic]
   );

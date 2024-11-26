@@ -93,6 +93,12 @@ const PianoKey: React.FC<PianoKeyProps> = ({
   const isWhiteKey = WHITE_KEYS.includes(note);
 
   const handleMouseDown = async () => {
+    console.log("[PianoKey] Mouse down:", {
+      note,
+      octave,
+      tonic,
+      absoluteNote: (note - tonic + 12) % 12,
+    });
     await playNotes(note, octave);
     setIsPressed(true);
   };
@@ -177,9 +183,7 @@ const PianoKey: React.FC<PianoKeyProps> = ({
           }`
         : "none",
     transition:
-      isPressed || isHovered
-        ? "transform 0.1s ease-in-out, background-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out"
-        : "transform 1s ease-in-out, background-color 1s ease-in-out, box-shadow 1s ease-in-out",
+      "transform 0.1s ease-in-out, background-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out",
     cursor: "pointer",
     zIndex: isHovered ? 3 : style.zIndex || 1,
     height: (() => {
@@ -386,7 +390,16 @@ export const PianoUI: React.FC<PianoUIProps> = ({
         if (event.code in keyboardMapping) {
           const { note, octave } =
             keyboardMapping[event.code as keyof typeof keyboardMapping];
+          console.log("[PianoUI] Key press:", {
+            keyCode: event.code,
+            mappedNote: note,
+            mappedOctave: octave,
+            tonic,
+          });
+
           const relativeNote = getRelativeNote(note, octave, tonic);
+          console.log("[PianoUI] Calculated relative note:", relativeNote);
+
           await playNotes(relativeNote.note, relativeNote.octave);
         }
       }
