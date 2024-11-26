@@ -4,14 +4,10 @@
     <meta charset="utf-8">
     <title>Redirecting...</title>
     <script>
-      const segment = '/layouts/';
-      const l = window.location;
-      const redirectPath = l.pathname.startsWith(segment) 
-        ? l.pathname.slice(segment.length) 
-        : '';
-      
-      sessionStorage.setItem('redirect', redirectPath);
-      l.replace(segment);
+      // Get the current path excluding the /layouts prefix
+      const path = window.location.pathname.replace('/layouts/', '');
+      // Redirect to the root with a special parameter
+      window.location.href = '/layouts/?p=' + encodeURIComponent(path);
     </script>
   </head>
   <body>
