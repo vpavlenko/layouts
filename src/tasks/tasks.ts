@@ -7,6 +7,7 @@ export type TaskId = number;
 
 export interface TaskConfig {
   title: string;
+  slug: string;
   keyboardMapping: KeyboardMapping;
   colorMode: ColorMode;
 }
@@ -242,7 +243,7 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
     `,
   },
 
-  "V7 to I": {
+  "V7 to major I": {
     keyboardMapping: keyboard`
       G1 B1 D2 F2 G2 B2 D3 F3 G3 B3 D4 F4
       G4 B4 D5 F5 G5 B5 D6 F6 G6 B6 D7 F7
@@ -251,7 +252,7 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
     `,
   },
 
-  "V7 to i": {
+  "V7 to minor i": {
     keyboardMapping: keyboard`
       G1 B1 D2 F2 G2 B2 D3 F3 G3 B3 D4 F4
       G4 B4 D5 F5 G5 B5 D6 F6 G6 B6 D7 F7
@@ -330,10 +331,19 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
   },
 };
 
+// Add these helper functions at the top of the file
+export const slugify = (text: string): string => {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+};
+
 // Transform internal format to exported format
 export const TASK_CONFIGS: TaskConfig[] = Object.entries(INTERNAL_TASKS).map(
   ([title, config]) => ({
     title,
+    slug: slugify(title),
     keyboardMapping:
       typeof config.keyboardMapping === "string"
         ? processKeyboardString(config.keyboardMapping)
