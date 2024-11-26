@@ -329,6 +329,15 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
     C2 Eb2 Ab2 Bb2 G2 Bb4 B4 C5
     `,
   },
+
+  Axis: {
+    keyboardMapping: keyboard`
+    A1 A2 E3 A3 C4 E4 A4 C5 E5 A5 C6 E6
+    F1 F2 C3 F3 A3 C4 F4 A4 C5 F5 A5 C6 F6 A6
+    C1 C2 G2 C3 E3 G3 C4 E4 G4 C5 E5 G5 C6
+    G1 G2 D3 G3 B3 D4 G4 B4 D5 G5 B5 D6
+    `,
+  },
 };
 
 // Add these helper functions at the top of the file
