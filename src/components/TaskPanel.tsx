@@ -3,11 +3,6 @@ import { KeyboardMapping } from "../constants/keyboard";
 import { Layout } from "./Layout";
 import { TASK_CONFIGS, TaskConfig } from "../tasks/tasks";
 
-interface KeyboardState {
-  activeKeyCodes: Set<string>;
-  taskKeyboardMapping?: KeyboardMapping;
-}
-
 interface TaskPanelProps {
   currentTask: TaskConfig;
   onTaskChange: (task: TaskConfig) => void;
