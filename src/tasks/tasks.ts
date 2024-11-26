@@ -168,21 +168,57 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
     `,
   },
 
-  "Traditional Layout": {
-    keyboardMapping: keyboard`
-      . F#3 G#3 A#3 . C#4 D#4 . F#4 G#4 A#4
-      F3 G3 A3 B3 C4 D4 E4 F4 G4 A4 B4 C5
-      . C#2 D#2 . F#2 G#2 A#2 . C#3 D#3
-      C2 D2 E2 F2 G2 A2 B2 C3 D3 E3
-  `,
-  },
-
   "Major/minor Tonic Chord": {
     keyboardMapping: keyboard`
       E1 E2 E3 E4 E5 E6 E7 . . . . .
       G1 G2 G3 G4 G5 G6 G7 . . . . .
       C1 C2 C3 C4 C5 C6 C7 C8 . . .
       Eb1 Eb2 Eb3 Eb4 Eb5 Eb6 Eb7 . . .
+    `,
+  },
+
+  "Roman Numerals": {
+    keyboardMapping: keyboard`
+    F3 G3 C3 D3 E3 F#3 G#3 A3 B3 C#4 D4 
+    Ab3 Bb3 Eb3 F3 G3 A3 B3 C4 D4 E4 F4 
+    Db3 Eb3 Ab2 Bb2 C3 D3 E3 F3 G3 A3 B3
+    E3 Gb3 B2 Db3 Eb3 F3 G3 Ab3 Bb3 C4 D4
+    `,
+  },
+
+  "V7 to major I": {
+    keyboardMapping: keyboard`
+      G1 B1 D2 F2 G2 B2 D3 F3 G3 B3 D4 F4
+      G4 B4 D5 F5 G5 B5 D6 F6 G6 B6 D7 F7
+      C1 E1 G1 C2 E2 G2 C3 E3 G3 E7 G7
+      C4 E4 G4 C5 E5 G5 C6 E6 G6 C7
+    `,
+  },
+
+  "V7 to minor i": {
+    keyboardMapping: keyboard`
+      G1 B1 D2 F2 G2 B2 D3 F3 G3 B3 D4 F4
+      G4 B4 D5 F5 G5 B5 D6 F6 G6 B6 D7 F7
+      C1 Eb1 G1 C2 Eb2 G2 C3 Eb3 G3 Eb7 G7
+      C4 Eb4 G4 C5 Eb5 G5 C6 Eb6 G6 C7
+    `,
+  },
+
+  "Chain of Dominants": {
+    keyboardMapping: keyboard`
+    Eb4 Bb3 F4 C4 G4 D4 A4 E4 B4 F#4 C#5 G#4 D#5
+    C4 G3 D4 A3 E4 B3 F#4 C#4 G#4 D#4 A#4 F4 C5
+    A3 E3 B3 F#3 C#4 G#3 D#4 A#3 F4 C4 G4 D4
+    F3 C3 G3 D3 A3 E3 B3 F#3 C#4 G#3 D#4 A#3 F4
+    `,
+  },
+
+  "Circle of Fifths": {
+    keyboardMapping: keyboard`
+    D3 A3 E3 B3 F#3 C#4 G#3 D#4 A#3 F4 C4 G4
+    F3 C4 G3 D4 A3 E4 B3 F#4 C#4 G#4 D#4 A#4
+    Bb2 F3 C3 G3 D3 A3 E3 B3 F#3 C#4 G#3 D#4 
+    Db3 Ab3 Eb3 Bb3 F3 C4 G3 D4 A3 E4
     `,
   },
 
@@ -243,42 +279,6 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
     `,
   },
 
-  "V7 to major I": {
-    keyboardMapping: keyboard`
-      G1 B1 D2 F2 G2 B2 D3 F3 G3 B3 D4 F4
-      G4 B4 D5 F5 G5 B5 D6 F6 G6 B6 D7 F7
-      C1 E1 G1 C2 E2 G2 C3 E3 G3 E7 G7
-      C4 E4 G4 C5 E5 G5 C6 E6 G6 C7
-    `,
-  },
-
-  "V7 to minor i": {
-    keyboardMapping: keyboard`
-      G1 B1 D2 F2 G2 B2 D3 F3 G3 B3 D4 F4
-      G4 B4 D5 F5 G5 B5 D6 F6 G6 B6 D7 F7
-      C1 Eb1 G1 C2 Eb2 G2 C3 Eb3 G3 Eb7 G7
-      C4 Eb4 G4 C5 Eb5 G5 C6 Eb6 G6 C7
-    `,
-  },
-
-  "Chain of Dominants": {
-    keyboardMapping: keyboard`
-    Bb3 F4 C4 G4 D4 A4 E4 B4 F#4 C#5 G#4 D#5
-    G3 D4 A3 E4 B3 F#4 C#4 G#4 D#4 A#4 F4 C5
-    E3 B3 F#3 C#4 G#3 D#4 A#3 F4 C4 G4 D4
-    C3 G3 D3 A3 E3 B3 F#3 C#4 G#3 D#4 A#3 F4
-    `,
-  },
-
-  "Circle of Fifths": {
-    keyboardMapping: keyboard`
-    D3 A3 E3 B3 F#3 C#4 G#3 D#4 A#3 F4 C4 G4
-    F3 C4 G3 D4 A3 E4 B3 F#4 C#4 G#4 D#4 A#4
-    Bb2 F3 C3 G3 D3 A3 E3 B3 F#3 C#4 G#3 D#4 
-    Db3 Ab3 Eb3 Bb3 F3 C4 G3 D4 A3 E4
-    `,
-  },
-
   "Minor Pentatonic": {
     keyboardMapping: keyboard`
     C1 Eb1 F1 G1 Bb1 C5 Eb5 F5 G5 Bb5
@@ -319,6 +319,15 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
     E3 F3 F#3 G3 G#3 A3 A#3 B3 C4 C#4 D4 E4 F4 F#4 
     C3 C#3 D3 D#3 E3 F3 F#3 G3 G#3 A3 A#3 B3 C4
     `,
+  },
+
+  "Traditional Layout": {
+    keyboardMapping: keyboard`
+      . F#3 G#3 A#3 . C#4 D#4 . F#4 G#4 A#4
+      F3 G3 A3 B3 C4 D4 E4 F4 G4 A4 B4 C5
+      . C#2 D#2 . F#2 G#2 A#2 . C#3 D#3
+      C2 D2 E2 F2 G2 A2 B2 C3 D3 E3
+  `,
   },
 
   "Gravity Falls Opening": {
