@@ -186,6 +186,24 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
     `,
   },
 
+  "Applied in Major": {
+    keyboardMapping: keyboard`
+    B3 C4 G3  D4 A3  E4 Bb3 F4 C4  G4 B3 D4
+    G3 A3 E3  B3 F#3 C4 G3  D4 A3  E4 G#3
+    E3 F3 C#3 G3 D#3 A3 E3  B3 F#3 C4 E3
+    C3 D3 A2  E3 B2  F3 C3  G3 D3  A3 
+    `,
+  },
+
+  "Applied in Minor": {
+    keyboardMapping: keyboard`
+    Bb3 C4 G3  D4 Ab3  Eb4 Bb3 F4 C4  G4 Bb3 Db4
+    G3 Ab3 E3   Bb3 F3 C4 G3  D4 A3  Eb4 G3
+    Eb3 F3 C#3 G3 D3 Ab3 E3  B3 F#3 C4 Eb3
+    C3 D3 A2   Eb3 Bb2  F3 C3  G3 D3  Ab3 
+    `,
+  },
+
   "V7 to major I": {
     keyboardMapping: keyboard`
       G1 B1 D2 F2 G2 B2 D3 F3 G3 B3 D4 F4
@@ -312,15 +330,6 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
     `,
   },
 
-  "Maj7 Chords": {
-    keyboardMapping: keyboard`
-    B3 C4 C#4 D4 D#4 E4 F4 F#4 G4 G#4 A4 A#4
-    G3 G#3 A3 A#3 B3 C4 C#4 D4 D#4 E4 F4 F#4 
-    E3 F3 F#3 G3 G#3 A3 A#3 B3 C4 C#4 D4 E4 F4 F#4 
-    C3 C#3 D3 D#3 E3 F3 F#3 G3 G#3 A3 A#3 B3 C4
-    `,
-  },
-
   "Traditional Layout": {
     keyboardMapping: keyboard`
       . F#3 G#3 A#3 . C#4 D#4 . F#4 G#4 A#4
@@ -328,6 +337,15 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
       . C#2 D#2 . F#2 G#2 A#2 . C#3 D#3
       C2 D2 E2 F2 G2 A2 B2 C3 D3 E3
   `,
+  },
+
+  "Maj7 Chords": {
+    keyboardMapping: keyboard`
+    B3 C4 C#4 D4 D#4 E4 F4 F#4 G4 G#4 A4 A#4
+    G3 G#3 A3 A#3 B3 C4 C#4 D4 D#4 E4 F4 F#4 
+    E3 F3 F#3 G3 G#3 A3 A#3 B3 C4 C#4 D4 E4 F4 F#4 
+    C3 C#3 D3 D#3 E3 F3 F#3 G3 G#3 A3 A#3 B3 C4
+    `,
   },
 
   "Gravity Falls Opening": {
