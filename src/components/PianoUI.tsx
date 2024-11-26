@@ -329,7 +329,6 @@ interface PianoUIProps {
   tonic: number;
   setTonic: (tonic: number) => void;
   colorMode: ColorMode;
-  onColorModeChange: (mode: ColorMode) => void;
   playNotes: (
     note: number,
     octave: number
@@ -348,7 +347,6 @@ export const PianoUI: React.FC<PianoUIProps> = ({
   tonic,
   setTonic,
   colorMode,
-  onColorModeChange,
   playNotes,
   releaseNotes,
   fallingNotes,

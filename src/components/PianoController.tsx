@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { PianoUI } from "./PianoUI";
-import { ColorMode } from "./types";
 import { sampler } from "../audio/sampler";
 import { FallingNote } from "./FallingNotes";
 import { TaskPanel } from "./TaskPanel";
@@ -35,7 +34,6 @@ export interface PianoControllerState {
 
 export const PianoController: React.FC = () => {
   const [tonic, setTonic] = useState<number>(0);
-  const [colorMode, setColorMode] = useState<ColorMode>("chromatic");
   const [fallingNotes, setFallingNotes] = useState<FallingNote[]>([]);
   const [taskId, setTaskId] = useState<TaskId>(0);
   const navigate = useNavigate();
@@ -48,8 +46,6 @@ export const PianoController: React.FC = () => {
   const [activeKeyCodes, setActiveKeyCodes] = useState<Set<string>>(new Set());
   const [audioContextState, setAudioContextState] =
     useState<string>("suspended");
-
-  console.log("colorMode", colorMode);
 
   // Initialize taskId from URL parameter
   useEffect(() => {
@@ -191,7 +187,6 @@ export const PianoController: React.FC = () => {
           tonic={tonic}
           setTonic={setTonic}
           colorMode={TASK_CONFIGS[taskId].colorMode}
-          onColorModeChange={setColorMode}
           playNotes={playNotes}
           releaseNotes={releaseNotes}
           fallingNotes={fallingNotes}
