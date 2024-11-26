@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Redirecting...</title>
+    <script>
+      // Get the current path excluding the base URL
+      const path = window.location.pathname.replace('/layouts/', '');
+      // Redirect to the main page with a hash route
+      window.location.href = '/layouts/#/' + path + window.location.search;
+    </script>
+  </head>
+  <body>
+    Redirecting...
+  </body>
+</html> 
