@@ -293,6 +293,15 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
     `,
   },
 
+  "Circle of Fifths": {
+    keyboardMapping: keyboard`
+    D3 A3 E3 B3 F#3 C#4 G#3 D#4 A#3 F4 C4 G4
+    F3 C4 G3 D4 A3 E4 B3 F#4 C#4 G#4 D#4 A#4
+    Bb2 F3 C3 G3 D3 A3 E3 B3 F#3 C#4 G#3 D#4 
+    Db3 Ab3 Eb3 Bb3 F3 C4 G3 D4 A3 E4
+    `,
+  },
+
   "Minor Scale": {
     keyboardMapping: keyboard`
     G1 Ab1 Bb1 C2 D2 Eb2 F2 G2 Ab2 B2 C3 D3
