@@ -6,5 +6,11 @@ export default defineConfig({
   base: "/layouts/",
   build: {
     assetsDir: "assets",
+    rollupOptions: {
+      input: {
+        main: "index.html",
+        404: "404.html",
+      },
+    },
   },
 });
