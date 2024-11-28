@@ -170,10 +170,10 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
 
   "Major/minor Tonic Chord": {
     keyboardMapping: keyboard`
-      E1 E2 E3 E4 E5 E6 E7 . . . . .
-      G1 G2 G3 G4 G5 G6 G7 . . . . .
-      C1 C2 C3 C4 C5 C6 C7 C8 . . .
-      Eb1 Eb2 Eb3 Eb4 Eb5 Eb6 Eb7 . . .
+      E7 . C7 C8 G7 . Eb7 .
+      E5 E6 C5 C6 G5 G6 Eb5 Eb6
+      E3 E4 C3 C4 G3 G4 Eb3 Eb4
+      E1 E2 C1 C2 G1 G2 Eb1 Eb2
     `,
   },
 
