@@ -374,6 +374,15 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
     E1 E2 B2 E3 G3 B3 E4 G4 B4 E5 G5 B5
     `,
   },
+
+  "Russian Pop": {
+    keyboardMapping: keyboard`
+    Ab1 Ab2 Eb3 Ab3 C4 Eb4 Ab4 C5 Eb5 Ab5 C6 Eb6
+    G1 G2 D3 G3 B3 D4 G4 B4 D5 G5 B5 D6 F6 B6
+    C2 C3 G3 C4 Eb4 G4 C5 Eb5 G5 C6 Eb6
+    Eb2 Eb3 Bb3 Eb4 G4 Bb4 Eb5 G5 Bb5 Eb6 G6 Bb6
+    `,
+  },
 };
 
 // Add these helper functions at the top of the file
