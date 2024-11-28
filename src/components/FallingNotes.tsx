@@ -146,7 +146,8 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
             style={{
               position: "absolute",
               left: left,
-              top: top,
+              top: 0,
+              transform: `translateY(${top}px)`,
               width: fallingNoteWidth,
               height: height,
               backgroundColor: noteColor,
