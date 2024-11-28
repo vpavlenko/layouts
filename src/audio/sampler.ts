@@ -1,5 +1,12 @@
 import * as Tone from "tone";
 
+// Add type definitions for our custom method
+declare module "tone/build/esm/core/context/BaseContext" {
+  interface BaseContext {
+    addAudioWorklet: () => Promise<void>;
+  }
+}
+
 // Import all audio files
 import C1 from "../assets/salamander/C1.mp3";
 import Ds1 from "../assets/salamander/Ds1.mp3";
@@ -73,6 +80,41 @@ export const sampler = new Tone.Sampler({
   },
 }).toDestination();
 
+// Enable Audio Worklet processing
+Tone.getContext().addAudioWorklet = async () => {
+  const context = Tone.getContext().rawContext;
+  if (context.audioWorklet) {
+    try {
+      await context.audioWorklet.addModule(
+        `data:text/javascript;charset=utf-8,
+        class ToneProcessor extends AudioWorkletProcessor {
+          process(inputs, outputs) {
+            // Pass audio through
+            const output = outputs[0];
+            const input = inputs[0];
+            for (let channel = 0; channel < output.length; ++channel) {
+              const inputChannel = input[channel];
+              const outputChannel = output[channel];
+              for (let i = 0; i < outputChannel.length; ++i) {
+                outputChannel[i] = inputChannel ? inputChannel[i] : 0;
+              }
+            }
+            return true;
+          }
+        }
+        registerProcessor('tone-processor', ToneProcessor);`
+      );
+
+      const workletNode = new AudioWorkletNode(context, "tone-processor");
+      sampler.connect(workletNode);
+      workletNode.connect(context.destination);
+      console.log("Audio Worklet enabled successfully");
+    } catch (error) {
+      console.error("Failed to add Audio Worklet:", error);
+    }
+  }
+};
+
 const originalTriggerAttack = sampler.triggerAttack;
 sampler.triggerAttack = function (...args) {
   console.log("Audio Context State:", Tone.getContext().state);
@@ -92,7 +134,8 @@ export const getAudioContextState = () => {
 export const startAudioContext = async () => {
   try {
     await Tone.start();
-    console.log("Audio context started successfully");
+    await Tone.getContext().addAudioWorklet();
+    console.log("Audio context started successfully with Audio Worklet");
     return true;
   } catch (error) {
     console.error("Failed to start audio context:", error);
