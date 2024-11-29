@@ -180,6 +180,19 @@ export const PianoController: React.FC = () => {
     };
   }, [activeKeys, releaseNotes]);
 
+  useEffect(() => {
+    if (audioContextState === "suspended") {
+      const interval = setInterval(() => {
+        const currentState = getAudioContextState();
+        if (currentState !== "suspended") {
+          setAudioContextState(currentState);
+        }
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [audioContextState]);
+
   return (
     <>
       <TaskPanel
