@@ -152,10 +152,13 @@ export function keyboard(strings: TemplateStringsArray): KeyboardMapping {
 const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
   "White Keys": {
     keyboardMapping: keyboard`
-      C5 D5 E5 F5 G5 A5 B5 C6 D6 E6 F6 G6
-      C4 D4 E4 F4 G4 A4 B4 C5 D5 E5 F5 G5
-      C3 D3 E3 F3 G3 A3 B3 C4 D4 E4 F4
-      C2 D2 E2 F2 G2 A2 B2 C3 D3 E3
+    C2 D2 E2 F2 G2 A2 B2 C3 D3 E3 F3 G3
+    C3 D3 E3 F3 G3 A3 B3 C4 D4 E4 F4 G4
+    C4 D4 E4 F4 G4 A4 B4 C5 D5 E5 F5 G5
+    C5 D5 E5 F5 G5 A5 B5 C6 D6 E6 F6 G6
+      
+      
+      
     `,
   },
 
@@ -355,8 +358,8 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
     keyboardMapping: keyboard`
     Eb3 G3 C4 D4 B3   Bb4 C5 D5 Eb5 F5 G5 Ab5 Bb5 B5
     C3 Eb3 Ab3 Bb3 G3 Bb3 C4 D4 Eb4 F4 G4 Ab4 
-    G2 Bb2 Eb3 F3 D3  Bb5 B5 C6
-    C2 Eb2 Ab2 Bb2 G2 Bb4 B4 C5
+    G2 Bb2 Eb3 F3 D3  Bb5 B5 C6 D6 Eb6 F6
+    C2 Eb2 Ab2 Bb2 G2 Bb4 B4 C5 D5 Eb5
     `,
   },
 
@@ -380,10 +383,19 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
 
   "Russian Pop": {
     keyboardMapping: keyboard`
-    Ab1 Ab2 Eb3 Ab3 C4 Eb4 Ab4 C5 Eb5 Ab5 C6 Eb6
-    G1 G2 D3 G3 B3 D4 G4 B4 D5 G5 B5 D6 F6 B6
-    C2 C3 G3 C4 Eb4 G4 C5 Eb5 G5 C6 Eb6
-    Eb2 Eb3 Bb3 Eb4 G4 Bb4 Eb5 G5 Bb5 Eb6 G6 Bb6
+    F1 F2 C3 F3 A3 C4 F4 A4 C5 F5 A5 C6
+    E1 E2 B2 E3 G#3 B3 E4 G#4 B4 E5 G#5 B5 E6 G#6
+    A1 A2 E3 A3 C4 E4 A4 C5 E5 A5 C6
+    C2 C3 G3 C4 E4 G4 C5 E5 G5 C6 E6 G6
+    `,
+  },
+
+  Creep: {
+    keyboardMapping: keyboard`
+    C1 C2 G2 C3 E3 G3 C4 E4 G4 C5 E5 G5 C6
+    E1 E2 B2 E3 G#3 B3 E4 G#4 B4 E5 G#5 B5
+    F1 F2 C3 F3 A3 C4 F4 A4 C5 F5 A5 C6 F6 A6
+    F1 F2 C3 F3 Ab3 C4 F4 Ab4 C5 F5 Ab5 C6 F6 Ab6
     `,
   },
 };
