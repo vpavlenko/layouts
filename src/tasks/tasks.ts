@@ -150,7 +150,7 @@ export function keyboard(strings: TemplateStringsArray): KeyboardMapping {
 
 // Define tasks with a more concise format
 const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
-  "White Keys": {
+  "Major Scale": {
     keyboardMapping: keyboard`
     C2 D2 E2 F2 G2 A2 B2 C3 D3 E3 F3 G3
     C3 D3 E3 F3 G3 A3 B3 C4 D4 E4 F4 G4
