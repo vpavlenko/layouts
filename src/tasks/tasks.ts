@@ -186,6 +186,45 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
     `,
   },
 
+  "Minor Pentatonic": {
+    keyboardMapping: keyboard`
+    C1 Eb1 F1 G1 Bb1 C2 Eb2 F2 G2 Bb2 C3 Eb3
+    C3 Eb3 F3 G3 Bb3 C4 Eb4 F4 G4 Bb4 C5 Eb5 
+    C5 Eb5 F5 G5 Bb5 C6 Eb6 F6 G6 Bb6 C7
+    C7 Eb7 F7 G7 Bb7 C8 . . . Bb0  
+    `,
+  },
+
+  "Blues Scale": {
+    keyboardMapping: keyboard`
+    C1 Eb1 F1 F#1 G1 Bb1 C2 Eb2 F2 F#2 G2 Bb2 
+    C3 Eb3 F3 F#3 G3 Bb3 C4 Eb4 F4 F#4 G4 Bb4 
+    C5 Eb5 F5 F#5 G5 Bb5 C6 Eb6 F6 F#6 G6 Bb6
+    C7 Eb7 F7 F#7 G7 Bb7 C8 . . Bb0
+    `,
+  },
+
+  "Hirajoshi Scale": {
+    keyboardMapping: keyboard`
+    C1 C#1 F1 F#1 Bb1 C2 C#2 F2 F#2 Bb2 C3 C#3
+    C3 C#3 F3 F#3 Bb3 C4 C#4 F4 F#4 Bb4 C5 C#5
+     C5 C#5 F5 F#5 Bb5 C6 C#6 F6 F#6 Bb6 C7
+        C7 C#7 F7 F#7 Bb7 C8 . . . Bb0
+      
+      
+      
+    `,
+  },
+
+  "Traditional Layout": {
+    keyboardMapping: keyboard`
+      . F#3 G#3 A#3 . C#4 D#4 . F#4 G#4 A#4
+      F3 G3 A3 B3 C4 D4 E4 F4 G4 A4 B4 C5
+      . C#2 D#2 . F#2 G#2 A#2 . C#3 D#3
+      C2 D2 E2 F2 G2 A2 B2 C3 D3 E3
+  `,
+  },
+
   "Major/minor Tonic Chord": {
     keyboardMapping: keyboard`
       E7 . C7 C8 G7 . Eb7 .
@@ -319,45 +358,6 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
       C3 F3 Bb3 Eb4 Ab4 Db5 Gb5 B5 E6 A6 D7 G7
       C4 F4 Bb4 Eb5 Ab5 Db6 Gb6 B6 E7 A7 D8 G8
     `,
-  },
-
-  "Minor Pentatonic": {
-    keyboardMapping: keyboard`
-    C1 Eb1 F1 G1 Bb1 C2 Eb2 F2 G2 Bb2 C3 Eb3
-    C3 Eb3 F3 G3 Bb3 C4 Eb4 F4 G4 Bb4 C5 Eb5 
-    C5 Eb5 F5 G5 Bb5 C6 Eb6 F6 G6 Bb6 C7
-    C7 Eb7 F7 G7 Bb7 C8 . . . Bb0  
-    `,
-  },
-
-  "Blues Scale": {
-    keyboardMapping: keyboard`
-    C1 Eb1 F1 F#1 G1 Bb1 C2 Eb2 F2 F#2 G2 Bb2 
-    C3 Eb3 F3 F#3 G3 Bb3 C4 Eb4 F4 F#4 G4 Bb4 
-    C5 Eb5 F5 F#5 G5 Bb5 C6 Eb6 F6 F#6 G6 Bb6
-    C7 Eb7 F7 F#7 G7 Bb7 C8 . . Bb0
-    `,
-  },
-
-  "Hirajoshi Scale": {
-    keyboardMapping: keyboard`
-    C1 C#1 F1 F#1 Bb1 C2 C#2 F2 F#2 Bb2 C3 C#3
-    C3 C#3 F3 F#3 Bb3 C4 C#4 F4 F#4 Bb4 C5 C#5
-     C5 C#5 F5 F#5 Bb5 C6 C#6 F6 F#6 Bb6 C7
-        C7 C#7 F7 F#7 Bb7 C8 . . . Bb0
-      
-      
-      
-    `,
-  },
-
-  "Traditional Layout": {
-    keyboardMapping: keyboard`
-      . F#3 G#3 A#3 . C#4 D#4 . F#4 G#4 A#4
-      F3 G3 A3 B3 C4 D4 E4 F4 G4 A4 B4 C5
-      . C#2 D#2 . F#2 G#2 A#2 . C#3 D#3
-      C2 D2 E2 F2 G2 A2 B2 C3 D3 E3
-  `,
   },
 
   "Maj7 Chords": {
