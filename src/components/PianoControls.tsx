@@ -57,21 +57,32 @@ const TonicPicker: React.FC<TonicPickerProps> = ({ tonic, onTonicChange }) => {
             style={{
               flex: 1,
               height: "100%",
-              backgroundColor:
-                tonic === index
-                  ? "#4CAF50"
-                  : hoveredNote === index
-                  ? "#ddd"
-                  : "#fff",
+              backgroundColor: hoveredNote === index ? "#ddd" : "#fff",
               border: "1px solid #000",
               borderRadius: "0 0 3px 3px",
               cursor: "pointer",
               transition: "all 0.1s ease-in-out",
               position: "relative",
               marginRight: "-1px",
-              color: tonic === index ? "#fff" : "#000",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "12px",
+              fontWeight: tonic === index ? "bold" : "normal",
+              color: "#000",
             }}
-          />
+          >
+            {tonic === index && (
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: "-4px",
+                }}
+              >
+                {note}
+              </div>
+            )}
+          </div>
         );
       })}
 
@@ -86,20 +97,22 @@ const TonicPicker: React.FC<TonicPickerProps> = ({ tonic, onTonicChange }) => {
             position: "absolute",
             width: "16px",
             height: "20px",
-            backgroundColor:
-              tonic === index
-                ? "#4CAF50"
-                : hoveredNote === index
-                ? "#666"
-                : "#000",
+            backgroundColor: hoveredNote === index ? "#666" : "#000",
             border: "1px solid #000",
             borderRadius: "0 0 3px 3px",
             cursor: "pointer",
             zIndex: 1,
             left: `${(index * 180) / 12}px`,
             transition: "all 0.1s ease-in-out",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "10px",
+            color: "#fff",
           }}
-        />
+        >
+          {tonic === index && notes[index]}
+        </div>
       ))}
     </div>
   );
