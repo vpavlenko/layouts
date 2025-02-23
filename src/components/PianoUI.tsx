@@ -182,10 +182,9 @@ const PianoKey: React.FC<PianoKeyProps> = ({
             isWhiteKey ? "rgba(0, 0, 0, 0.5)" : "rgba(255, 255, 255, 0.5)"
           }`
         : "none",
-    transition:
-      "transform 0.1s ease-in-out, background-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out",
+    transition: "all 1s ease-in-out",
     cursor: "pointer",
-    zIndex: isHovered ? 3 : style.zIndex || 1,
+    zIndex: style.zIndex || 1,
     height: (() => {
       if (colorMode === "flat-chromatic") {
         return PIANO_HEIGHT;
