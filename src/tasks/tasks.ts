@@ -168,6 +168,22 @@ const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
     `,
   },
 
+  "Editor LH Minor Scale": {
+    keyboardMapping: keyboard`
+    C2 D2 Eb2 F2 G2 Ab2 Bb2 C3 D3 Eb3 
+    C3 D3 Eb3 F3 G3 Ab3 Bb3 C4 D4 Eb4 
+    C4 D4 Eb4 F4 G4 Ab4 Bb4 C5 D5 
+    `,
+  },
+
+  "Editor RH Minor Scale": {
+    keyboardMapping: keyboard` 
+    C4 D4 Eb4 F4 G4 Ab4 Bb4 C5 D5 Eb5
+    C5 D5 Eb5 F5 G5 Ab5 Bb5 C6 D6 Eb6
+    C6 D6 Eb6 F6 G6 Ab6 Bb6 C7 D7
+    `,
+  },
+
   "Major Scale": {
     keyboardMapping: keyboard`
     C2 D2 E2 F2 G2 A2 B2 C3 D3 E3 F3 G3
