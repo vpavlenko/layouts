@@ -6,6 +6,7 @@ import { TaskPanel } from "./TaskPanel";
 import { immediate } from "tone";
 import { useParams, useNavigate } from "react-router-dom";
 import { TASK_CONFIGS, TaskConfig } from "../tasks/tasks";
+import { convertToColorMapping } from "../utils/colors";
 import {
   ensureSamplerLoaded,
   getAudioContextState,

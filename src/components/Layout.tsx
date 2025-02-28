@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useCallback } from "react";
 import Keyboard from "react-simple-keyboard";
 import "react-simple-keyboard/build/css/index.css";
-import { KEY_DISPLAY_LABELS, KeyboardMapping } from "../constants/keyboard";
-import { getColors, getLabelColorForNote } from "../utils/colors";
+import {
+  KEY_DISPLAY_LABELS,
+  ColorKeyboardMapping,
+} from "../constants/keyboard";
 
 interface KeyboardState {
   activeKeyCodes: Set<string>;
-  taskKeyboardMapping?: KeyboardMapping;
+  colorKeyboardMapping: ColorKeyboardMapping;
 }
 
 interface LayoutProps {
@@ -35,14 +37,13 @@ export const Layout: React.FC<LayoutProps> = ({
 
   // Create a single stylesheet for all keyboard styles
   const createStyleSheet = useCallback(
-    (mapping: KeyboardMapping) => {
+    (colorMapping: ColorKeyboardMapping) => {
       if (!styleSheetRef.current) {
         styleSheetRef.current = document.createElement("style");
         styleSheetRef.current.id = "piano-keyboard-styles";
         document.head.appendChild(styleSheetRef.current);
       }
 
-      const colors = getColors(0, "chromatic");
       let css = "";
 
       // Add base styles for when labels should be hidden
@@ -54,10 +55,9 @@ export const Layout: React.FC<LayoutProps> = ({
       `;
       }
 
-      Object.entries(mapping).forEach(([keyCode, { note }]) => {
-        const backgroundColor = colors[note];
-        const textColor = getLabelColorForNote(note);
-        css += `
+      Object.entries(colorMapping).forEach(
+        ([keyCode, { backgroundColor, textColor }]) => {
+          css += `
         .keyboard-${uid.current} .simple-keyboard-base .hg-button.${keyCode}-mapped {
           background: ${backgroundColor} !important;
           color: ${textColor} !important;
@@ -66,16 +66,17 @@ export const Layout: React.FC<LayoutProps> = ({
         }
       `;
 
-        css += `
+          css += `
         .keyboard-${uid.current} .simple-keyboard-base .hg-button.${keyCode}-mapped.hg-active {
           transform: scale(0.8) !important;
         }
       `;
-      });
+        }
+      );
 
       // Add styles for unmapped keys
       Object.keys(KEY_DISPLAY_LABELS).forEach((keyCode) => {
-        if (!mapping[keyCode]) {
+        if (!colorMapping[keyCode]) {
           css += `
           .keyboard-${uid.current} .simple-keyboard-base .hg-button.${keyCode}-mapped {
             background: #000 !important;
@@ -88,7 +89,7 @@ export const Layout: React.FC<LayoutProps> = ({
       styleSheetRef.current.textContent = css;
 
       console.log("Applied keyboard styles:", {
-        mappingSize: Object.keys(mapping).length,
+        mappingSize: Object.keys(colorMapping).length,
         cssLength: css.length,
         sampleStyle: css.split("}")[0] + "}",
       });
@@ -98,8 +99,8 @@ export const Layout: React.FC<LayoutProps> = ({
 
   // Apply styles when mapping changes
   useEffect(() => {
-    if (keyboardState.taskKeyboardMapping) {
-      createStyleSheet(keyboardState.taskKeyboardMapping);
+    if (Object.keys(keyboardState.colorKeyboardMapping).length > 0) {
+      createStyleSheet(keyboardState.colorKeyboardMapping);
     }
 
     // Cleanup
@@ -109,12 +110,11 @@ export const Layout: React.FC<LayoutProps> = ({
         styleSheetRef.current = null;
       }
     };
-  }, [keyboardState.taskKeyboardMapping, createStyleSheet]);
+  }, [keyboardState.colorKeyboardMapping, createStyleSheet]);
 
   // Function to get button themes
   const getButtonTheme = useCallback(() => {
-    const mapping = keyboardState.taskKeyboardMapping;
-    if (!mapping) return [];
+    if (Object.keys(keyboardState.colorKeyboardMapping).length === 0) return [];
 
     return Object.entries(KEY_DISPLAY_LABELS).map(([keyCode, label]) => ({
       class: `${keyCode}-mapped${
@@ -122,7 +122,7 @@ export const Layout: React.FC<LayoutProps> = ({
       }`,
       buttons: label.toLowerCase(),
     }));
-  }, [keyboardState.taskKeyboardMapping, keyboardState.activeKeyCodes]);
+  }, [keyboardState.activeKeyCodes, keyboardState.colorKeyboardMapping]);
 
   // Function to get display mapping
   const getDisplay = useCallback(() => {

@@ -7,6 +7,16 @@ export type KeyboardMapping = {
   [key: string]: NoteMapping;
 };
 
+// New interface for color-based keyboard mapping
+export interface ColorKeyInfo {
+  backgroundColor: string;
+  textColor: string;
+}
+
+export type ColorKeyboardMapping = {
+  [key: string]: ColorKeyInfo;
+};
+
 // Key display labels remain the same
 export const KEY_DISPLAY_LABELS: { [key: string]: string } = {
   KeyZ: "z",

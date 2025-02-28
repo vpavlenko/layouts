@@ -1,5 +1,6 @@
 import { ColorMode } from "../components/types";
-import { KeyboardMapping } from "../constants/keyboard";
+import { KeyboardMapping, ColorKeyboardMapping } from "../constants/keyboard";
+import { convertToColorMapping } from "../utils/colors";
 
 export type ChromaticNote = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 
@@ -9,6 +10,7 @@ export interface TaskConfig {
   title: string;
   slug: string;
   keyboardMapping: KeyboardMapping;
+  colorKeyboardMapping?: ColorKeyboardMapping;
   colorMode: ColorMode;
 }
 
@@ -441,13 +443,25 @@ export const slugify = (text: string): string => {
 
 // Transform internal format to exported format
 export const TASK_CONFIGS: TaskConfig[] = Object.entries(INTERNAL_TASKS).map(
-  ([title, config]) => ({
-    title,
-    slug: slugify(title),
-    keyboardMapping:
+  ([title, config]) => {
+    const keyboardMapping =
       typeof config.keyboardMapping === "string"
         ? processKeyboardString(config.keyboardMapping)
-        : config.keyboardMapping,
-    colorMode: config.colorMode ?? "chromatic",
-  })
+        : config.keyboardMapping;
+
+    const colorMode = config.colorMode ?? "chromatic";
+
+    return {
+      title,
+      slug: slugify(title),
+      keyboardMapping,
+      // Pre-compute color mapping for all tasks
+      colorKeyboardMapping: convertToColorMapping(
+        keyboardMapping,
+        0,
+        colorMode
+      ),
+      colorMode,
+    };
+  }
 );

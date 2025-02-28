@@ -1,5 +1,6 @@
 import { ColorMode } from "../components/types";
 import { ChromaticNote } from "../tasks/tasks";
+import { KeyboardMapping, ColorKeyboardMapping } from "../constants/keyboard";
 
 export const COLORS: { [key: number]: string } = {
   0: "white",
@@ -40,4 +41,25 @@ export const getLabelColorForNote = (note: number): string => {
   const chromaticNote = (note % 12) as ChromaticNote;
   const shouldUseDarkText = [0, 4, 6, 9, 11].includes(chromaticNote);
   return shouldUseDarkText ? "black" : "white";
+};
+
+/**
+ * Converts a note-based keyboard mapping to a color-based mapping
+ */
+export const convertToColorMapping = (
+  mapping: KeyboardMapping,
+  tonic: number = 0,
+  colorMode: ColorMode = "chromatic"
+): ColorKeyboardMapping => {
+  const colors = getColors(tonic, colorMode);
+  const colorMapping: ColorKeyboardMapping = {};
+
+  Object.entries(mapping).forEach(([keyCode, { note }]) => {
+    colorMapping[keyCode] = {
+      backgroundColor: colors[note],
+      textColor: getLabelColorForNote(note),
+    };
+  });
+
+  return colorMapping;
 };

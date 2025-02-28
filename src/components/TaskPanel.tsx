@@ -14,13 +14,34 @@ interface TaskPanelProps {
 
 export const TaskPanel: React.FC<TaskPanelProps> = React.memo(
   ({ currentTask, onTaskChange, keyboardState }) => {
+    // Log the full keyboardState props
+    React.useEffect(() => {
+      console.log(
+        "Layout keyboardState with showLabels=true:",
+        JSON.stringify(
+          {
+            activeKeyCodes: Array.from(keyboardState.activeKeyCodes),
+            taskKeyboardMapping: keyboardState.taskKeyboardMapping,
+          },
+          null,
+          2
+        )
+      );
+    }, [keyboardState]);
+
     return (
       <div className="fixed top-0 left-0 w-[600px] h-screen bg-gray-900 text-white flex flex-col">
         {/* Keyboard section */}
         <div className="bg-gray-900 p-4 border-b border-gray-800">
           <div className="flex items-center justify-between">
             <div className="text-lg text-white">{currentTask.title}</div>
-            <Layout keyboardState={keyboardState} showLabels={true} />
+            <Layout
+              keyboardState={{
+                activeKeyCodes: keyboardState.activeKeyCodes,
+                colorKeyboardMapping: currentTask.colorKeyboardMapping!,
+              }}
+              showLabels={true}
+            />
           </div>
         </div>
 
@@ -46,7 +67,8 @@ export const TaskPanel: React.FC<TaskPanelProps> = React.memo(
                         <Layout
                           keyboardState={{
                             activeKeyCodes: new Set(),
-                            taskKeyboardMapping: taskConfig.keyboardMapping,
+                            colorKeyboardMapping:
+                              taskConfig.colorKeyboardMapping!,
                           }}
                           showLabels={false}
                         />
