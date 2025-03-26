@@ -154,69 +154,82 @@ export function keyboard(strings: TemplateStringsArray): KeyboardMapping {
 const INTERNAL_TASKS: Record<string, InternalTaskConfig> = {
   "Editor LH Major Scale": {
     keyboardMapping: keyboard`
-    C2 D2 E2 F2 G2 A2 B2 C3 D3 E3 
     C3 D3 E3 F3 G3 A3 B3 C4 D4 E4 
-    C4 D4 E4 F4 G4 A4 B4 C5 D5 
+    C2 D2 E2 F2 G2 A2 B2 C3 D3 E3 
+    C1 D1 E1 F1 G1 A1 B1 C2 D2 
     `,
   },
 
   "Editor RH Major Scale": {
     keyboardMapping: keyboard` 
-    C4 D4 E4 F4 G4 A4 B4 C5 D5 E5
     C5 D5 E5 F5 G5 A5 B5 C6 D6 E6
-    C6 D6 E6 F6 G6 A6 B6 C7 D7
+    C4 D4 E4 F4 G4 A4 B4 C5 D5 E5
+    C3 D3 E3 F3 G3 A3 B3 C4 D4 
+    
+    
     `,
   },
 
   "Editor LH Minor Scale": {
     keyboardMapping: keyboard`
-    C2 D2 Eb2 F2 G2 Ab2 Bb2 C3 D3 Eb3 
     C3 D3 Eb3 F3 G3 Ab3 Bb3 C4 D4 Eb4 
-    C4 D4 Eb4 F4 G4 Ab4 Bb4 C5 D5 
+    C2 D2 Eb2 F2 G2 Ab2 Bb2 C3 D3 Eb3 
+    C1 D1 Eb1 F1 G1 Ab1 Bb1 C2 D2 
+    
     `,
   },
 
   "Editor RH Minor Scale": {
     keyboardMapping: keyboard` 
-    C4 D4 Eb4 F4 G4 Ab4 Bb4 C5 D5 Eb5
     C5 D5 Eb5 F5 G5 Ab5 Bb5 C6 D6 Eb6
-    C6 D6 Eb6 F6 G6 Ab6 Bb6 C7 D7
+    C4 D4 Eb4 F4 G4 Ab4 Bb4 C5 D5 Eb5
+    C3 D3 Eb3 F3 G3 Ab3 Bb3 C4 D4 
     `,
   },
 
   "Major Scale": {
     keyboardMapping: keyboard`
-    C2 D2 E2 F2 G2 A2 B2 C3 D3 E3 F3 G3
-    C3 D3 E3 F3 G3 A3 B3 C4 D4 E4 F4 G4
-    C4 D4 E4 F4 G4 A4 B4 C5 D5 E5 F5 G5
     C5 D5 E5 F5 G5 A5 B5 C6 D6 E6 F6 G6
+    C4 D4 E4 F4 G4 A4 B4 C5 D5 E5 F5 G5
+    C3 D3 E3 F3 G3 A3 B3 C4 D4 E4 F4 G4
+    C2 D2 E2 F2 G2 A2 B2 C3 D3 E3 F3 G3
+    
     `,
   },
 
   "Natural Minor Scale": {
     keyboardMapping: keyboard`
-    C2 D2 Eb2 F2 G2 Ab2 Bb2 C3 D3 Eb3 F3 G3
-    C3 D3 Eb3 F3 G3 Ab3 Bb3 C4 D4 Eb4 F4 G4
-    C4 D4 Eb4 F4 G4 Ab4 Bb4 C5 D5 Eb5 F5 G5
     C5 D5 Eb5 F5 G5 Ab5 Bb5 C6 D6 Eb6 F6 G6
+    C4 D4 Eb4 F4 G4 Ab4 Bb4 C5 D5 Eb5 F5 G5
+    C3 D3 Eb3 F3 G3 Ab3 Bb3 C4 D4 Eb4 F4 G4
+    C2 D2 Eb2 F2 G2 Ab2 Bb2 C3 D3 Eb3 F3 G3
+    
+    
+    
     `,
   },
 
   "Harmonic Minor Scale": {
     keyboardMapping: keyboard`
-    C2 D2 Eb2 F2 G2 Ab2 B2 C3 D3 Eb3 F3 G3
-    C3 D3 Eb3 F3 G3 Ab3 B3 C4 D4 Eb4 F4 G4
-    C4 D4 Eb4 F4 G4 Ab4 B4 C5 D5 Eb5 F5 G5
     C5 D5 Eb5 F5 G5 Ab5 B5 C6 D6 Eb6 F6 G6
+    C4 D4 Eb4 F4 G4 Ab4 B4 C5 D5 Eb5 F5 G5
+    C3 D3 Eb3 F3 G3 Ab3 B3 C4 D4 Eb4 F4 G4
+    C2 D2 Eb2 F2 G2 Ab2 B2 C3 D3 Eb3 F3 G3
+    
+    
+    
     `,
   },
 
   "Minor Scale with V": {
     keyboardMapping: keyboard`
-    G1 Ab1 Bb1 C2 D2 Eb2 F2 G2 Ab2 B2 C3 D3
-    G2 Ab2 Bb2 C3 D3 Eb3 F3 G3 Ab3 B3 C4 D4
+    G4 Ab4 Bb4 C5 D5 Eb5 F5 G5 Ab5 B5 C6 D6
     G3 Ab3 Bb3 C4 D4 Eb4 F4 G4 Ab4 B4 C5 D5
-    G4 Ab4 Bb4 C5 D5 Eb5 F5 G5 Ab5 B5
+    G2 Ab2 Bb2 C3 D3 Eb3 F3 G3 Ab3 B3 C4 D4
+    G1 Ab1 Bb1 C2 D2 Eb2 F2 G2 Ab2 B2 C3 D3
+    
+    
+    
     `,
   },
 
