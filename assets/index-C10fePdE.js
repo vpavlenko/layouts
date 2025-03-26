@@ -331,41 +331,54 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           }
         `)}),s.current.textContent=h,console.log("Applied keyboard styles:",{mappingSize:Object.keys(c).length,cssLength:h.length,sampleStyle:h.split("}")[0]+"}"})},[e]);ne.useEffect(()=>(Object.keys(t.colorKeyboardMapping).length>0&&i(t.colorKeyboardMapping),()=>{s.current&&(s.current.remove(),s.current=null)}),[t.colorKeyboardMapping,i]);const a=ne.useCallback(()=>Object.keys(t.colorKeyboardMapping).length===0?[]:Object.entries(cc).map(([c,h])=>({class:`${c}-mapped${t.activeKeyCodes.has(c)?" hg-active":""}`,buttons:h.toLowerCase()})),[t.activeKeyCodes,t.colorKeyboardMapping]),l=ne.useCallback(()=>{const c="1234567890-=qwertyuiop[]asdfghjkl;'zxcvbnm,./",h={};return c.split("").forEach(f=>{h[f]=e?f:""}),h},[e]);return Ce.jsx("div",{className:`w-[290px] keyboard-${n.current}`,ref:r,children:Ce.jsx(Gk,{layout:Wk,display:l(),buttonTheme:a(),mergeDisplay:!0,physicalKeyboardHighlight:!1,physicalKeyboardHighlightPress:!1,useButtonTag:!0,disableButtonHold:!0,preventMouseDownDefault:!0,baseClass:"simple-keyboard-base",theme:"hg-theme-default custom-theme"})})},Uk=t=>{var s;const e=t.replace(/[0-9]/g,""),n=parseInt(((s=t.match(/\d+/))==null?void 0:s[0])||"0");return{note:{C:0,"C#":1,Db:1,D:2,"D#":3,Eb:3,E:4,F:5,"F#":6,Gb:6,G:7,"G#":8,Ab:8,A:9,"A#":10,Bb:10,B:11}[e],octave:n}},$k=[["Digit1","Digit2","Digit3","Digit4","Digit5","Digit6","Digit7","Digit8","Digit9","Digit0","Minus","Equal"],["KeyQ","KeyW","KeyE","KeyR","KeyT","KeyY","KeyU","KeyI","KeyO","KeyP","BracketLeft","BracketRight"],["KeyA","KeyS","KeyD","KeyF","KeyG","KeyH","KeyJ","KeyK","KeyL","Semicolon","Quote"],["KeyZ","KeyX","KeyC","KeyV","KeyB","KeyN","KeyM","Comma","Period","Slash"]],Fv=t=>{const e={};return t.trim().split(`
 `).forEach((r,s)=>{const i=r.trim().split(/\s+/),a=$k[s];a&&i.forEach((l,c)=>{const h=a[c];!h||l==="."||(e[h]=Uk(l))})}),e};function Ge(t){return Fv(t[0])}const Kk={"Editor LH Major Scale":{keyboardMapping:Ge`
-    C2 D2 E2 F2 G2 A2 B2 C3 D3 E3 
     C3 D3 E3 F3 G3 A3 B3 C4 D4 E4 
-    C4 D4 E4 F4 G4 A4 B4 C5 D5 
+    C2 D2 E2 F2 G2 A2 B2 C3 D3 E3 
+    C1 D1 E1 F1 G1 A1 B1 C2 D2 
     `},"Editor RH Major Scale":{keyboardMapping:Ge` 
-    C4 D4 E4 F4 G4 A4 B4 C5 D5 E5
     C5 D5 E5 F5 G5 A5 B5 C6 D6 E6
-    C6 D6 E6 F6 G6 A6 B6 C7 D7
+    C4 D4 E4 F4 G4 A4 B4 C5 D5 E5
+    C3 D3 E3 F3 G3 A3 B3 C4 D4 
+    
+    
     `},"Editor LH Minor Scale":{keyboardMapping:Ge`
-    C2 D2 Eb2 F2 G2 Ab2 Bb2 C3 D3 Eb3 
     C3 D3 Eb3 F3 G3 Ab3 Bb3 C4 D4 Eb4 
-    C4 D4 Eb4 F4 G4 Ab4 Bb4 C5 D5 
+    C2 D2 Eb2 F2 G2 Ab2 Bb2 C3 D3 Eb3 
+    C1 D1 Eb1 F1 G1 Ab1 Bb1 C2 D2 
+    
     `},"Editor RH Minor Scale":{keyboardMapping:Ge` 
-    C4 D4 Eb4 F4 G4 Ab4 Bb4 C5 D5 Eb5
     C5 D5 Eb5 F5 G5 Ab5 Bb5 C6 D6 Eb6
-    C6 D6 Eb6 F6 G6 Ab6 Bb6 C7 D7
+    C4 D4 Eb4 F4 G4 Ab4 Bb4 C5 D5 Eb5
+    C3 D3 Eb3 F3 G3 Ab3 Bb3 C4 D4 
     `},"Major Scale":{keyboardMapping:Ge`
-    C2 D2 E2 F2 G2 A2 B2 C3 D3 E3 F3 G3
-    C3 D3 E3 F3 G3 A3 B3 C4 D4 E4 F4 G4
-    C4 D4 E4 F4 G4 A4 B4 C5 D5 E5 F5 G5
     C5 D5 E5 F5 G5 A5 B5 C6 D6 E6 F6 G6
+    C4 D4 E4 F4 G4 A4 B4 C5 D5 E5 F5 G5
+    C3 D3 E3 F3 G3 A3 B3 C4 D4 E4 F4 G4
+    C2 D2 E2 F2 G2 A2 B2 C3 D3 E3 F3 G3
+    
     `},"Natural Minor Scale":{keyboardMapping:Ge`
-    C2 D2 Eb2 F2 G2 Ab2 Bb2 C3 D3 Eb3 F3 G3
-    C3 D3 Eb3 F3 G3 Ab3 Bb3 C4 D4 Eb4 F4 G4
-    C4 D4 Eb4 F4 G4 Ab4 Bb4 C5 D5 Eb5 F5 G5
     C5 D5 Eb5 F5 G5 Ab5 Bb5 C6 D6 Eb6 F6 G6
+    C4 D4 Eb4 F4 G4 Ab4 Bb4 C5 D5 Eb5 F5 G5
+    C3 D3 Eb3 F3 G3 Ab3 Bb3 C4 D4 Eb4 F4 G4
+    C2 D2 Eb2 F2 G2 Ab2 Bb2 C3 D3 Eb3 F3 G3
+    
+    
+    
     `},"Harmonic Minor Scale":{keyboardMapping:Ge`
-    C2 D2 Eb2 F2 G2 Ab2 B2 C3 D3 Eb3 F3 G3
-    C3 D3 Eb3 F3 G3 Ab3 B3 C4 D4 Eb4 F4 G4
-    C4 D4 Eb4 F4 G4 Ab4 B4 C5 D5 Eb5 F5 G5
     C5 D5 Eb5 F5 G5 Ab5 B5 C6 D6 Eb6 F6 G6
+    C4 D4 Eb4 F4 G4 Ab4 B4 C5 D5 Eb5 F5 G5
+    C3 D3 Eb3 F3 G3 Ab3 B3 C4 D4 Eb4 F4 G4
+    C2 D2 Eb2 F2 G2 Ab2 B2 C3 D3 Eb3 F3 G3
+    
+    
+    
     `},"Minor Scale with V":{keyboardMapping:Ge`
-    G1 Ab1 Bb1 C2 D2 Eb2 F2 G2 Ab2 B2 C3 D3
-    G2 Ab2 Bb2 C3 D3 Eb3 F3 G3 Ab3 B3 C4 D4
+    G4 Ab4 Bb4 C5 D5 Eb5 F5 G5 Ab5 B5 C6 D6
     G3 Ab3 Bb3 C4 D4 Eb4 F4 G4 Ab4 B4 C5 D5
-    G4 Ab4 Bb4 C5 D5 Eb5 F5 G5 Ab5 B5
+    G2 Ab2 Bb2 C3 D3 Eb3 F3 G3 Ab3 B3 C4 D4
+    G1 Ab1 Bb1 C2 D2 Eb2 F2 G2 Ab2 B2 C3 D3
+    
+    
+    
     `},"Minor Pentatonic":{keyboardMapping:Ge`
     C1 Eb1 F1 G1 Bb1 C2 Eb2 F2 G2 Bb2 C3 Eb3
     C3 Eb3 F3 G3 Bb3 C4 Eb4 F4 G4 Bb4 C5 Eb5 
