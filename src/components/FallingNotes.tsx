@@ -65,6 +65,9 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
 
   const colors = getColors(tonic, colorMode);
 
+  // Define the specific order for chord keys
+  const CHORD_KEY_ORDER = "asdfghjklqwertyuiop1234567890";
+
   // Calculate position using linear interpolation
   const calculateNotePosition = (midiNote: number): number => {
     const { c1, c2 } = referencePoints;
@@ -224,10 +227,17 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
 
       // If this was the last note in the chord (no more active notes)
       if (currentActiveNotes.size === 0) {
-        // Emit the chord exactly once
-        const chordKeys = Array.from(notesInThisChord).join("");
+        // Sort and emit the chord exactly once
+        const chordKeysArray = Array.from(notesInThisChord);
+        // Sort keys based on their position in CHORD_KEY_ORDER
+        chordKeysArray.sort((a, b) => {
+          const indexA = CHORD_KEY_ORDER.indexOf(a);
+          const indexB = CHORD_KEY_ORDER.indexOf(b);
+          return indexA - indexB;
+        });
+        const sortedChordKeys = chordKeysArray.join("");
 
-        if (chordKeys && metronomeState === "active" && chordStartTime) {
+        if (sortedChordKeys && metronomeState === "active" && chordStartTime) {
           // Calculate chord duration
           const chordEndTime = Date.now();
           const durationMs = chordEndTime - chordStartTime;
@@ -240,10 +250,12 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
           // Get the appropriate duration symbol
           const durationSymbol = getNoteDurationSymbol(durationInBeats);
 
-          setKeyHistory((prev) => prev + chordKeys + durationSymbol + " ");
-        } else if (chordKeys) {
+          setKeyHistory(
+            (prev) => prev + sortedChordKeys + durationSymbol + " "
+          );
+        } else if (sortedChordKeys) {
           // Use quarter notes if metronome is off or in waiting state
-          setKeyHistory((prev) => prev + chordKeys + ", ");
+          setKeyHistory((prev) => prev + sortedChordKeys + ", ");
         }
 
         // Reset for next chord
