@@ -79,13 +79,14 @@ export const PianoController: React.FC = () => {
 
   // Update playNotes to handle the tonic offset correctly
   const playNotes = useCallback(
-    async (note: number, octave: number) => {
+    async (note: number, octave: number, keyPressed?: string) => {
       if (!samplerReady) return [];
 
       console.log("[PianoController] playNotes input:", {
         note,
         octave,
         tonic,
+        keyPressed,
       });
 
       // For mouse clicks, note is already absolute
@@ -108,6 +109,7 @@ export const PianoController: React.FC = () => {
         octave,
         startTime: Date.now(),
         endTime: null,
+        keyPressed,
       };
 
       setFallingNotes((prev) => [...prev, newNote]);

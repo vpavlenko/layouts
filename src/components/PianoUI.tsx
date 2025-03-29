@@ -59,7 +59,8 @@ interface PianoKeyProps {
   colorMode: ColorMode;
   playNotes: (
     note: number,
-    octave: number
+    octave: number,
+    key: string
   ) => Promise<Array<{ note: number; octave: number }>>;
   releaseNotes: (
     note: number,
@@ -100,7 +101,7 @@ const PianoKey: React.FC<PianoKeyProps> = ({
       tonic,
       absoluteNote: (note - tonic + 12) % 12,
     });
-    await playNotes(note, octave);
+    await playNotes(note, octave, "");
     setIsPressed(true);
   };
 
@@ -335,7 +336,8 @@ interface PianoUIProps {
   colorMode: ColorMode;
   playNotes: (
     note: number,
-    octave: number
+    octave: number,
+    key: string
   ) => Promise<Array<{ note: number; octave: number }>>;
   releaseNotes: (
     note: number,
@@ -406,7 +408,11 @@ export const PianoUI: React.FC<PianoUIProps> = ({
           const relativeNote = getRelativeNote(note, octave, tonic);
           console.log("[PianoUI] Calculated relative note:", relativeNote);
 
-          await playNotes(relativeNote.note, relativeNote.octave);
+          await playNotes(
+            relativeNote.note,
+            relativeNote.octave,
+            event.key.toLowerCase()
+          );
         }
       }
     };

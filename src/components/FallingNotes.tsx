@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ColorMode } from "./types";
 import { COLORS, getColors } from "../utils/colors";
 import { PIANO_HEIGHT } from "./PianoUI";
+import { Copy, Check } from "lucide-react";
 
 const PIXELS_PER_SECOND = 50;
 
@@ -11,6 +12,7 @@ export interface FallingNote {
   octave: number;
   startTime: number;
   endTime: number | null;
+  keyPressed?: string;
 }
 
 export interface MetronomeLine {
@@ -39,6 +41,11 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
   metronomeLines,
 }) => {
   const [time, setTime] = useState(Date.now());
+  const [keyHistory, setKeyHistory] = useState<string>("");
+  const [showCopySuccess, setShowCopySuccess] = useState(false);
+  // Simple local state to track which keys are active and collecting keystrokes
+  const [activeNoteIds, setActiveNoteIds] = useState<Set<string>>(new Set());
+  const [currentChord, setCurrentChord] = useState<Set<string>>(new Set());
   const colors = getColors(tonic, colorMode);
 
   // Calculate position using linear interpolation
@@ -130,6 +137,75 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
     });
   };
 
+  // Handle copy to clipboard
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(keyHistory);
+      setShowCopySuccess(true);
+      setTimeout(() => setShowCopySuccess(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+    }
+  };
+
+  // Process notes - track key presses and releases
+  useEffect(() => {
+    // Process new notes (key presses)
+    const newNotes = notes.filter((note) => !note.endTime && note.keyPressed);
+    if (newNotes.length > 0) {
+      // Add new notes to active notes
+      setActiveNoteIds((prev) => {
+        const next = new Set(prev);
+        newNotes.forEach((note) => {
+          next.add(note.id);
+        });
+        return next;
+      });
+
+      // Add keys to current chord
+      setCurrentChord((prev) => {
+        const next = new Set(prev);
+        newNotes.forEach((note) => {
+          if (note.keyPressed && note.keyPressed.trim()) {
+            next.add(note.keyPressed);
+          }
+        });
+        return next;
+      });
+    }
+
+    // Process released notes
+    const releasedNotes = notes.filter(
+      (note) => note.endTime && note.keyPressed
+    );
+    if (releasedNotes.length > 0) {
+      // Remove released notes from active notes
+      setActiveNoteIds((prev) => {
+        const next = new Set(prev);
+        releasedNotes.forEach((note) => {
+          next.delete(note.id);
+        });
+        return next;
+      });
+
+      // Check if all keys are released
+      setTimeout(() => {
+        // Use setTimeout to ensure we get the latest state
+        setActiveNoteIds((currentActive) => {
+          // If no active notes left and we have a chord, emit it
+          if (currentActive.size === 0 && currentChord.size > 0) {
+            const keysToEmit = Array.from(currentChord).join("");
+            setKeyHistory((prev) => prev + keysToEmit + ", ");
+
+            // Clear the current chord
+            setCurrentChord(new Set());
+          }
+          return currentActive;
+        });
+      }, 0);
+    }
+  }, [notes]);
+
   useEffect(() => {
     let animationFrameId: number;
     const animate = () => {
@@ -189,6 +265,58 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
           />
         );
       })}
+      <div
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: "8px",
+          backgroundColor: "rgba(0, 0, 0, 0.8)",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          zIndex: 1000,
+        }}
+      >
+        <input
+          type="text"
+          value={keyHistory}
+          readOnly
+          style={{
+            flex: 1,
+            padding: "8px",
+            backgroundColor: "rgba(255, 255, 255, 0.1)",
+            border: "1px solid rgba(255, 255, 255, 0.2)",
+            borderRadius: "4px",
+            color: "white",
+            fontSize: "14px",
+          }}
+          placeholder="Key history will appear here..."
+        />
+        <button
+          onClick={handleCopy}
+          style={{
+            padding: "8px",
+            backgroundColor: "rgba(255, 255, 255, 0.1)",
+            border: "1px solid rgba(255, 255, 255, 0.2)",
+            borderRadius: "4px",
+            color: "white",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transition: "all 0.2s ease",
+          }}
+          title="Copy to clipboard"
+        >
+          {showCopySuccess ? (
+            <Check size={16} color="#4CAF50" />
+          ) : (
+            <Copy size={16} />
+          )}
+        </button>
+      </div>
     </div>
   );
 };
