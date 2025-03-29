@@ -43,9 +43,10 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
   const [time, setTime] = useState(Date.now());
   const [keyHistory, setKeyHistory] = useState<string>("");
   const [showCopySuccess, setShowCopySuccess] = useState(false);
-  // Simple local state to track which keys are active and collecting keystrokes
-  const [activeNoteIds, setActiveNoteIds] = useState<Set<string>>(new Set());
-  const [currentChord, setCurrentChord] = useState<Set<string>>(new Set());
+  const [notesInThisChord, setNotesInThisChord] = useState<Set<string>>(
+    new Set()
+  );
+
   const colors = getColors(tonic, colorMode);
 
   // Calculate position using linear interpolation
@@ -150,61 +151,52 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
 
   // Process notes - track key presses and releases
   useEffect(() => {
-    // Process new notes (key presses)
+    // Maintain active notes as local variable in effect
+    const currentActiveNotes = new Map<string, string>();
+
+    // Process new active notes (key down events)
     const newNotes = notes.filter((note) => !note.endTime && note.keyPressed);
     if (newNotes.length > 0) {
-      // Add new notes to active notes
-      setActiveNoteIds((prev) => {
-        const next = new Set(prev);
-        newNotes.forEach((note) => {
-          next.add(note.id);
-        });
-        return next;
-      });
+      newNotes.forEach((note) => {
+        if (note.keyPressed && !currentActiveNotes.has(note.id)) {
+          currentActiveNotes.set(note.id, note.keyPressed);
 
-      // Add keys to current chord
-      setCurrentChord((prev) => {
-        const next = new Set(prev);
-        newNotes.forEach((note) => {
-          if (note.keyPressed && note.keyPressed.trim()) {
-            next.add(note.keyPressed);
-          }
-        });
-        return next;
+          // Add to the current chord's set of keys
+          setNotesInThisChord((prev) => {
+            const updated = new Set(prev);
+            if (note.keyPressed) {
+              updated.add(note.keyPressed);
+            }
+            return updated;
+          });
+        }
       });
     }
 
-    // Process released notes
+    // Process released notes (key up events)
     const releasedNotes = notes.filter(
       (note) => note.endTime && note.keyPressed
     );
+
     if (releasedNotes.length > 0) {
-      // Remove released notes from active notes
-      setActiveNoteIds((prev) => {
-        const next = new Set(prev);
-        releasedNotes.forEach((note) => {
-          next.delete(note.id);
-        });
-        return next;
+      // Remove the released notes from active notes
+      releasedNotes.forEach((note) => {
+        currentActiveNotes.delete(note.id);
       });
 
-      // Check if all keys are released
-      setTimeout(() => {
-        // Use setTimeout to ensure we get the latest state
-        setActiveNoteIds((currentActive) => {
-          // If no active notes left and we have a chord, emit it
-          if (currentActive.size === 0 && currentChord.size > 0) {
-            const keysToEmit = Array.from(currentChord).join("");
-            setKeyHistory((prev) => prev + keysToEmit + ", ");
+      // If this was the last note in the chord (no more active notes)
+      if (currentActiveNotes.size === 0) {
+        // Emit the chord exactly once
+        const chordKeys = Array.from(notesInThisChord).join("");
+        if (chordKeys) {
+          setKeyHistory((prev) => prev + chordKeys + ", ");
+        }
 
-            // Clear the current chord
-            setCurrentChord(new Set());
-          }
-          return currentActive;
-        });
-      }, 0);
+        // Reset the chord set
+        setNotesInThisChord(new Set());
+      }
     }
-  }, [notes]);
+  }, [notes, notesInThisChord]);
 
   useEffect(() => {
     let animationFrameId: number;
