@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { ColorMode } from "./types";
+import { ColorMode, MetronomeState } from "./types";
 
 interface TonicPickerProps {
   tonic: number;
@@ -12,7 +12,10 @@ interface ColorModeToggleProps {
   onColorModeChange: (mode: ColorMode) => void;
 }
 
-interface ControlsProps extends TonicPickerProps, ColorModeToggleProps {}
+interface ControlsProps extends TonicPickerProps, ColorModeToggleProps {
+  bpm: number | null;
+  metronomeState: MetronomeState;
+}
 
 const TonicPicker: React.FC<TonicPickerProps> = ({ tonic, onTonicChange }) => {
   const [hoveredNote, setHoveredNote] = useState<number | null>(null);
@@ -179,27 +182,63 @@ const ColorModeToggle: React.FC<ColorModeToggleProps> = ({
   );
 };
 
+// Update the BpmDisplay props to include metronome state
+interface BpmDisplayProps {
+  bpm: number | null;
+  metronomeState: MetronomeState;
+}
+
+const BpmDisplay: React.FC<BpmDisplayProps> = ({ bpm, metronomeState }) => {
+  const style = {
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    padding: "4px 8px",
+    borderRadius: "4px",
+    fontSize: "14px",
+    fontWeight: "bold",
+    color: "white",
+  };
+
+  switch (metronomeState) {
+    case "off":
+      return <div style={style}>press Space to start metronome</div>;
+
+    case "waiting_for_bpm":
+      return <div style={style}>press Space to set BPM</div>;
+
+    case "active":
+      return <div style={style}>{bpm} BPM. press Space to disable</div>;
+  }
+};
+
 export const PianoControls: React.FC<ControlsProps> = ({
   tonic,
   onTonicChange,
   colorMode,
   onColorModeChange,
+  bpm,
+  metronomeState,
 }) => (
   <div
     style={{
       position: "absolute",
       top: -30,
       left: 0,
+      right: 0,
       display: "flex",
       alignItems: "center",
-      gap: "40px",
+      justifyContent: "space-between",
       color: "white",
+      padding: "0 20px",
     }}
   >
-    <TonicPicker tonic={tonic} onTonicChange={onTonicChange} />
-    <ColorModeToggle
-      colorMode={colorMode}
-      onColorModeChange={onColorModeChange}
-    />
+    <div style={{ display: "flex", alignItems: "center", gap: "40px" }}>
+      <TonicPicker tonic={tonic} onTonicChange={onTonicChange} />
+      <ColorModeToggle
+        colorMode={colorMode}
+        onColorModeChange={onColorModeChange}
+      />
+    </div>
+
+    <BpmDisplay bpm={bpm} metronomeState={metronomeState} />
   </div>
 );

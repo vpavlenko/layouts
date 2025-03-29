@@ -6,7 +6,7 @@ import { TaskPanel } from "./TaskPanel";
 import { immediate } from "tone";
 import { useParams, useNavigate } from "react-router-dom";
 import { TASK_CONFIGS, TaskConfig } from "../tasks/tasks";
-import { convertToColorMapping } from "../utils/colors";
+import { MetronomeState } from "./types";
 import {
   ensureSamplerLoaded,
   getAudioContextState,
@@ -32,6 +32,12 @@ export interface PianoControllerState {
   activeKeysSize: number;
 }
 
+// Add interface for metronome lines
+export interface MetronomeLine {
+  id: string;
+  timestamp: number;
+}
+
 export const PianoController: React.FC = () => {
   const [tonic, setTonic] = useState<number>(0);
   const [fallingNotes, setFallingNotes] = useState<FallingNote[]>([]);
@@ -43,6 +49,15 @@ export const PianoController: React.FC = () => {
   const [activeKeyCodes, setActiveKeyCodes] = useState<Set<string>>(new Set());
   const [audioContextState, setAudioContextState] =
     useState<string>("suspended");
+
+  // Replace metronomeActive with more detailed state
+  const [metronomeState, setMetronomeState] = useState<MetronomeState>("off");
+  const [metronomeFirstTap, setMetronomeFirstTap] = useState<number | null>(
+    null
+  );
+  const [bpm, setBpm] = useState<number | null>(null);
+  const [metronomeLines, setMetronomeLines] = useState<MetronomeLine[]>([]);
+  const [metronomeTimerId, setMetronomeTimerId] = useState<number | null>(null);
 
   // Initialize taskId from URL parameter
   useEffect(() => {
@@ -194,6 +209,97 @@ export const PianoController: React.FC = () => {
     }
   }, [audioContextState]);
 
+  // Handle spacebar press for metronome
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === "Space" && !e.repeat) {
+        e.preventDefault();
+
+        const now = Date.now();
+
+        switch (metronomeState) {
+          case "off": {
+            // First tap - start first line and wait for BPM
+            setMetronomeFirstTap(now);
+            setMetronomeState("waiting_for_bpm");
+            // Add first line immediately
+            const firstLine: MetronomeLine = {
+              id: `metronome-${now}`,
+              timestamp: now,
+            };
+            setMetronomeLines([firstLine]);
+            break;
+          }
+
+          case "waiting_for_bpm": {
+            // Second tap - calculate interval and start regular lines
+            const interval = now - metronomeFirstTap!;
+            const calculatedBpm = Math.round(60000 / interval);
+
+            setBpm(calculatedBpm);
+            setMetronomeState("active");
+
+            // Add second line
+            const secondLine: MetronomeLine = {
+              id: `metronome-${now}`,
+              timestamp: now,
+            };
+            setMetronomeLines((prev) => [...prev, secondLine]);
+
+            // Start interval for regular lines
+            const timerId = window.setInterval(() => {
+              const lineTimestamp = Date.now();
+              const newLine: MetronomeLine = {
+                id: `metronome-${lineTimestamp}`,
+                timestamp: lineTimestamp,
+              };
+
+              setMetronomeLines((prev) => [...prev, newLine]);
+            }, interval);
+
+            setMetronomeTimerId(timerId);
+            break;
+          }
+
+          case "active": {
+            // Third tap - disable metronome
+            if (metronomeTimerId !== null) {
+              window.clearInterval(metronomeTimerId);
+            }
+
+            setMetronomeState("off");
+            setMetronomeFirstTap(null);
+            setBpm(null);
+            setMetronomeTimerId(null);
+            setMetronomeLines([]);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      if (metronomeTimerId !== null) {
+        window.clearInterval(metronomeTimerId);
+      }
+    };
+  }, [metronomeState, metronomeFirstTap, metronomeTimerId]);
+
+  // Clean up old metronome lines
+  useEffect(() => {
+    const cleanupInterval = window.setInterval(() => {
+      const now = Date.now();
+      // Keep only metronome lines that are less than 20 seconds old
+      setMetronomeLines((prev) =>
+        prev.filter((line) => now - line.timestamp < 20000)
+      );
+    }, 5000);
+
+    return () => window.clearInterval(cleanupInterval);
+  }, []);
+
   return (
     <>
       <TaskPanel
@@ -228,6 +334,9 @@ export const PianoController: React.FC = () => {
           fallingNotes={fallingNotes}
           keyboardMapping={currentTask.keyboardMapping}
           setActiveKeyCodes={setActiveKeyCodes}
+          metronomeLines={metronomeLines}
+          bpm={bpm}
+          metronomeState={metronomeState}
         />
       )}
     </>

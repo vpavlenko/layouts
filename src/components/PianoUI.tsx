@@ -1,10 +1,11 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { FallingNotes, FallingNote } from "./FallingNotes";
-import { ColorMode } from "./types";
+import { ColorMode, MetronomeState } from "./types";
 import { getColors, getLabelColorForNote } from "../utils/colors";
 import { KEY_DISPLAY_LABELS, KeyboardMapping } from "../constants/keyboard";
 import { PianoControls } from "./PianoControls";
+import { MetronomeLine } from "./PianoController";
 
 const getAbsoluteNote = (
   note: number,
@@ -343,6 +344,9 @@ interface PianoUIProps {
   fallingNotes: FallingNote[];
   keyboardMapping: KeyboardMapping;
   setActiveKeyCodes: React.Dispatch<React.SetStateAction<Set<string>>>;
+  metronomeLines?: MetronomeLine[];
+  bpm: number | null;
+  metronomeState: MetronomeState;
 }
 
 export const PianoUI: React.FC<PianoUIProps> = ({
@@ -354,6 +358,9 @@ export const PianoUI: React.FC<PianoUIProps> = ({
   fallingNotes,
   keyboardMapping,
   setActiveKeyCodes,
+  metronomeLines,
+  bpm,
+  metronomeState,
 }) => {
   const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
   const [activeNotes, setActiveNotes] = useState<
@@ -541,6 +548,8 @@ export const PianoUI: React.FC<PianoUIProps> = ({
           onTonicChange={setTonic}
           colorMode={localColorMode}
           onColorModeChange={setLocalColorMode}
+          bpm={bpm}
+          metronomeState={metronomeState}
         />
         {Object.entries(OCTAVE_RANGES).map(([octave, range]) => {
           const octaveNum = parseInt(octave);
@@ -606,6 +615,7 @@ export const PianoUI: React.FC<PianoUIProps> = ({
             c1: { note: 12, left: c1Left },
             c2: { note: 24, left: c2Left },
           }}
+          metronomeLines={metronomeLines || []}
         />
       </div>
     </div>

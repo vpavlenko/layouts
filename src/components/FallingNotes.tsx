@@ -13,6 +13,11 @@ export interface FallingNote {
   endTime: number | null;
 }
 
+export interface MetronomeLine {
+  id: string;
+  timestamp: number;
+}
+
 interface FallingNotesProps {
   notes: FallingNote[];
   tonic: number;
@@ -22,6 +27,7 @@ interface FallingNotesProps {
     c1: { note: number; left: number };
     c2: { note: number; left: number };
   };
+  metronomeLines: MetronomeLine[];
 }
 
 export const FallingNotes: React.FC<FallingNotesProps> = ({
@@ -30,6 +36,7 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
   colorMode,
   fallingNoteWidth,
   referencePoints,
+  metronomeLines,
 }) => {
   const [time, setTime] = useState(Date.now());
   const colors = getColors(tonic, colorMode);
@@ -100,6 +107,29 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
     return lines;
   };
 
+  // Render metronome lines
+  const renderMetronomeLines = () => {
+    return metronomeLines.map((line) => {
+      const timeSince = (time - line.timestamp) / 1000;
+      const top = timeSince * PIXELS_PER_SECOND;
+
+      return (
+        <div
+          key={line.id}
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: top,
+            height: "1px",
+            backgroundColor: "rgba(255, 255, 255, 0.5)",
+            pointerEvents: "none",
+          }}
+        />
+      );
+    });
+  };
+
   useEffect(() => {
     let animationFrameId: number;
     const animate = () => {
@@ -122,6 +152,7 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
       }}
     >
       {generateTonicLines()}
+      {renderMetronomeLines()}
       {notes.map((note) => {
         const isActive = !note.endTime;
         const timeSinceEnd = note.endTime ? (time - note.endTime) / 1000 : 0;
