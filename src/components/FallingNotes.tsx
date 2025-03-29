@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ColorMode } from "./types";
 import { COLORS, getColors } from "../utils/colors";
 import { PIANO_HEIGHT } from "./PianoUI";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, Trash2 } from "lucide-react";
 
 const PIXELS_PER_SECOND = 50;
 
@@ -30,7 +30,19 @@ interface FallingNotesProps {
     c2: { note: number; left: number };
   };
   metronomeLines: MetronomeLine[];
+  bpm?: number;
 }
+
+// Note duration mapping
+const NOTE_DURATIONS = [
+  { value: 0.0625, symbol: '"' }, // Sixty-fourth note
+  { value: 0.125, symbol: "'" }, // Thirty-second note
+  { value: 0.25, symbol: "=" }, // Sixteenth note
+  { value: 0.5, symbol: "-" }, // Eighth note
+  { value: 1, symbol: "," }, // Quarter note
+  { value: 2, symbol: "_" }, // Half note
+  { value: 4, symbol: "+" }, // Whole note
+];
 
 export const FallingNotes: React.FC<FallingNotesProps> = ({
   notes,
@@ -39,6 +51,7 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
   fallingNoteWidth,
   referencePoints,
   metronomeLines,
+  bpm = 60,
 }) => {
   const [time, setTime] = useState(Date.now());
   const [keyHistory, setKeyHistory] = useState<string>("");
@@ -46,6 +59,7 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
   const [notesInThisChord, setNotesInThisChord] = useState<Set<string>>(
     new Set()
   );
+  const [chordStartTime, setChordStartTime] = useState<number | null>(null);
 
   const colors = getColors(tonic, colorMode);
 
@@ -138,6 +152,23 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
     });
   };
 
+  // Find the closest note duration symbol for a given duration in beats
+  const getNoteDurationSymbol = (durationInBeats: number): string => {
+    // Sort durations by how close they are to the target duration
+    const sortedDurations = [...NOTE_DURATIONS].sort(
+      (a, b) =>
+        Math.abs(a.value - durationInBeats) -
+        Math.abs(b.value - durationInBeats)
+    );
+
+    return sortedDurations[0].symbol;
+  };
+
+  // Clear the key history
+  const handleClear = () => {
+    setKeyHistory("");
+  };
+
   // Handle copy to clipboard
   const handleCopy = async () => {
     try {
@@ -157,6 +188,11 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
     // Process new active notes (key down events)
     const newNotes = notes.filter((note) => !note.endTime && note.keyPressed);
     if (newNotes.length > 0) {
+      // If this is the first note in a new chord, record the start time
+      if (notesInThisChord.size === 0 && newNotes.length > 0) {
+        setChordStartTime(Date.now());
+      }
+
       newNotes.forEach((note) => {
         if (note.keyPressed && !currentActiveNotes.has(note.id)) {
           currentActiveNotes.set(note.id, note.keyPressed);
@@ -188,15 +224,32 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
       if (currentActiveNotes.size === 0) {
         // Emit the chord exactly once
         const chordKeys = Array.from(notesInThisChord).join("");
-        if (chordKeys) {
+
+        if (chordKeys && metronomeLines.length > 0 && chordStartTime) {
+          // Calculate chord duration
+          const chordEndTime = Date.now();
+          const durationMs = chordEndTime - chordStartTime;
+
+          // Convert to beats based on BPM
+          // (BPM = beats per minute, so one beat = 60000/BPM milliseconds)
+          const beatDuration = 60000 / bpm;
+          const durationInBeats = durationMs / beatDuration;
+
+          // Get the appropriate duration symbol
+          const durationSymbol = getNoteDurationSymbol(durationInBeats);
+
+          setKeyHistory((prev) => prev + chordKeys + durationSymbol + " ");
+        } else if (chordKeys) {
+          // Fallback to original behavior if metronome is off
           setKeyHistory((prev) => prev + chordKeys + ", ");
         }
 
-        // Reset the chord set
+        // Reset for next chord
         setNotesInThisChord(new Set());
+        setChordStartTime(null);
       }
     }
-  }, [notes, notesInThisChord]);
+  }, [notes, notesInThisChord, metronomeLines, bpm, chordStartTime]);
 
   useEffect(() => {
     let animationFrameId: number;
@@ -286,6 +339,24 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
           }}
           placeholder="Key history will appear here..."
         />
+        <button
+          onClick={handleClear}
+          style={{
+            padding: "8px",
+            backgroundColor: "rgba(255, 255, 255, 0.1)",
+            border: "1px solid rgba(255, 255, 255, 0.2)",
+            borderRadius: "4px",
+            color: "white",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transition: "all 0.2s ease",
+          }}
+          title="Clear history"
+        >
+          <Trash2 size={16} />
+        </button>
         <button
           onClick={handleCopy}
           style={{
