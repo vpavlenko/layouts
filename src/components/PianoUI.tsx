@@ -622,6 +622,8 @@ export const PianoUI: React.FC<PianoUIProps> = ({
             c2: { note: 24, left: c2Left },
           }}
           metronomeLines={metronomeLines || []}
+          metronomeState={metronomeState}
+          bpm={bpm}
         />
       </div>
     </div>

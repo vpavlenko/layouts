@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ColorMode } from "./types";
+import { ColorMode, MetronomeState } from "./types";
 import { COLORS, getColors } from "../utils/colors";
 import { PIANO_HEIGHT } from "./PianoUI";
 import { Copy, Check, Trash2 } from "lucide-react";
@@ -30,6 +30,7 @@ interface FallingNotesProps {
     c2: { note: number; left: number };
   };
   metronomeLines: MetronomeLine[];
+  metronomeState: MetronomeState;
   bpm?: number;
 }
 
@@ -51,6 +52,7 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
   fallingNoteWidth,
   referencePoints,
   metronomeLines,
+  metronomeState,
   bpm = 60,
 }) => {
   const [time, setTime] = useState(Date.now());
@@ -225,14 +227,14 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
         // Emit the chord exactly once
         const chordKeys = Array.from(notesInThisChord).join("");
 
-        if (chordKeys && metronomeLines.length > 0 && chordStartTime) {
+        if (chordKeys && metronomeState === "active" && chordStartTime) {
           // Calculate chord duration
           const chordEndTime = Date.now();
           const durationMs = chordEndTime - chordStartTime;
 
           // Convert to beats based on BPM
           // (BPM = beats per minute, so one beat = 60000/BPM milliseconds)
-          const beatDuration = 60000 / bpm;
+          const beatDuration = 60000 / (bpm || 60); // Ensure we have a valid BPM
           const durationInBeats = durationMs / beatDuration;
 
           // Get the appropriate duration symbol
@@ -240,7 +242,7 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
 
           setKeyHistory((prev) => prev + chordKeys + durationSymbol + " ");
         } else if (chordKeys) {
-          // Fallback to original behavior if metronome is off
+          // Use quarter notes if metronome is off or in waiting state
           setKeyHistory((prev) => prev + chordKeys + ", ");
         }
 
@@ -249,7 +251,14 @@ export const FallingNotes: React.FC<FallingNotesProps> = ({
         setChordStartTime(null);
       }
     }
-  }, [notes, notesInThisChord, metronomeLines, bpm, chordStartTime]);
+  }, [
+    notes,
+    notesInThisChord,
+    metronomeLines,
+    bpm,
+    chordStartTime,
+    metronomeState,
+  ]);
 
   useEffect(() => {
     let animationFrameId: number;
