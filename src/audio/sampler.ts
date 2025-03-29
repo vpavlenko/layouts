@@ -127,6 +127,10 @@ sampler.triggerRelease = function (...args) {
   return originalTriggerRelease.apply(this, args);
 };
 
+export const getAudioContext = () => {
+  return Tone.getContext().rawContext;
+};
+
 export const getAudioContextState = () => {
   return Tone.getContext().state;
 };

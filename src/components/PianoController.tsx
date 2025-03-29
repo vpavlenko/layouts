@@ -12,6 +12,7 @@ import {
   getAudioContextState,
   startAudioContext,
 } from "../audio/sampler";
+import { createKickSound } from "../audio/metronome";
 
 const NOTE_NAMES = [
   "C",
@@ -222,12 +223,13 @@ export const PianoController: React.FC = () => {
             // First tap - start first line and wait for BPM
             setMetronomeFirstTap(now);
             setMetronomeState("waiting_for_bpm");
-            // Add first line immediately
+            // Add first line immediately and play sound
             const firstLine: MetronomeLine = {
               id: `metronome-${now}`,
               timestamp: now,
             };
             setMetronomeLines([firstLine]);
+            createKickSound();
             break;
           }
 
@@ -239,12 +241,13 @@ export const PianoController: React.FC = () => {
             setBpm(calculatedBpm);
             setMetronomeState("active");
 
-            // Add second line
+            // Add second line and play sound
             const secondLine: MetronomeLine = {
               id: `metronome-${now}`,
               timestamp: now,
             };
             setMetronomeLines((prev) => [...prev, secondLine]);
+            createKickSound();
 
             // Start interval for regular lines
             const timerId = window.setInterval(() => {
@@ -255,6 +258,7 @@ export const PianoController: React.FC = () => {
               };
 
               setMetronomeLines((prev) => [...prev, newLine]);
+              createKickSound(); // Play sound with each new line
             }, interval);
 
             setMetronomeTimerId(timerId);
