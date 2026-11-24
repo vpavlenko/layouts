@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import { playQanunPitch, prepareQanun, stopQanun } from "../audio/quarterToneQanun";
 import { scoreSteps } from "../constants/alAtlal";
 import { KEY_DISPLAY_LABELS } from "../constants/keyboard";
+import { oudMaqams, oudScores } from "../constants/oud";
 import { KEYBOARD_ROWS } from "../tasks/tasks";
 import { COLORS } from "../utils/colors";
 import { QuarterToneFall, trailLifetime } from "./QuarterToneFall";
@@ -11,7 +12,6 @@ import type { PlayedPitch } from "./QuarterToneFall";
 import "../styles/quarterToneKeyboard.css";
 
 const noteNames = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"];
-const scoreUrl = "https://rawl.rocks/f/riyad-al-sunbati-al-atlal";
 const stepsPerOctave = 24;
 // E half-flat, F half-sharp, A half-flat, and B half-flat.
 const repertoireQuartertones = new Set([7, 11, 17, 21]);
@@ -45,8 +45,12 @@ const defaultTonic = 4;
 const darkLabel = [true, false, true, false, true, false, true, true, false, true, true, true];
 const darkQuarterLabel = [true, false, false, true, true, true, true, false, false, true, true, true];
 
+function relativePitch(step: number, tonic: number) {
+  return (step - tonic) % stepsPerOctave;
+}
+
 function styleForStep(step: number, tonic: number): CSSProperties {
-  const relativeStep = (step - tonic) % stepsPerOctave;
+  const relativeStep = relativePitch(step, tonic);
   const pitchClass = Math.floor(relativeStep / 2);
   const lower = COLORS[pitchClass];
   const upper = COLORS[(pitchClass + 1) % 12];
@@ -71,6 +75,8 @@ export function AlAtlalKeyboard() {
   const [octave, setOctave] = useState(concertOctave);
   const [lowerStrings, setLowerStrings] = useState(false);
   const [tonic, setTonic] = useState(defaultTonic);
+  const [maqam, setMaqam] = useState<(typeof oudMaqams)[number] | null>(null);
+  const [score, setScore] = useState<(typeof oudScores)[number]>(oudScores[0]);
   const [notes, setNotes] = useState<PlayedNote[]>([]);
   const [audioError, setAudioError] = useState(false);
   const inputs = useRef(new Map<string, { id: number; cancel: () => void }>());
@@ -191,7 +197,7 @@ export function AlAtlalKeyboard() {
           <h1>Arabic oud</h1>
           <div className="quarter-header-links">
             <a href={`${import.meta.env.BASE_URL}kanun-sources.txt`}>Kanun credits</a>
-            <a href={scoreUrl}>
+            <a href={score.url}>
               Rawl <ArrowUpRight size={15} aria-hidden="true" />
             </a>
           </div>
@@ -234,6 +240,7 @@ export function AlAtlalKeyboard() {
                           style={styleForStep(shownPitch, tonic)}
                           data-playing={heldPitch !== undefined}
                           data-uncommon={quartertone && !repertoireQuartertones.has(shownPitch % stepsPerOctave)}
+                          data-outside-maqam={maqam !== null && !maqam.steps.includes(relativePitch(shownPitch, tonic))}
                           {...noteHandlers(pitch, code)}
                         >
                           {label}
@@ -246,12 +253,43 @@ export function AlAtlalKeyboard() {
               );
             })}
           </div>
+          <fieldset className="quarter-maqam">
+            <legend>Maqam</legend>
+            <div className="quarter-options">
+              <button type="button" aria-pressed={maqam === null} onClick={() => setMaqam(null)}>All</button>
+              {oudMaqams.map((option) => (
+                <button
+                  key={option.name}
+                  type="button"
+                  aria-pressed={maqam === option}
+                  onClick={() => setMaqam(option)}
+                >
+                  {option.name}
+                </button>
+              ))}
+            </div>
+          </fieldset>
         </div>
 
         {audioError && <p className="quarter-error" role="status">Audio unavailable</p>}
         <QuarterToneFall notes={notes} styleForStep={(step) => styleForStep(step, tonic)} octaveStarts={octaveStarts} />
       </div>
-      <iframe className="quarter-score" src={scoreUrl} title="Al Atlal" tabIndex={-1} allow="autoplay; fullscreen" />
+      <div className="quarter-score-pane">
+        <div className="quarter-options quarter-score-picker" role="group" aria-label="Score">
+          {oudScores.map((option) => (
+            <button
+              key={option.url}
+              type="button"
+              title={option.title}
+              aria-pressed={score === option}
+              onClick={() => setScore(option)}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+        <iframe key={score.url} className="quarter-score" src={score.url} title={score.title} tabIndex={-1} allow="autoplay; fullscreen" />
+      </div>
     </main>
   );
 }
