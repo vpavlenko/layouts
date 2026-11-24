@@ -233,7 +233,8 @@
   overflow-y: hidden;
   overscroll-behavior-x: contain;
   scrollbar-width: thin;
-  padding: 6px max(16px, calc((100% - 1260px) / 2));
+  padding-block: 6px;
+  padding-inline-end: max(16px, calc((100% - 1260px) / 2));
 }
 
 .quarter-score-picker button {
