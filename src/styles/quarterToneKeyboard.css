@@ -13,50 +13,51 @@
   flex-direction: column;
   min-width: 0;
   overflow: auto;
-  padding: clamp(10px, 3vh, 26px) max(16px, calc((100% - 1260px) / 2)) 0;
+  padding-inline: max(16px, calc((100% - 1260px) / 2));
 }
 
-.quarter-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 18px;
-}
-
-.quarter-header h1 {
-  font: 500 clamp(2rem, 5vw, 3.25rem) / 1.08 Georgia, serif;
+.quarter-controls h1 {
+  font: 500 2rem / 1.08 Georgia, serif;
   letter-spacing: -0.035em;
 }
 
 .quarter-header-links {
   display: flex;
+  flex: none;
   align-items: flex-end;
   flex-direction: column;
+  margin-inline-start: auto;
 }
 
-.quarter-header a {
+.quarter-header-links a {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 3px 0;
   color: #d4d4d4;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   text-decoration: underline;
   text-underline-offset: 4px;
+  white-space: nowrap;
 }
 
 .quarter-toolbar {
   display: flex;
-  flex-wrap: wrap;
+  flex: none;
   align-items: center;
-  gap: 10px 16px;
-  margin-bottom: 14px;
+  gap: 16px;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  padding-block: 4px;
 }
 
 .quarter-controls {
   display: grid;
-  gap: 6px;
+  flex: none;
+  gap: 4px;
 }
 
 .quarter-select,
@@ -91,8 +92,8 @@
 
 .quarter-shortcuts {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px 12px;
+  gap: 12px;
+  white-space: nowrap;
 }
 
 .quarter-shortcuts kbd {
@@ -103,11 +104,12 @@
 .quarter-key-layout {
   --key-width: clamp(17px, 5.4vw, 26px);
   display: grid;
+  flex: none;
   gap: 2px;
 }
 
 .quarter-maqam {
-  flex: 1 1 160px;
+  flex: 0 0 262px;
   min-width: 0;
   max-width: 262px;
   margin: 0;
@@ -116,10 +118,15 @@
 }
 
 .quarter-maqam legend {
-  margin-bottom: 5px;
+  margin-bottom: 2px;
   padding: 0;
   color: #bcbcbc;
   font-size: 0.8125rem;
+  line-height: 1.2;
+}
+
+.quarter-maqam .quarter-options button {
+  min-height: 24px;
 }
 
 .quarter-options {
@@ -282,8 +289,8 @@
   color: #ff9e80;
 }
 
-@media (max-width: 720px) {
-  .quarter-maqam {
-    max-width: 100%;
+@media (max-width: 900px) {
+  .quarter-key-layout {
+    order: -1;
   }
 }

@@ -193,18 +193,9 @@ export function AlAtlalKeyboard() {
   return (
     <main className="quarter-keyboard">
       <div className="quarter-instrument" style={{ "--lane": `${100 / (pitchSteps.length + 1)}%` } as CSSProperties}>
-        <header className="quarter-header">
-          <h1>Arabic oud</h1>
-          <div className="quarter-header-links">
-            <a href={`${import.meta.env.BASE_URL}kanun-sources.txt`}>Kanun credits</a>
-            <a href={score.url}>
-              Rawl <ArrowUpRight size={15} aria-hidden="true" />
-            </a>
-          </div>
-        </header>
-
         <div className="quarter-toolbar">
-          <div className="quarter-controls">
+          <header className="quarter-controls">
+            <h1>Arabic oud</h1>
             <div className="quarter-select" role="group" aria-label="Keyboard octave">
               <span>Octave</span>
               {octaves.map((bank) => (
@@ -217,7 +208,7 @@ export function AlAtlalKeyboard() {
               <span title="Lower strings"><kbd>Shift</kbd> ↓↓</span>
               <span><kbd>Cmd+click</kbd> changes tonic</span>
             </div>
-          </div>
+          </header>
           <div className="quarter-key-layout" role="group" aria-label="Oud strings">
             {stringKeys.map((keys, row) => {
               const openName = pitchName(firstSelectedStep + stringPitch(row, 0, lowerStrings));
@@ -269,6 +260,12 @@ export function AlAtlalKeyboard() {
               ))}
             </div>
           </fieldset>
+          <div className="quarter-header-links">
+            <a href={`${import.meta.env.BASE_URL}kanun-sources.txt`}>Kanun credits</a>
+            <a href={score.url}>
+              Rawl <ArrowUpRight size={15} aria-hidden="true" />
+            </a>
+          </div>
         </div>
 
         {audioError && <p className="quarter-error" role="status">Audio unavailable</p>}
