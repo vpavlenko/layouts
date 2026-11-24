@@ -11,6 +11,7 @@ import type { PlayedPitch } from "./QuarterToneFall";
 import "../styles/quarterToneKeyboard.css";
 
 const noteNames = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"];
+const scoreUrl = "https://rawl.rocks/f/riyad-al-sunbati-al-atlal";
 const stepsPerOctave = 24;
 const concertOctave = 4;
 const lastOctave = Math.floor(Math.max(...scoreSteps) / stepsPerOctave) - 1;
@@ -28,24 +29,12 @@ const stringKeys = KEYBOARD_ROWS.map((row, index) =>
 const keysByCode = new Map(stringKeys.flat().map((key) => [key.code, key]));
 const lowestOpen = openStrings[openStrings.length - 1];
 const firstStep = (concertOctave + 1) * stepsPerOctave + lowestOpen;
-const lastStep = (lastOctave + 2) * stepsPerOctave - 1;
+const lastStep = (lastOctave + 1) * stepsPerOctave + stringKeys[0].length - 1;
 const pitchSteps = Array.from({ length: lastStep - firstStep + 1 }, (_, i) => firstStep + i);
 const octaveStarts = pitchSteps.filter((step) => step % stepsPerOctave === 0);
-const scorePitches = new Set(scoreSteps);
-const pitchShortcuts = new Map<number, string[]>();
 
 function stringPitch(row: number, position: number, lower: boolean) {
   return openStrings[row + (lower ? lowerStringOffset : 0)] + position;
-}
-
-for (const { code, label, row, position } of keysByCode.values()) {
-  for (const lower of [false, true]) {
-    const pitch = stringPitch(row, position, lower);
-    const shortcuts = pitchShortcuts.get(pitch) ?? [];
-    const key = code === "Backspace" ? code : label;
-    shortcuts.push(lower ? `Shift+${key}` : key);
-    pitchShortcuts.set(pitch, shortcuts);
-  }
 }
 
 // The score's Rawl analysis sets D as the reference for these colors.
@@ -83,10 +72,8 @@ export function AlAtlalKeyboard() {
   const [audioError, setAudioError] = useState(false);
   const inputs = useRef(new Map<string, { id: number; cancel: () => void }>());
   const nextNote = useRef(0);
-  const scroll = useRef<HTMLDivElement>(null);
   const firstSelectedStep = (octave + 1) * stepsPerOctave;
   const activeNotes = notes.filter(({ endedAt }) => endedAt === null);
-  const activeSteps = new Set(activeNotes.map(({ step }) => step));
   const activeKeys = new Map(activeNotes.map(({ keyCode, step }) => [keyCode, step]));
 
   useEffect(() => {
@@ -94,21 +81,6 @@ export function AlAtlalKeyboard() {
     prepareQanun(pitchSteps);
     return () => { document.title = "Rawl Layouts"; };
   }, []);
-
-  useEffect(() => {
-    const view = scroll.current;
-    if (!view) return;
-    const showOctave = () => {
-      const low = stringPitch(stringKeys.length - 1, 0, lowerStrings);
-      const high = stringPitch(0, stringKeys[0].length - 1, lowerStrings);
-      const centerStep = firstSelectedStep + (low + high) / 2;
-      const center = (centerStep - firstStep + 1) / (pitchSteps.length + 1);
-      view.scrollLeft = view.scrollWidth * center - view.clientWidth / 2;
-    };
-    showOctave();
-    window.addEventListener("resize", showOctave);
-    return () => window.removeEventListener("resize", showOctave);
-  }, [firstSelectedStep, lowerStrings]);
 
   const press = useCallback((input: string, step: number, keyCode?: string) => {
     const previous = inputs.current.get(input);
@@ -206,87 +178,59 @@ export function AlAtlalKeyboard() {
 
   return (
     <main className="quarter-keyboard">
-      <header className="quarter-header">
-        <h1>Arabic oud</h1>
-        <div className="quarter-header-links">
-          <a href={`${import.meta.env.BASE_URL}kanun-sources.txt`}>Kanun credits</a>
-          <a href="https://rawl.rocks/f/riyad-al-sunbati-al-atlal">
-            Rawl <ArrowUpRight size={15} aria-hidden="true" />
-          </a>
-        </div>
-      </header>
+      <div className="quarter-instrument" style={{ "--lane": `${100 / (pitchSteps.length + 1)}%` } as CSSProperties}>
+        <header className="quarter-header">
+          <h1>Arabic oud</h1>
+          <div className="quarter-header-links">
+            <a href={`${import.meta.env.BASE_URL}kanun-sources.txt`}>Kanun credits</a>
+            <a href={scoreUrl}>
+              Rawl <ArrowUpRight size={15} aria-hidden="true" />
+            </a>
+          </div>
+        </header>
 
-      <div className="quarter-toolbar">
-        <div className="quarter-shortcuts">
-          <span title="Lower strings"><kbd>Shift</kbd> ↓↓</span>
-        </div>
-        <div className="quarter-key-layout" role="group" aria-label="Oud strings">
-          {stringKeys.map((keys, row) => {
-            const openName = pitchName(firstSelectedStep + stringPitch(row, 0, lowerStrings));
-            return (
-              <div className="quarter-string" key={row} role="group" aria-label={openName}>
-                <span className="quarter-string-note" aria-hidden="true">{openName}</span>
-                <div className="quarter-key-row">
-                  {keys.map(({ code, label, position }) => {
-                    const heldPitch = activeKeys.get(code);
-                    const pitch = firstSelectedStep + stringPitch(row, position, lowerStrings);
-                    const shownPitch = heldPitch ?? pitch;
-                    return (
-                      <button
-                        className="quarter-layout-key"
-                        key={code}
-                        type="button"
-                        aria-label={code === "Backspace" ? code : undefined}
-                        title={pitchName(shownPitch)}
-                        style={styleForStep(shownPitch, tonic)}
-                        data-playing={heldPitch !== undefined}
-                        {...noteHandlers(pitch, code)}
-                      >
-                        {label}
-                        {shownPitch % 2 === 1 && <i className="quarter-layout-dot" aria-hidden="true" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <span className="quarter-legend"><i aria-hidden="true" /> Score pitches</span>
-      </div>
-
-      {audioError && <p className="quarter-error" role="status">Audio unavailable</p>}
-      <div className="quarter-piano-scroll" ref={scroll}>
-        <div className="quarter-piano-stage" style={{ "--lane": `${100 / (pitchSteps.length + 1)}%` } as CSSProperties}>
-          <div className="quarter-piano" role="group" aria-label="Piano keys">
-            {pitchSteps.map((step) => {
-              const offset = step % 2;
-              const isC = step % stepsPerOctave === 0;
-              const name = pitchName(step);
-              const inScore = scorePitches.has(step);
+        <div className="quarter-toolbar">
+          <div className="quarter-shortcuts">
+            <span title="Lower strings"><kbd>Shift</kbd> ↓↓</span>
+          </div>
+          <div className="quarter-key-layout" role="group" aria-label="Oud strings">
+            {stringKeys.map((keys, row) => {
+              const openName = pitchName(firstSelectedStep + stringPitch(row, 0, lowerStrings));
               return (
-                <button
-                  key={step}
-                  type="button"
-                  className="quarter-key"
-                  data-offset={offset}
-                  data-playing={activeSteps.has(step)}
-                  aria-label={name}
-                  aria-description={inScore ? "Score pitch" : undefined}
-                  aria-keyshortcuts={pitchShortcuts.get(step - firstSelectedStep)?.join(" ")}
-                  title={name}
-                  style={styleForStep(step, tonic)}
-                  {...noteHandlers(step)}
-                >
-                  {inScore && <i className="quarter-dot" aria-hidden="true" />}
-                  {offset ? <span>+50</span> : <span>{isC ? name : name.slice(0, -1)}</span>}
-                </button>
+                <div className="quarter-string" key={row} role="group" aria-label={openName}>
+                  <span className="quarter-string-note" aria-hidden="true">{openName}</span>
+                  <div className="quarter-key-row">
+                    {keys.map(({ code, label, position }) => {
+                      const heldPitch = activeKeys.get(code);
+                      const pitch = firstSelectedStep + stringPitch(row, position, lowerStrings);
+                      const shownPitch = heldPitch ?? pitch;
+                      return (
+                        <button
+                          className="quarter-layout-key"
+                          key={code}
+                          type="button"
+                          aria-label={code === "Backspace" ? code : undefined}
+                          title={pitchName(shownPitch)}
+                          style={styleForStep(shownPitch, tonic)}
+                          data-playing={heldPitch !== undefined}
+                          {...noteHandlers(pitch, code)}
+                        >
+                          {label}
+                          {shownPitch % 2 === 1 && <i className="quarter-layout-dot" aria-hidden="true" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               );
             })}
           </div>
-          <QuarterToneFall notes={notes} styleForStep={(step) => styleForStep(step, tonic)} octaveStarts={octaveStarts} />
         </div>
+
+        {audioError && <p className="quarter-error" role="status">Audio unavailable</p>}
+        <QuarterToneFall notes={notes} styleForStep={(step) => styleForStep(step, tonic)} octaveStarts={octaveStarts} />
       </div>
+      <iframe className="quarter-score" src={scoreUrl} title="Al Atlal" allow="autoplay; fullscreen" />
     </main>
   );
 }
