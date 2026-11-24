@@ -89,6 +89,12 @@
   color: #000;
 }
 
+.quarter-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
 .quarter-shortcuts kbd {
   color: #f5f5f5;
   font-weight: 600;

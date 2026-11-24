@@ -209,6 +209,7 @@ export function AlAtlalKeyboard() {
             </div>
             <div className="quarter-shortcuts">
               <span title="Lower strings"><kbd>Shift</kbd> ↓↓</span>
+              <span><kbd>Cmd+click</kbd> changes tonic</span>
             </div>
           </div>
           <div className="quarter-key-layout" role="group" aria-label="Oud strings">
