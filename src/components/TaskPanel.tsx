@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { KeyboardMapping } from "../constants/keyboard";
 import { Layout } from "./Layout";
 import { TASK_CONFIGS, TaskConfig } from "../tasks/tasks";
@@ -34,7 +35,10 @@ export const TaskPanel: React.FC<TaskPanelProps> = React.memo(
         {/* Keyboard section */}
         <div className="bg-gray-900 p-4 border-b border-gray-800">
           <div className="flex items-center justify-between">
-            <div className="text-lg text-white">{currentTask.title}</div>
+            <div>
+              <div className="text-lg text-white">{currentTask.title}</div>
+              <Link to="/layouts/al-atlal" className="text-sm text-gray-300 underline outline-offset-2 focus-visible:outline focus-visible:outline-amber-300">Al Atlal</Link>
+            </div>
             <Layout
               keyboardState={{
                 activeKeyCodes: keyboardState.activeKeyCodes,

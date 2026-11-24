@@ -1,4 +1,5 @@
 import * as Tone from "tone";
+import { pianoSamples } from "./pianoSamples";
 
 // Add type definitions for our custom method
 declare module "tone/build/esm/core/context/BaseContext" {
@@ -7,72 +8,11 @@ declare module "tone/build/esm/core/context/BaseContext" {
   }
 }
 
-// Import all audio files
-import C1 from "../assets/salamander/C1.mp3";
-import Ds1 from "../assets/salamander/Ds1.mp3";
-import Fs1 from "../assets/salamander/Fs1.mp3";
-import A1 from "../assets/salamander/A1.mp3";
-import C2 from "../assets/salamander/C2.mp3";
-import Ds2 from "../assets/salamander/Ds2.mp3";
-import Fs2 from "../assets/salamander/Fs2.mp3";
-import A2 from "../assets/salamander/A2.mp3";
-import C3 from "../assets/salamander/C3.mp3";
-import Ds3 from "../assets/salamander/Ds3.mp3";
-import Fs3 from "../assets/salamander/Fs3.mp3";
-import A3 from "../assets/salamander/A3.mp3";
-import C4 from "../assets/salamander/C4.mp3";
-import Ds4 from "../assets/salamander/Ds4.mp3";
-import Fs4 from "../assets/salamander/Fs4.mp3";
-import A4 from "../assets/salamander/A4.mp3";
-import C5 from "../assets/salamander/C5.mp3";
-import Ds5 from "../assets/salamander/Ds5.mp3";
-import Fs5 from "../assets/salamander/Fs5.mp3";
-import A5 from "../assets/salamander/A5.mp3";
-import C6 from "../assets/salamander/C6.mp3";
-import Ds6 from "../assets/salamander/Ds6.mp3";
-import Fs6 from "../assets/salamander/Fs6.mp3";
-import A6 from "../assets/salamander/A6.mp3";
-import C7 from "../assets/salamander/C7.mp3";
-import Ds7 from "../assets/salamander/Ds7.mp3";
-import Fs7 from "../assets/salamander/Fs7.mp3";
-import A7 from "../assets/salamander/A7.mp3";
-import C8 from "../assets/salamander/C8.mp3";
-
 let samplerLoaded = false;
 let loadingPromise: Promise<void> | null = null;
 
 export const sampler = new Tone.Sampler({
-  urls: {
-    C1,
-    "D#1": Ds1,
-    "F#1": Fs1,
-    A1,
-    C2,
-    "D#2": Ds2,
-    "F#2": Fs2,
-    A2,
-    C3,
-    "D#3": Ds3,
-    "F#3": Fs3,
-    A3,
-    C4,
-    "D#4": Ds4,
-    "F#4": Fs4,
-    A4,
-    C5,
-    "D#5": Ds5,
-    "F#5": Fs5,
-    A5,
-    C6,
-    "D#6": Ds6,
-    "F#6": Fs6,
-    A6,
-    C7,
-    "D#7": Ds7,
-    "F#7": Fs7,
-    A7,
-    C8,
-  },
+  urls: pianoSamples,
   onload: () => {
     console.log("Sampler loaded");
     console.log("Audio Context State:", Tone.getContext().state);
