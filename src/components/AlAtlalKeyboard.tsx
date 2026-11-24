@@ -15,6 +15,7 @@ const scoreUrl = "https://rawl.rocks/f/riyad-al-sunbati-al-atlal";
 const stepsPerOctave = 24;
 const concertOctave = 4;
 const lastOctave = Math.floor(Math.max(...scoreSteps) / stepsPerOctave) - 1;
+const octaves = Array.from({ length: lastOctave - concertOctave + 1 }, (_, i) => concertOctave + i);
 // C4, G3, D3, A2, F2, C2 in quartertone steps relative to the highest course.
 const openStrings = [0, -10, -20, -30, -38, -48];
 const lowerStringOffset = 2;
@@ -115,7 +116,12 @@ export function AlAtlalKeyboard() {
 
   useEffect(() => {
     function keydown(event: KeyboardEvent) {
-      if (event.defaultPrevented || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
+      if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
+      if (event.key === "Tab") {
+        event.preventDefault();
+        return;
+      }
+      if (event.repeat) return;
       setLowerStrings(event.shiftKey);
       if (event.code === "ArrowUp" || event.code === "ArrowDown") {
         event.preventDefault();
@@ -190,8 +196,18 @@ export function AlAtlalKeyboard() {
         </header>
 
         <div className="quarter-toolbar">
-          <div className="quarter-shortcuts">
-            <span title="Lower strings"><kbd>Shift</kbd> ↓↓</span>
+          <div className="quarter-controls">
+            <div className="quarter-select" role="group" aria-label="Keyboard octave">
+              <span>Octave</span>
+              {octaves.map((bank) => (
+                <button key={bank} type="button" aria-pressed={octave === bank} onClick={() => setOctave(bank)}>
+                  {bank}
+                </button>
+              ))}
+            </div>
+            <div className="quarter-shortcuts">
+              <span title="Lower strings"><kbd>Shift</kbd> ↓↓</span>
+            </div>
           </div>
           <div className="quarter-key-layout" role="group" aria-label="Oud strings">
             {stringKeys.map((keys, row) => {
@@ -230,7 +246,7 @@ export function AlAtlalKeyboard() {
         {audioError && <p className="quarter-error" role="status">Audio unavailable</p>}
         <QuarterToneFall notes={notes} styleForStep={(step) => styleForStep(step, tonic)} octaveStarts={octaveStarts} />
       </div>
-      <iframe className="quarter-score" src={scoreUrl} title="Al Atlal" allow="autoplay; fullscreen" />
+      <iframe className="quarter-score" src={scoreUrl} title="Al Atlal" tabIndex={-1} allow="autoplay; fullscreen" />
     </main>
   );
 }
