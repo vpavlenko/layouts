@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties, PointerEvent, MouseEvent } from "react";
 import { ArrowUpRight } from "lucide-react";
+import { MAX_TRANSPOSE_SEMITONES, TransposeControl } from "librawl/components";
+import "librawl/transpose-control.css";
 import { playQanunPitch, prepareQanun, stopQanun } from "../audio/quarterToneQanun";
 import { scoreSteps } from "../constants/alAtlal";
 import { KEY_DISPLAY_LABELS } from "../constants/keyboard";
@@ -12,7 +14,8 @@ import type { PlayedPitch } from "./QuarterToneFall";
 import "../styles/quarterToneKeyboard.css";
 
 const noteNames = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"];
-const stepsPerOctave = 24;
+const stepsPerSemitone = 2;
+const stepsPerOctave = 12 * stepsPerSemitone;
 // E half-flat, F half-sharp, A half-flat, and B half-flat.
 const repertoireQuartertones = new Set([7, 11, 17, 21]);
 const concertOctave = 4;
@@ -31,8 +34,9 @@ const stringKeys = KEYBOARD_ROWS.map((row, index) =>
 );
 const keysByCode = new Map(stringKeys.flat().map((key) => [key.code, key]));
 const lowestOpen = openStrings[openStrings.length - 1];
-const firstStep = (concertOctave + 1) * stepsPerOctave + lowestOpen;
-const lastStep = (lastOctave + 1) * stepsPerOctave + stringKeys[0].length - 1;
+const transposeRange = MAX_TRANSPOSE_SEMITONES * stepsPerSemitone;
+const firstStep = (concertOctave + 1) * stepsPerOctave + lowestOpen - transposeRange;
+const lastStep = (lastOctave + 1) * stepsPerOctave + stringKeys[0].length - 1 + transposeRange;
 const pitchSteps = Array.from({ length: lastStep - firstStep + 1 }, (_, i) => firstStep + i);
 const octaveStarts = pitchSteps.filter((step) => step % stepsPerOctave === 0);
 
@@ -45,17 +49,17 @@ const defaultTonic = 4;
 const darkLabel = [true, false, true, false, true, false, true, true, false, true, true, true];
 const darkQuarterLabel = [true, false, false, true, true, true, true, false, false, true, true, true];
 
-function relativePitch(step: number, tonic: number) {
-  return (step - tonic) % stepsPerOctave;
+function pitchClass(step: number) {
+  return ((step % stepsPerOctave) + stepsPerOctave) % stepsPerOctave;
 }
 
 function styleForStep(step: number, tonic: number): CSSProperties {
-  const relativeStep = relativePitch(step, tonic);
-  const pitchClass = Math.floor(relativeStep / 2);
-  const lower = COLORS[pitchClass];
-  const upper = COLORS[(pitchClass + 1) % 12];
-  const quarter = relativeStep % 2 === 1;
-  const dark = (quarter ? darkQuarterLabel : darkLabel)[pitchClass];
+  const relativeStep = pitchClass(step - tonic);
+  const color = Math.floor(relativeStep / stepsPerSemitone);
+  const lower = COLORS[color];
+  const upper = COLORS[(color + 1) % COLORS.length];
+  const quarter = relativeStep % stepsPerSemitone !== 0;
+  const dark = (quarter ? darkQuarterLabel : darkLabel)[color];
   return {
     "--pitch-color": quarter ? `color-mix(in srgb, ${lower} 50%, ${upper})` : lower,
     "--pitch-ink": dark ? "#000" : "#fff",
@@ -65,14 +69,15 @@ function styleForStep(step: number, tonic: number): CSSProperties {
 
 function pitchName(step: number) {
   const octave = Math.floor(step / stepsPerOctave) - 1;
-  const name = noteNames[Math.floor(step % stepsPerOctave / 2)];
-  return `${name}${octave}${step % 2 ? " +50¢" : ""}`;
+  const name = noteNames[Math.floor(pitchClass(step) / stepsPerSemitone)];
+  return `${name}${octave}${step % stepsPerSemitone ? " +50¢" : ""}`;
 }
 
 type PlayedNote = PlayedPitch & { keyCode?: string };
 
 export function AlAtlalKeyboard() {
   const [octave, setOctave] = useState(concertOctave);
+  const [transpose, setTranspose] = useState(0);
   const [lowerStrings, setLowerStrings] = useState(false);
   const [tonic, setTonic] = useState(defaultTonic);
   const [maqam, setMaqam] = useState<(typeof oudMaqams)[number] | null>(null);
@@ -81,7 +86,9 @@ export function AlAtlalKeyboard() {
   const [audioError, setAudioError] = useState(false);
   const inputs = useRef(new Map<string, { id: number; cancel: () => void }>());
   const nextNote = useRef(0);
-  const firstSelectedStep = (octave + 1) * stepsPerOctave;
+  const transposeSteps = transpose * stepsPerSemitone;
+  const firstSelectedStep = (octave + 1) * stepsPerOctave + transposeSteps;
+  const soundingTonic = tonic + transposeSteps;
   const activeNotes = notes.filter(({ endedAt }) => endedAt === null);
   const activeKeys = new Map(activeNotes.map(({ keyCode, step }) => [keyCode, step]));
 
@@ -180,7 +187,7 @@ export function AlAtlalKeyboard() {
       onLostPointerCapture: (event: PointerEvent) => release(`pointer:${event.pointerId}`, true),
       onClick(event: MouseEvent) {
         if (event.metaKey) {
-          setTonic(step % stepsPerOctave);
+          setTonic(pitchClass(step - transposeSteps));
           return;
         }
         if (event.detail !== 0) return;
@@ -196,13 +203,25 @@ export function AlAtlalKeyboard() {
         <div className="quarter-toolbar">
           <header className="quarter-controls">
             <h1>Arabic oud</h1>
-            <div className="quarter-select" role="group" aria-label="Keyboard octave">
-              <span>Octave</span>
-              {octaves.map((bank) => (
-                <button key={bank} type="button" aria-pressed={octave === bank} onClick={() => setOctave(bank)}>
-                  {bank}
-                </button>
-              ))}
+            <div className="quarter-settings">
+              <div className="quarter-select" role="group" aria-label="Keyboard octave">
+                <span>Octave</span>
+                {octaves.map((bank) => (
+                  <button key={bank} type="button" aria-pressed={octave === bank} onClick={() => setOctave(bank)}>
+                    {bank}
+                  </button>
+                ))}
+              </div>
+              <div className="quarter-transpose">
+                <span>Transpose</span>
+                <TransposeControl
+                  value={transpose}
+                  onChange={setTranspose}
+                  firstTonic={tonic / stepsPerSemitone}
+                  placement="top"
+                  captureKeys={false}
+                />
+              </div>
             </div>
             <div className="quarter-shortcuts">
               <span title="Lower strings"><kbd>Shift</kbd> ↓↓</span>
@@ -220,7 +239,7 @@ export function AlAtlalKeyboard() {
                       const heldPitch = activeKeys.get(code);
                       const pitch = firstSelectedStep + stringPitch(row, position, lowerStrings);
                       const shownPitch = heldPitch ?? pitch;
-                      const quartertone = shownPitch % 2 === 1;
+                      const quartertone = shownPitch % stepsPerSemitone !== 0;
                       return (
                         <button
                           className="quarter-layout-key"
@@ -228,10 +247,10 @@ export function AlAtlalKeyboard() {
                           type="button"
                           aria-label={code === "Backspace" ? code : undefined}
                           title={pitchName(shownPitch)}
-                          style={styleForStep(shownPitch, tonic)}
+                          style={styleForStep(shownPitch, soundingTonic)}
                           data-playing={heldPitch !== undefined}
-                          data-uncommon={maqam === null && quartertone && !repertoireQuartertones.has(shownPitch % stepsPerOctave)}
-                          data-outside-maqam={maqam !== null && !maqam.steps.includes(relativePitch(shownPitch, tonic))}
+                          data-uncommon={maqam === null && quartertone && !repertoireQuartertones.has(pitchClass(shownPitch - transposeSteps))}
+                          data-outside-maqam={maqam !== null && !maqam.steps.includes(pitchClass(shownPitch - soundingTonic))}
                           {...noteHandlers(pitch, code)}
                         >
                           {label}
@@ -269,7 +288,7 @@ export function AlAtlalKeyboard() {
         </div>
 
         {audioError && <p className="quarter-error" role="status">Audio unavailable</p>}
-        <QuarterToneFall notes={notes} styleForStep={(step) => styleForStep(step, tonic)} octaveStarts={octaveStarts} />
+        <QuarterToneFall notes={notes} styleForStep={(step) => styleForStep(step, soundingTonic)} octaveStarts={octaveStarts} />
       </div>
       <div className="quarter-score-pane">
         <div className="quarter-options quarter-score-picker" role="group" aria-label="Score">

@@ -11,21 +11,24 @@ dependencies:
   gh-pages:
     specifier: ^6.2.0
     version: 6.2.0
+  librawl:
+    specifier: github:vpavlenko/librawl#872cc876970219dae73d92908cc8ebf363cda82f
+    version: github.com/vpavlenko/librawl/872cc876970219dae73d92908cc8ebf363cda82f(react-dom@19.3.1)(react@19.3.1)
   lucide-react:
-    specifier: ^0.344.0
-    version: 0.344.0(react@18.3.1)
+    specifier: ^0.562.0
+    version: 0.562.0(react@19.3.1)
   react:
-    specifier: ^18.3.1
-    version: 18.3.1
+    specifier: ^19.3.1
+    version: 19.3.1
   react-dom:
-    specifier: ^18.3.1
-    version: 18.3.1(react@18.3.1)
+    specifier: ^19.3.1
+    version: 19.3.1(react@19.3.1)
   react-router-dom:
     specifier: ^6.28.0
-    version: 6.28.0(react-dom@18.3.1)(react@18.3.1)
+    version: 6.28.0(react-dom@19.3.1)(react@19.3.1)
   react-simple-keyboard:
-    specifier: ^3.8.22
-    version: 3.8.22(react-dom@18.3.1)(react@18.3.1)
+    specifier: ^3.8.298
+    version: 3.8.298(react-dom@19.3.1)(react@19.3.1)
   tone:
     specifier: ^15.0.4
     version: 15.0.4
@@ -38,11 +41,11 @@ devDependencies:
     specifier: ^1.6.4
     version: 1.6.4
   '@types/react':
-    specifier: ^18.3.5
-    version: 18.3.12
+    specifier: ^19.3.0
+    version: 19.3.0
   '@types/react-dom':
-    specifier: ^18.3.0
-    version: 18.3.1
+    specifier: ^19.3.0
+    version: 19.3.0(@types/react@19.3.0)
   '@vitejs/plugin-react':
     specifier: ^4.3.1
     version: 4.3.3(vite@5.4.10)
@@ -827,21 +830,18 @@ packages:
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==, tarball: https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.15.tgz}
     dev: true
 
-  /@types/prop-types@15.7.13:
-    resolution: {integrity: sha512-hCZTSvwbzWGvhqxp/RqVqwU999pBf2vp7hzIjiYOsl8wqOmUxkQ6ddw1cV3l8811+kdUFus/q4d1Y3E3SyEifA==, tarball: https://registry.npmjs.org/@types/prop-types/-/prop-types-15.7.13.tgz}
+  /@types/react-dom@19.3.0(@types/react@19.3.0):
+    resolution: {integrity: sha512-ZI7bU42mZXXKHn/qNLEw2IrbiINU7X5+vfgdixBHkCNpYWXjKgfQ/P+uyGb5CjOLB9UcnTeg3rylQtV2hym44Q==, tarball: https://registry.npmjs.org/@types/react-dom/-/react-dom-19.3.0.tgz}
+    peerDependencies:
+      '@types/react': ^19.3.0
+    dependencies:
+      '@types/react': 19.3.0
     dev: true
 
-  /@types/react-dom@18.3.1:
-    resolution: {integrity: sha512-qW1Mfv8taImTthu4KoXgDfLuk4bydU6Q/TkADnDWWHwi4NX4BR+LWfTp2sVmTqRrsHvyDDTelgelxJ+SsejKKQ==, tarball: https://registry.npmjs.org/@types/react-dom/-/react-dom-18.3.1.tgz}
+  /@types/react@19.3.0:
+    resolution: {integrity: sha512-N0rFCuH9YoxG9/m61l9MfpJKfmLOVU0em7ipIz6TRgSSkvReLB9vL85GB+yr8Bs5leqpvg96JSwF4ZS1s4viQg==, tarball: https://registry.npmjs.org/@types/react/-/react-19.3.0.tgz}
     dependencies:
-      '@types/react': 18.3.12
-    dev: true
-
-  /@types/react@18.3.12:
-    resolution: {integrity: sha512-D2wOSq/d6Agt28q7rSI3jhU7G6aiuzljDGZ2hTZHIkrTLUI+AF3WMeKkEZ9nN2fkBAlcktT6vcZjDFiIhMYEQw==, tarball: https://registry.npmjs.org/@types/react/-/react-18.3.12.tgz}
-    dependencies:
-      '@types/prop-types': 15.7.13
-      csstype: 3.1.3
+      csstype: 3.2.4
     dev: true
 
   /@typescript-eslint/eslint-plugin@8.12.2(@typescript-eslint/parser@8.12.2)(eslint@9.14.0)(typescript@5.6.3):
@@ -1212,8 +1212,8 @@ packages:
     hasBin: true
     dev: true
 
-  /csstype@3.1.3:
-    resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==, tarball: https://registry.npmjs.org/csstype/-/csstype-3.1.3.tgz}
+  /csstype@3.2.4:
+    resolution: {integrity: sha512-PoKaoPzQapnEoqUSnHx1u6W6ku8CVEgKsnpmmzU3m1nwkidpPBQ8V/Zq2+bWNrsOKoKLwTGdbx6xF7BXP1zLVQ==, tarball: https://registry.npmjs.org/csstype/-/csstype-3.2.4.tgz}
     dev: true
 
   /debug@4.3.7:
@@ -1714,6 +1714,7 @@ packages:
 
   /js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==, tarball: https://registry.npmjs.org/js-tokens/-/js-tokens-4.0.0.tgz}
+    dev: true
 
   /js-yaml@4.1.0:
     resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==, tarball: https://registry.npmjs.org/js-yaml/-/js-yaml-4.1.0.tgz}
@@ -1800,13 +1801,6 @@ packages:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==, tarball: https://registry.npmjs.org/lodash.merge/-/lodash.merge-4.6.2.tgz}
     dev: true
 
-  /loose-envify@1.4.0:
-    resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==, tarball: https://registry.npmjs.org/loose-envify/-/loose-envify-1.4.0.tgz}
-    hasBin: true
-    dependencies:
-      js-tokens: 4.0.0
-    dev: false
-
   /lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==, tarball: https://registry.npmjs.org/lru-cache/-/lru-cache-10.4.3.tgz}
     dev: true
@@ -1817,12 +1811,12 @@ packages:
       yallist: 3.1.1
     dev: true
 
-  /lucide-react@0.344.0(react@18.3.1):
-    resolution: {integrity: sha512-6YyBnn91GB45VuVT96bYCOKElbJzUHqp65vX8cDcu55MQL9T969v4dhGClpljamuI/+KMO9P6w9Acq1CVQGvIQ==, tarball: https://registry.npmjs.org/lucide-react/-/lucide-react-0.344.0.tgz}
+  /lucide-react@0.562.0(react@19.3.1):
+    resolution: {integrity: sha512-82hOAu7y0dbVuFfmO4bYF1XEwYk/mEbM5E+b1jgci/udUBEE/R7LF5Ip0CCEmXe8AybRM8L+04eP+LGZeDvkiw==, tarball: https://registry.npmjs.org/lucide-react/-/lucide-react-0.562.0.tgz}
     peerDependencies:
-      react: ^16.5.1 || ^17.0.0 || ^18.0.0
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
     dependencies:
-      react: 18.3.1
+      react: 19.3.1
     dev: false
 
   /make-dir@3.1.0:
@@ -2097,14 +2091,13 @@ packages:
   /queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==, tarball: https://registry.npmjs.org/queue-microtask/-/queue-microtask-1.2.3.tgz}
 
-  /react-dom@18.3.1(react@18.3.1):
-    resolution: {integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==, tarball: https://registry.npmjs.org/react-dom/-/react-dom-18.3.1.tgz}
+  /react-dom@19.3.1(react@19.3.1):
+    resolution: {integrity: sha512-Y0bARz53lhEC1NMCASs0/j+faB/zqt3R8hpvg1e8+61ZVJ4UL0UdC4cBbXfZMcIuhrfgeILTLe+ZeBCavQPtKQ==, tarball: https://registry.npmjs.org/react-dom/-/react-dom-19.3.1.tgz}
     peerDependencies:
-      react: ^18.3.1
+      react: ^19.3.1
     dependencies:
-      loose-envify: 1.4.0
-      react: 18.3.1
-      scheduler: 0.23.2
+      react: 19.3.1
+      scheduler: 0.28.0
     dev: false
 
   /react-refresh@0.14.2:
@@ -2112,7 +2105,7 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /react-router-dom@6.28.0(react-dom@18.3.1)(react@18.3.1):
+  /react-router-dom@6.28.0(react-dom@19.3.1)(react@19.3.1):
     resolution: {integrity: sha512-kQ7Unsl5YdyOltsPGl31zOjLrDv+m2VcIEcIHqYYD3Lp0UppLjrzcfJqDJwXxFw3TH/yvapbnUvPlAj7Kx5nbg==, tarball: https://registry.npmjs.org/react-router-dom/-/react-router-dom-6.28.0.tgz}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -2120,36 +2113,34 @@ packages:
       react-dom: '>=16.8'
     dependencies:
       '@remix-run/router': 1.21.0
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      react-router: 6.28.0(react@18.3.1)
+      react: 19.3.1
+      react-dom: 19.3.1(react@19.3.1)
+      react-router: 6.28.0(react@19.3.1)
     dev: false
 
-  /react-router@6.28.0(react@18.3.1):
+  /react-router@6.28.0(react@19.3.1):
     resolution: {integrity: sha512-HrYdIFqdrnhDw0PqG/AKjAqEqM7AvxCz0DQ4h2W8k6nqmc5uRBYDag0SBxx9iYz5G8gnuNVLzUe13wl9eAsXXg==, tarball: https://registry.npmjs.org/react-router/-/react-router-6.28.0.tgz}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       react: '>=16.8'
     dependencies:
       '@remix-run/router': 1.21.0
-      react: 18.3.1
+      react: 19.3.1
     dev: false
 
-  /react-simple-keyboard@3.8.22(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-7zAJgMRgswikkgQFgqH0YkAPZ1HC1PT9Dbc/1qH5s5LvYbN7AKYJsLEDIEhAHGXCfynaNyIo1F2dIhFxb0IIBA==, tarball: https://registry.npmjs.org/react-simple-keyboard/-/react-simple-keyboard-3.8.22.tgz}
+  /react-simple-keyboard@3.8.298(react-dom@19.3.1)(react@19.3.1):
+    resolution: {integrity: sha512-ry3c+IYmj1pEWSIrqixYCXPcU+YuU/C13K5OCWPZhAaY/oL8mqN58U679K8dt5Gry6EbQs3BCmp+djQFxFZsCQ==, tarball: https://registry.npmjs.org/react-simple-keyboard/-/react-simple-keyboard-3.8.298.tgz}
     peerDependencies:
-      react: ^16.0.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0
+      react: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
     dependencies:
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
+      react: 19.3.1
+      react-dom: 19.3.1(react@19.3.1)
     dev: false
 
-  /react@18.3.1:
-    resolution: {integrity: sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==, tarball: https://registry.npmjs.org/react/-/react-18.3.1.tgz}
+  /react@19.3.1:
+    resolution: {integrity: sha512-QNhWdt7nrgVWWQG58QuGsAR3jv3Hbe4mb4vz7w2csnHavciZJgda1CPNaldF6eVxv90ud3jUXpKlHL69gO38yw==, tarball: https://registry.npmjs.org/react/-/react-19.3.1.tgz}
     engines: {node: '>=0.10.0'}
-    dependencies:
-      loose-envify: 1.4.0
     dev: false
 
   /read-cache@1.0.0:
@@ -2220,10 +2211,8 @@ packages:
     dependencies:
       queue-microtask: 1.2.3
 
-  /scheduler@0.23.2:
-    resolution: {integrity: sha512-UOShsPwz7NrMUqhR6t0hWjFduvOzbtv7toDH1/hIrfRNIDBnnBWd0CwJTGvTpngVlmwGCdP9/Zl/tVrDqcuYzQ==, tarball: https://registry.npmjs.org/scheduler/-/scheduler-0.23.2.tgz}
-    dependencies:
-      loose-envify: 1.4.0
+  /scheduler@0.28.0:
+    resolution: {integrity: sha512-juorfCmIkIw8tT+p5BXSm6PJjQF/ycEYmKyzURCIt/RaZIhL+PulbQ9Yu2z1HdOJDdqDTlxA1+xKBmHXJsczAw==, tarball: https://registry.npmjs.org/scheduler/-/scheduler-0.28.0.tgz}
     dev: false
 
   /semver@6.3.1:
@@ -2566,3 +2555,16 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==, tarball: https://registry.npmjs.org/yocto-queue/-/yocto-queue-0.1.0.tgz}
     engines: {node: '>=10'}
     dev: true
+
+  github.com/vpavlenko/librawl/872cc876970219dae73d92908cc8ebf363cda82f(react-dom@19.3.1)(react@19.3.1):
+    resolution: {tarball: https://codeload.github.com/vpavlenko/librawl/tar.gz/872cc876970219dae73d92908cc8ebf363cda82f}
+    id: github.com/vpavlenko/librawl/872cc876970219dae73d92908cc8ebf363cda82f
+    name: librawl
+    version: 0.4.1-local
+    peerDependencies:
+      react: ^19.0.0
+      react-dom: ^19.0.0
+    dependencies:
+      react: 19.3.1
+      react-dom: 19.3.1(react@19.3.1)
+    dev: false

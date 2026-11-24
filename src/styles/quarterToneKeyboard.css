@@ -60,7 +60,23 @@
   gap: 4px;
 }
 
+.quarter-settings,
+.quarter-transpose {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.quarter-transpose {
+  --rawlt-focus-color: #ffcc80;
+}
+
+.quarter-settings {
+  gap: 12px;
+}
+
 .quarter-select,
+.quarter-transpose,
 .quarter-shortcuts {
   color: #bcbcbc;
   font-size: 0.8125rem;
@@ -218,7 +234,7 @@
   box-shadow: inset 0 0 0 1px var(--pitch-color);
 }
 
-.quarter-keyboard :is(button, a):focus-visible {
+.quarter-keyboard :is(.quarter-select button, .quarter-layout-key, .quarter-options button, .quarter-header-links a):focus-visible {
   outline: 2px solid #ffcc80;
   outline-offset: 2px;
   position: relative;
