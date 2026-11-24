@@ -13,6 +13,8 @@ import "../styles/quarterToneKeyboard.css";
 const noteNames = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"];
 const scoreUrl = "https://rawl.rocks/f/riyad-al-sunbati-al-atlal";
 const stepsPerOctave = 24;
+// E half-flat, F half-sharp, A half-flat, and B half-flat.
+const repertoireQuartertones = new Set([7, 11, 17, 21]);
 const concertOctave = 4;
 const lastOctave = Math.floor(Math.max(...scoreSteps) / stepsPerOctave) - 1;
 const octaves = Array.from({ length: lastOctave - concertOctave + 1 }, (_, i) => concertOctave + i);
@@ -220,6 +222,7 @@ export function AlAtlalKeyboard() {
                       const heldPitch = activeKeys.get(code);
                       const pitch = firstSelectedStep + stringPitch(row, position, lowerStrings);
                       const shownPitch = heldPitch ?? pitch;
+                      const quartertone = shownPitch % 2 === 1;
                       return (
                         <button
                           className="quarter-layout-key"
@@ -229,10 +232,11 @@ export function AlAtlalKeyboard() {
                           title={pitchName(shownPitch)}
                           style={styleForStep(shownPitch, tonic)}
                           data-playing={heldPitch !== undefined}
+                          data-uncommon={quartertone && !repertoireQuartertones.has(shownPitch % stepsPerOctave)}
                           {...noteHandlers(pitch, code)}
                         >
                           {label}
-                          {shownPitch % 2 === 1 && <i className="quarter-layout-dot" aria-hidden="true" />}
+                          {quartertone && <i className="quarter-layout-dot" aria-hidden="true" />}
                         </button>
                       );
                     })}

@@ -156,6 +156,11 @@
   background: currentColor;
 }
 
+.quarter-layout-key[data-uncommon="true"] {
+  background: #000;
+  color: #767676;
+}
+
 .quarter-layout-key[data-playing="true"] {
   background: var(--pitch-ink);
   color: var(--pitch-color);
