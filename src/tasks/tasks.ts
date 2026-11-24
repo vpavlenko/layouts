@@ -60,7 +60,7 @@ const parseNoteString = (
   };
 };
 
-const KEYBOARD_ROWS = [
+export const KEYBOARD_ROWS = [
   [
     "Digit1",
     "Digit2",

@@ -1,0 +1,13 @@
+Arabic oud — kanun sample credits
+
+Recorded by Barış Bozkurt (barisbozkurt). Original sound and CC0 1.0 dedication:
+https://freesound.org/people/barisbozkurt/sounds/211133/
+https://creativecommons.org/publicdomain/zero/1.0/
+
+The isolated-note slices come from joetessy/qanun:
+https://github.com/joetessy/qanun/tree/781775a018735ba9e7f83f9d84d8ef326bcbc5f2/public/samples/qanun
+
+The keyboard uses the original per-note M4A slices retained by Rawl,
+byte-for-byte from the pinned bank. It uses Rawl's per-sample pitch calibration
+in playback and transposes the samples for intermediate and out-of-range pitches.
+https://rawl.rocks/audio/qanun/SOURCES.md

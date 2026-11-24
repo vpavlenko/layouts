@@ -1,21 +1,71 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { CSSProperties, PointerEvent, MouseEvent } from "react";
 import { ArrowUpRight } from "lucide-react";
-import { playQuarterTone, prepareQuarterTonePiano } from "../audio/quarterTonePiano";
+import { playQanunPitch, prepareQanun, stopQanun } from "../audio/quarterToneQanun";
 import { scoreSteps } from "../constants/alAtlal";
+import { KEY_DISPLAY_LABELS } from "../constants/keyboard";
+import { KEYBOARD_ROWS } from "../tasks/tasks";
+import { COLORS } from "../utils/colors";
+import { QuarterToneFall, trailLifetime } from "./QuarterToneFall";
+import type { PlayedPitch } from "./QuarterToneFall";
 import "../styles/quarterToneKeyboard.css";
 
 const noteNames = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"];
-const letterCodes = ["KeyQ", "KeyW", "KeyE", "KeyR", "KeyT", "KeyY", "KeyU", "KeyI", "KeyO", "KeyP", "BracketLeft", "BracketRight"];
-const numberCodes = ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9", "Digit0", "Minus", "Equal"];
-const letterLabels = "QWERTYUIOP[]";
-const numberLabels = "1234567890-=";
 const stepsPerOctave = 24;
-const firstOctave = Math.floor(Math.min(...scoreSteps) / stepsPerOctave) - 1;
+const concertOctave = 4;
 const lastOctave = Math.floor(Math.max(...scoreSteps) / stepsPerOctave) - 1;
-const octaves = Array.from({ length: lastOctave - firstOctave + 1 }, (_, i) => firstOctave + i);
+// C4, G3, D3, A2, F2, C2 in quartertone steps relative to the highest course.
+const openStrings = [0, -10, -20, -30, -38, -48];
+const lowerStringOffset = 2;
+const stringKeys = KEYBOARD_ROWS.map((row, index) =>
+  (index === 0 ? [...row, "Backspace"] : row).map((code, position) => ({
+    code,
+    label: KEY_DISPLAY_LABELS[code]?.toUpperCase() ?? "⌫",
+    row: index,
+    position,
+  }))
+);
+const keysByCode = new Map(stringKeys.flat().map((key) => [key.code, key]));
+const lowestOpen = openStrings[openStrings.length - 1];
+const firstStep = (concertOctave + 1) * stepsPerOctave + lowestOpen;
+const lastStep = (lastOctave + 2) * stepsPerOctave - 1;
+const pitchSteps = Array.from({ length: lastStep - firstStep + 1 }, (_, i) => firstStep + i);
+const octaveStarts = pitchSteps.filter((step) => step % stepsPerOctave === 0);
 const scorePitches = new Set(scoreSteps);
+const pitchShortcuts = new Map<number, string[]>();
 
-type Voice = ReturnType<typeof playQuarterTone>;
+function stringPitch(row: number, position: number, lower: boolean) {
+  return openStrings[row + (lower ? lowerStringOffset : 0)] + position;
+}
+
+for (const { code, label, row, position } of keysByCode.values()) {
+  for (const lower of [false, true]) {
+    const pitch = stringPitch(row, position, lower);
+    const shortcuts = pitchShortcuts.get(pitch) ?? [];
+    const key = code === "Backspace" ? code : label;
+    shortcuts.push(lower ? `Shift+${key}` : key);
+    pitchShortcuts.set(pitch, shortcuts);
+  }
+}
+
+// The score's Rawl analysis sets D as the reference for these colors.
+const defaultTonic = 4;
+const darkLabel = [true, false, true, false, true, false, true, true, false, true, true, true];
+const darkQuarterLabel = [true, false, false, true, true, true, true, false, false, true, true, true];
+
+function styleForStep(step: number, tonic: number): CSSProperties {
+  const relativeStep = (step - tonic) % stepsPerOctave;
+  const pitchClass = Math.floor(relativeStep / 2);
+  const lower = COLORS[pitchClass];
+  const upper = COLORS[(pitchClass + 1) % 12];
+  const quarter = relativeStep % 2 === 1;
+  const dark = (quarter ? darkQuarterLabel : darkLabel)[pitchClass];
+  return {
+    "--pitch-color": quarter ? `color-mix(in srgb, ${lower} 50%, ${upper})` : lower,
+    "--pitch-ink": dark ? "#000" : "#fff",
+    "--pitch-position": `${100 * (step - firstStep + 1) / (pitchSteps.length + 1)}%`,
+  } as CSSProperties;
+}
 
 function pitchName(step: number) {
   const octave = Math.floor(step / stepsPerOctave) - 1;
@@ -23,57 +73,92 @@ function pitchName(step: number) {
   return `${name}${octave}${step % 2 ? " +50¢" : ""}`;
 }
 
+type PlayedNote = PlayedPitch & { keyCode?: string };
+
 export function AlAtlalKeyboard() {
-  const [octave, setOctave] = useState(Math.max(firstOctave, Math.min(4, lastOctave)));
-  const [activeSteps, setActiveSteps] = useState<Set<number>>(() => new Set());
+  const [octave, setOctave] = useState(concertOctave);
+  const [lowerStrings, setLowerStrings] = useState(false);
+  const [tonic, setTonic] = useState(defaultTonic);
+  const [notes, setNotes] = useState<PlayedNote[]>([]);
   const [audioError, setAudioError] = useState(false);
-  const inputs = useRef(new Map<string, { step: number; voice: Voice }>());
+  const inputs = useRef(new Map<string, { id: number; cancel: () => void }>());
+  const nextNote = useRef(0);
+  const scroll = useRef<HTMLDivElement>(null);
+  const firstSelectedStep = (octave + 1) * stepsPerOctave;
+  const activeNotes = notes.filter(({ endedAt }) => endedAt === null);
+  const activeSteps = new Set(activeNotes.map(({ step }) => step));
+  const activeKeys = new Map(activeNotes.map(({ keyCode, step }) => [keyCode, step]));
 
   useEffect(() => {
-    document.title = "Al Atlal · Quarter-tone keyboard";
-    prepareQuarterTonePiano(octaves.flatMap((bank) =>
-      Array.from({ length: stepsPerOctave }, (_, step) => (bank + 1) * stepsPerOctave + step)
-    ));
+    document.title = "Arabic oud";
+    prepareQanun(pitchSteps);
     return () => { document.title = "Rawl Layouts"; };
   }, []);
 
-  const updateActive = useCallback(() => {
-    setActiveSteps(new Set(Array.from(inputs.current.values(), ({ step }) => step)));
-  }, []);
+  useEffect(() => {
+    const view = scroll.current;
+    if (!view) return;
+    const showOctave = () => {
+      const low = stringPitch(stringKeys.length - 1, 0, lowerStrings);
+      const high = stringPitch(0, stringKeys[0].length - 1, lowerStrings);
+      const centerStep = firstSelectedStep + (low + high) / 2;
+      const center = (centerStep - firstStep + 1) / (pitchSteps.length + 1);
+      view.scrollLeft = view.scrollWidth * center - view.clientWidth / 2;
+    };
+    showOctave();
+    window.addEventListener("resize", showOctave);
+    return () => window.removeEventListener("resize", showOctave);
+  }, [firstSelectedStep, lowerStrings]);
 
-  const press = useCallback((input: string, step: number) => {
-    inputs.current.get(input)?.voice.cancel();
+  const press = useCallback((input: string, step: number, keyCode?: string) => {
+    const previous = inputs.current.get(input);
+    previous?.cancel();
+    const now = performance.now();
+    const id = nextNote.current++;
     setAudioError(false);
-    inputs.current.set(input, { step, voice: playQuarterTone(step, () => setAudioError(true)) });
-    updateActive();
-  }, [updateActive]);
+    inputs.current.set(input, { id, cancel: playQanunPitch(step, () => setAudioError(true)) });
+    setNotes((current) => [
+      ...current.filter((note) => note.endedAt === null || now - note.endedAt < trailLifetime)
+        .map((note) => note.id === previous?.id ? { ...note, endedAt: now } : note),
+      { id, step, startedAt: now, endedAt: null, keyCode },
+    ]);
+  }, []);
 
   const release = useCallback((input: string, cancel = false) => {
     const held = inputs.current.get(input);
     if (!held) return;
-    if (cancel) held.voice.cancel();
-    else held.voice.release();
+    if (cancel) held.cancel();
     inputs.current.delete(input);
-    updateActive();
-  }, [updateActive]);
+    const now = performance.now();
+    setNotes((current) => current.map((note) => note.id === held.id ? { ...note, endedAt: now } : note));
+  }, []);
 
   const stopAll = useCallback(() => {
-    for (const { voice } of inputs.current.values()) voice.cancel();
+    stopQanun();
     inputs.current.clear();
-    updateActive();
-  }, [updateActive]);
+    setLowerStrings(false);
+    const now = performance.now();
+    setNotes((current) => current.map((note) => note.endedAt === null ? { ...note, endedAt: now } : note));
+  }, []);
 
   useEffect(() => {
     function keydown(event: KeyboardEvent) {
       if (event.defaultPrevented || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
-      const letter = letterCodes.indexOf(event.code);
-      const number = numberCodes.indexOf(event.code);
-      if (letter < 0 && number < 0) return;
+      setLowerStrings(event.shiftKey);
+      if (event.code === "ArrowUp" || event.code === "ArrowDown") {
+        event.preventDefault();
+        const delta = event.code === "ArrowUp" ? 1 : -1;
+        setOctave((value) => Math.min(lastOctave, Math.max(concertOctave, value + delta)));
+        return;
+      }
+      const key = keysByCode.get(event.code);
+      if (!key) return;
       event.preventDefault();
-      const step = letter >= 0 ? letter * 2 : number * 2 + 1;
-      press(event.code, (octave + 1) * stepsPerOctave + step);
+      const step = stringPitch(key.row, key.position, event.shiftKey);
+      press(event.code, firstSelectedStep + step, event.code);
     }
     function keyup(event: KeyboardEvent) {
+      setLowerStrings(event.shiftKey);
       release(event.code);
     }
     window.addEventListener("keydown", keydown);
@@ -82,7 +167,7 @@ export function AlAtlalKeyboard() {
       window.removeEventListener("keydown", keydown);
       window.removeEventListener("keyup", keyup);
     };
-  }, [octave, press, release]);
+  }, [firstSelectedStep, press, release]);
 
   useEffect(() => {
     function visibilityChange() {
@@ -97,82 +182,111 @@ export function AlAtlalKeyboard() {
     };
   }, [stopAll]);
 
+  function noteHandlers(step: number, keyCode?: string) {
+    return {
+      onPointerDown(event: PointerEvent<HTMLButtonElement>) {
+        if (event.button !== 0 || event.metaKey) return;
+        event.currentTarget.setPointerCapture(event.pointerId);
+        press(`pointer:${event.pointerId}`, step, keyCode);
+      },
+      onPointerUp: (event: PointerEvent) => release(`pointer:${event.pointerId}`),
+      onPointerCancel: (event: PointerEvent) => release(`pointer:${event.pointerId}`, true),
+      onLostPointerCapture: (event: PointerEvent) => release(`pointer:${event.pointerId}`, true),
+      onClick(event: MouseEvent) {
+        if (event.metaKey) {
+          setTonic(step % stepsPerOctave);
+          return;
+        }
+        if (event.detail !== 0) return;
+        press("button", step, keyCode);
+        release("button");
+      },
+    };
+  }
+
   return (
     <main className="quarter-keyboard">
       <header className="quarter-header">
-        <div>
-          <p>Riyad al-Sunbati</p>
-          <h1>Al Atlal</h1>
+        <h1>Arabic oud</h1>
+        <div className="quarter-header-links">
+          <a href={`${import.meta.env.BASE_URL}kanun-sources.txt`}>Kanun credits</a>
+          <a href="https://rawl.rocks/f/riyad-al-sunbati-al-atlal">
+            Rawl <ArrowUpRight size={15} aria-hidden="true" />
+          </a>
         </div>
-        <a href="https://rawl.rocks/f/riyad-al-sunbati-al-atlal">
-          Rawl <ArrowUpRight size={15} aria-hidden="true" />
-        </a>
       </header>
 
       <div className="quarter-toolbar">
-        <div className="quarter-select" role="group" aria-label="Keyboard octave">
-          <span>Octave</span>
-          {octaves.map((bank) => (
-            <button key={bank} type="button" aria-pressed={octave === bank} onClick={() => setOctave(bank)}>
-              {bank}
-            </button>
-          ))}
+        <div className="quarter-shortcuts">
+          <span title="Lower strings"><kbd>Shift</kbd> ↓↓</span>
         </div>
-        <span className="quarter-legend"><i aria-hidden="true" /> Score pitches</span>
-      </div>
-
-      <div className="quarter-banks">
-        {octaves.map((bank) => (
-          <section className="quarter-bank" key={bank} aria-label={`Octave ${bank}`}>
-            <span className="quarter-octave" aria-hidden="true">{bank}</span>
-            <div className="quarter-keys">
-              {noteNames.map((name, pitch) => (
-                <div className="quarter-column" key={name}>
-                  {[0, 1].map((offset) => {
-                    const step = (bank + 1) * stepsPerOctave + pitch * 2 + offset;
-                    const label = pitchName(step);
-                    const inScore = scorePitches.has(step);
-                    const shortcut = (offset ? numberLabels : letterLabels)[pitch];
-                    const playing = activeSteps.has(step);
+        <div className="quarter-key-layout" role="group" aria-label="Oud strings">
+          {stringKeys.map((keys, row) => {
+            const openName = pitchName(firstSelectedStep + stringPitch(row, 0, lowerStrings));
+            return (
+              <div className="quarter-string" key={row} role="group" aria-label={openName}>
+                <span className="quarter-string-note" aria-hidden="true">{openName}</span>
+                <div className="quarter-key-row">
+                  {keys.map(({ code, label, position }) => {
+                    const heldPitch = activeKeys.get(code);
+                    const pitch = firstSelectedStep + stringPitch(row, position, lowerStrings);
+                    const shownPitch = heldPitch ?? pitch;
                     return (
                       <button
-                        key={step}
+                        className="quarter-layout-key"
+                        key={code}
                         type="button"
-                        className="quarter-key"
-                        data-offset={offset}
-                        data-accidental={name.length > 1}
-                        data-playing={playing}
-                        aria-label={label}
-                        aria-description={inScore ? "Score pitch" : undefined}
-                        aria-keyshortcuts={octave === bank ? shortcut : undefined}
-                        title={label}
-                        onPointerDown={(event) => {
-                          if (event.button !== 0) return;
-                          event.currentTarget.setPointerCapture(event.pointerId);
-                          press(`pointer:${event.pointerId}`, step);
-                        }}
-                        onPointerUp={(event) => release(`pointer:${event.pointerId}`)}
-                        onPointerCancel={(event) => release(`pointer:${event.pointerId}`, true)}
-                        onLostPointerCapture={(event) => release(`pointer:${event.pointerId}`, true)}
-                        onClick={(event) => {
-                          if (event.detail !== 0) return;
-                          press("button", step);
-                          release("button");
-                        }}
+                        aria-label={code === "Backspace" ? code : undefined}
+                        title={pitchName(shownPitch)}
+                        style={styleForStep(shownPitch, tonic)}
+                        data-playing={heldPitch !== undefined}
+                        {...noteHandlers(pitch, code)}
                       >
-                        {inScore && <i className="quarter-dot" aria-hidden="true" />}
-                        <span className="quarter-note">{name}{offset === 1 && <sup>+50¢</sup>}</span>
-                        {octave === bank && <kbd aria-hidden="true">{shortcut}</kbd>}
+                        {label}
+                        {shownPitch % 2 === 1 && <i className="quarter-layout-dot" aria-hidden="true" />}
                       </button>
                     );
                   })}
                 </div>
-              ))}
-            </div>
-          </section>
-        ))}
+              </div>
+            );
+          })}
+        </div>
+        <span className="quarter-legend"><i aria-hidden="true" /> Score pitches</span>
       </div>
+
       {audioError && <p className="quarter-error" role="status">Audio unavailable</p>}
+      <div className="quarter-piano-scroll" ref={scroll}>
+        <div className="quarter-piano-stage" style={{ "--lane": `${100 / (pitchSteps.length + 1)}%` } as CSSProperties}>
+          <div className="quarter-piano" role="group" aria-label="Piano keys">
+            {pitchSteps.map((step) => {
+              const offset = step % 2;
+              const isC = step % stepsPerOctave === 0;
+              const name = pitchName(step);
+              const inScore = scorePitches.has(step);
+              return (
+                <button
+                  key={step}
+                  type="button"
+                  className="quarter-key"
+                  data-offset={offset}
+                  data-playing={activeSteps.has(step)}
+                  aria-label={name}
+                  aria-description={inScore ? "Score pitch" : undefined}
+                  aria-keyshortcuts={pitchShortcuts.get(step - firstSelectedStep)?.join(" ")}
+                  title={name}
+                  style={styleForStep(step, tonic)}
+                  {...noteHandlers(step)}
+                >
+                  {inScore && <i className="quarter-dot" aria-hidden="true" />}
+                  {offset ? <span>+50</span> : <span>{isC ? name : name.slice(0, -1)}</span>}
+                </button>
+              );
+            })}
+          </div>
+          <QuarterToneFall notes={notes} styleForStep={(step) => styleForStep(step, tonic)} octaveStarts={octaveStarts} />
+        </div>
+      </div>
     </main>
   );
 }

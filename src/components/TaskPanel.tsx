@@ -37,7 +37,7 @@ export const TaskPanel: React.FC<TaskPanelProps> = React.memo(
           <div className="flex items-center justify-between">
             <div>
               <div className="text-lg text-white">{currentTask.title}</div>
-              <Link to="/layouts/al-atlal" className="text-sm text-gray-300 underline outline-offset-2 focus-visible:outline focus-visible:outline-amber-300">Al Atlal</Link>
+              <Link to="/layouts/al-atlal" className="text-sm text-gray-300 underline outline-offset-2 focus-visible:outline focus-visible:outline-amber-300">Arabic oud</Link>
             </div>
             <Layout
               keyboardState={{
