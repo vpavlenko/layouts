@@ -1,25 +1,32 @@
-export const oudScores = [
-  {
-    label: "Al Atlal",
-    title: "Al Atlal",
-    url: "https://rawl.rocks/f/riyad-al-sunbati-al-atlal",
-  },
-  {
-    label: "Samai Bayati",
-    title: "Ibrahim Al Aryan Samai Bayati Score",
-    url: "https://rawl.rocks/f/ibrahim-al-aryan-samai-bayati-score",
-  },
-  {
-    label: "Samai Huzam",
-    title: "Muhammad Abd Al Wahhab Samai Huzam",
-    url: "https://rawl.rocks/f/muhammad-abd-al-wahhab-samai-huzam",
-  },
-  {
-    label: "Hijazkar Kurd",
-    title: "Tatyos Efendi Samai Hijazkar Kurd",
-    url: "https://rawl.rocks/f/tatyos-efendi-samai-hijazkar-kurd",
-  },
+// Rawl's maqam corpora and the separately published Gamil Gamal.
+// Keep the original picker entries first.
+const rawlScores = [
+  ["riyad-al-sunbati-al-atlal", "Al Atlal"],
+  ["ibrahim-al-aryan-samai-bayati-score", "Ibrahim Al Aryan Samai Bayati Score", "Samai Bayati"],
+  ["muhammad-abd-al-wahhab-samai-huzam", "Muhammad Abd Al Wahhab Samai Huzam", "Samai Huzam"],
+  ["tatyos-efendi-samai-hijazkar-kurd", "Tatyos Efendi Samai Hijazkar Kurd", "Hijazkar Kurd"],
+  ["samai-bayati-qadim", "Samai Bayati Qadim"],
+  ["abraham-salman-taksim-bayat-mawzoun", "Taksim bayat mawzoun"],
+  ["rei-korkus-ibrahim-al-aryan-samai-bayati", "Samai Bayati | Ibrahim Al Aryan - Rei Korkus"],
+  ["muhammad-abd-al-wahhab-inta-omri", "Inta Omri"],
+  ["rawhi-al-khammash-samai-nahawand", "Samai Nahawend"],
+  ["riyad-al-sunbati-taqsim-nahawand", "Taqsim Nahawand"],
+  ["riyad-al-sunbati-taqsim-hijaz", "Taqsim Hijaz"],
+  ["riyad-al-sunbati-taqsim-bayyati", "Taqsim Bayyati"],
+  ["riyad-al-sunbati-taqsim-rast", "Taqsim Rast"],
+  ["riyad-al-sunbati-taqsim-kurd", "Taqsim Kurd"],
+  ["riyad-al-sunbati-taqsim-sekah", "Taqsim Sekah"],
+  ["mohamed-elabyad-al-atlal", "Mohamed Elabyad Al Atlal"],
+  ["riyad-al-sunbati-awwidt-ayni", "Awwidt Ayni"],
+  ["riyad-al-sunbati-arouh-limeen", "Arouh Limeen"],
+  ["farid-al-atrash-gamil-gamal", "Farid Al Atrash Gamil Gamal", "Gamil Gamal"],
 ] as const;
+
+export const oudScores = rawlScores.map(([slug, title, label = title]) => ({
+  label,
+  title,
+  url: `https://rawl.rocks/f/${slug}`,
+}));
 
 interface OudMaqam {
   name: string;
