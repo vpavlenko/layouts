@@ -239,7 +239,7 @@ export function AlAtlalKeyboard() {
                           title={pitchName(shownPitch)}
                           style={styleForStep(shownPitch, tonic)}
                           data-playing={heldPitch !== undefined}
-                          data-uncommon={quartertone && !repertoireQuartertones.has(shownPitch % stepsPerOctave)}
+                          data-uncommon={maqam === null && quartertone && !repertoireQuartertones.has(shownPitch % stepsPerOctave)}
                           data-outside-maqam={maqam !== null && !maqam.steps.includes(relativePitch(shownPitch, tonic))}
                           {...noteHandlers(pitch, code)}
                         >
