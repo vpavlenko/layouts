@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AlAtlalKeyboard } from "./components/AlAtlalKeyboard";
+import { OUD_PATH } from "./constants/routes";
 import "./styles/keyboard.css";
 import { TASK_CONFIGS } from "./tasks/tasks";
 
@@ -28,7 +29,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/layouts/al-atlal" element={<AlAtlalKeyboard />} />
+        <Route path={OUD_PATH} element={<AlAtlalKeyboard />} />
+        <Route path="/layouts/al-atlal" element={<Navigate to={OUD_PATH} replace />} />
         <Route path="/layouts/:slug" element={<Suspense fallback={null}><PianoController /></Suspense>} />
         <Route
           path="/layouts"

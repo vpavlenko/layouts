@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { KeyboardMapping } from "../constants/keyboard";
+import { OUD_PATH } from "../constants/routes";
 import { Layout } from "./Layout";
 import { TASK_CONFIGS, TaskConfig } from "../tasks/tasks";
 
@@ -37,7 +38,7 @@ export const TaskPanel: React.FC<TaskPanelProps> = React.memo(
           <div className="flex items-center justify-between">
             <div>
               <div className="text-lg text-white">{currentTask.title}</div>
-              <Link to="/layouts/al-atlal" className="text-sm text-gray-300 underline outline-offset-2 focus-visible:outline focus-visible:outline-amber-300">Arabic oud</Link>
+              <Link to={OUD_PATH} className="text-sm text-gray-300 underline outline-offset-2 focus-visible:outline focus-visible:outline-amber-300">Arabic oud</Link>
             </div>
             <Layout
               keyboardState={{
